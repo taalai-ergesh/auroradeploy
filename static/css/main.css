@@ -757,9 +757,6 @@
       position: relative;
       z-index: 1;
     }
-    .product-photo img.img-broken, .thumb img.img-broken {
-      opacity: 0;
-    }
     .product-photo::before, .thumb::before {
       content: "";
       position: absolute;

@@ -583,22 +583,12 @@
           img.classList.add("img-loaded");
           if (container) container.classList.add("img-ready");
         }
-        function markBroken() {
-          img.classList.add("img-broken");
-          if (container) container.classList.add("img-ready");
-        }
         if (img.complete && img.naturalWidth > 0) {
           markLoaded();
-        } else if (img.complete) {
-          markBroken();
         } else {
           img.addEventListener("load", markLoaded);
-          img.addEventListener("error", markBroken);
-          setTimeout(function () {
-            if (!img.classList.contains("img-loaded") && !img.classList.contains("img-broken")) {
-              if (img.naturalWidth > 0) { markLoaded(); } else { markBroken(); }
-            }
-          }, 2500);
+          img.addEventListener("error", markLoaded);
+          setTimeout(markLoaded, 2500);
         }
       });
     }

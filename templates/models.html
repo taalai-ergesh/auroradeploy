@@ -88,7 +88,7 @@
       {% if build %}
         <div class="card-top" style="align-items:center;">
           <div style="display:flex; align-items:center; gap:0.8rem;">
-            <span class="thumb"><img src="{{ url_for('static', filename='images/products/' + build.product.slug + '.jpg') }}?v=3" alt="{{ build.product.name }}"></span>
+            <span class="thumb"><img src="{{ url_for('static', filename='images/products/' + build.product.slug + '.jpg') }}" alt="{{ build.product.name }}"></span>
             <div>
               <h2 style="margin:0;">{{ row.build_label }}</h2>
               {% if build.product.slug == 'h100x8' %}
@@ -276,7 +276,7 @@
         var label = (r.count === 1 ? "" : r.count + "x ") + r.product.name;
         return '<div class="sim-row ' + statusClass + '" style="animation-delay:' + (idx * 0.12) + 's;" data-slug="' + r.product.slug + '">' +
           '<div class="sim-row-top">' +
-          '<span class="thumb sim-thumb"><img src="/static/images/products/' + r.product.slug + '.jpg?v=3" alt=""></span>' +
+          '<span class="thumb sim-thumb"><img src="/static/images/products/' + r.product.slug + '.jpg" alt=""></span>' +
           '<div class="sim-row-name"><strong>' + escapeHtml(label) + '</strong>' +
           (isRecommended ? ' <span class="sim-badge">Cheapest that fits</span>' : '') +
           '<span class="sim-row-sub">' + escapeHtml(r.product.category) + '</span></div>' +
@@ -291,8 +291,6 @@
           '<div class="sim-row-note">' + escapeHtml(r.note) + '</div>' +
           '</div>';
       }).join("");
-
-      if (typeof wireImageSkeletons === "function") wireImageSkeletons(result);
 
       var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       var rows = result.querySelectorAll(".sim-row");
