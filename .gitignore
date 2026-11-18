@@ -20,3 +20,4 @@ aistore_db.sql
 .idea/
 *.swp
 *.swo
+*.bak

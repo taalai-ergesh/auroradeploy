@@ -1,9 +1,11 @@
+import base64
 import math
 import os
 from datetime import datetime
+from functools import wraps
 
 import psycopg2
-from flask import Flask, abort, redirect, render_template, request, url_for
+from flask import Flask, Response, abort, redirect, render_template, request, url_for
 from markupsafe import Markup
 
 DATABASE_URL = os.environ["DATABASE_URL"]
@@ -296,6 +298,29 @@ SPEC_DATE = "July 2026"  # last date specs/pricing were checked against public l
 
 REQUEST_STATUSES = ("New", "Reviewed", "Contacted")
 
+
+def _admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        admin_pass = os.environ.get("ADMIN_PASSWORD", "")
+        auth = request.headers.get("Authorization", "")
+        if auth.startswith("Basic "):
+            try:
+                credentials = base64.b64decode(auth[6:]).decode()
+                _, password = credentials.split(":", 1)
+                if not admin_pass or password == admin_pass:
+                    return f(*args, **kwargs)
+            except Exception:
+                pass
+        elif not admin_pass:
+            return f(*args, **kwargs)
+        return Response(
+            "Admin access required.",
+            401,
+            {"WWW-Authenticate": 'Basic realm="Admin"'},
+        )
+    return decorated
+
 GLOSSARY = {
     "GDDR7": "A fast memory type used on desktop and workstation graphics cards. Cheaper per gigabyte than the HBM used in datacenter GPUs, but with less total bandwidth.",
     "HBM3": "\"High Bandwidth Memory\" — memory stacked directly on the GPU chip itself for very fast, very close access. Used in datacenter GPUs like the H100, not desktop cards.",
@@ -307,7 +332,7 @@ GLOSSARY = {
     "mixture of experts": "An AI model design that splits its knowledge into many specialized \"expert\" sub-networks. Only a handful of experts activate for any given word, so it computes faster than its size suggests — but all the experts still have to be sitting in memory, ready to be picked.",
     "20% working room": "Extra memory on top of the raw model weights, reserved for what a model needs while actually generating text — things like the KV cache and activation buffers. Real deployments almost never fit with zero headroom.",
     "price-sourcing": "Checked against NVIDIA's own product listings and major retailers (B&H, Micro Center, NVIDIA's marketplace) as of July 2026 — real published prices, not estimates.",
-    "Parameters (billions)": "A model's total parameter count, in billions — the \"B\" in a name like Qwen3.5-397B (397 billion). This is the single number that determines how much memory the model needs: roughly 1 GB of memory per billion parameters at standard 16-bit precision.",
+    "Parameters (billions)": "A model's total parameter count, in billions — the \"B\" in a name like Qwen3.5-397B (397 billion). This is the single number that determines how much memory the model needs: roughly 2 GB of memory per billion parameters at standard 16-bit precision (or ~1 GB at 8-bit, ~0.5 GB at 4-bit).",
     "Precision": "How many bits are used to store each parameter. 16-bit is the common default and the safest estimate; 8-bit and 4-bit are \"quantized\" versions that use fewer bits per parameter, which shrinks memory needs roughly in proportion (8-bit ≈ half the memory, 4-bit ≈ a quarter) but can reduce output quality somewhat. See the Quantization section below for the full explanation.",
 }
 
@@ -783,6 +808,7 @@ def quote():
 
 
 @app.route("/requests")
+@_admin_required
 def requests_list():
     with psycopg2.connect(DATABASE_URL) as conn, conn.cursor() as cur:
         cur.execute(
@@ -807,6 +833,7 @@ def requests_list():
 
 
 @app.route("/requests/<int:request_id>/status", methods=["POST"])
+@_admin_required
 def update_request_status(request_id):
     new_status = request.form.get("status")
     if new_status not in REQUEST_STATUSES:
@@ -818,6 +845,7 @@ def update_request_status(request_id):
 
 
 @app.route("/requests/<int:request_id>/print")
+@_admin_required
 def print_quote(request_id):
     with psycopg2.connect(DATABASE_URL) as conn, conn.cursor() as cur:
         cur.execute(
@@ -851,4 +879,4 @@ def print_quote(request_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=False)
