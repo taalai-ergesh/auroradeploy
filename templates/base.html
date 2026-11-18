@@ -27,7 +27,7 @@
       document.documentElement.setAttribute("data-simple", simple ? "on" : "off");
     })();
   </script>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=2">
 </head>
 <body>
   <div id="datacenter-depth-grid" aria-hidden="true"></div>
@@ -218,6 +218,6 @@
       { name: "FAQ", sub: "Plain-language answers", href: "{{ url_for('faq') }}" },
     ];
   </script>
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=2"></script>
 </body>
 </html>
