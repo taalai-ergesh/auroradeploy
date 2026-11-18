@@ -4,7 +4,7 @@
 {% block content %}
   <section class="hero-enterprise">
     <canvas id="hero-particles"></canvas>
-    <img src="{{ url_for('static', filename='images/products/gb300nvl72.jpg') }}" alt="NVIDIA GB300 NVL72 rack" class="hero-enterprise-bg">
+    <img src="{{ url_for('static', filename='images/products/gb300nvl72.jpg') }}?v=2" alt="NVIDIA GB300 NVL72 rack" class="hero-enterprise-bg">
     <div class="hero-grid" aria-hidden="true"></div>
     <div class="hero-enterprise-scrim"></div>
     <div class="hero-enterprise-content hero-split">
@@ -375,7 +375,7 @@
               data-name="{{ p.name }}" data-memory="{{ p.memory_gb }}" data-watts="{{ p.watts }}" data-price="{{ p.price }}">
             <td>
               <div style="display:flex; align-items:center; gap:0.7rem;">
-                <span class="thumb"><img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}" loading="lazy" width="40" height="40"></span>
+                <span class="thumb"><img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}?v=2" alt="{{ p.name }}" loading="lazy" width="40" height="40"></span>
                 <div>
                   <div style="font-weight:700;">{{ p.name }}</div>
                   <div style="color:var(--text-dim); font-size:0.78rem;">{{ p.category }}</div>
@@ -432,7 +432,7 @@
       {% set meters = meters_by_slug[p.slug] %}
       <div class="card hoverable card-glow" id="product-{{ p.slug }}" data-category="{{ p.category }}">
         <div class="product-photo">
-          <img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}" loading="lazy">
+          <img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}?v=2" alt="{{ p.name }}" loading="lazy">
           <span class="product-icon-badge">{{ icons.category(p.category) }}</span>
           <button type="button" class="quickview-btn" data-slug="{{ p.slug }}" style="position:absolute; bottom:0.7rem; right:0.7rem;">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" stroke="currentColor" stroke-width="1.8"></path><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"></circle></svg>
@@ -528,7 +528,7 @@
       {% set pc = power_context(p.watts) %}
       <div id="qv-source-{{ p.slug }}">
         <div class="product-photo" style="margin-bottom:1.3rem;">
-          <img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}" loading="lazy">
+          <img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}?v=2" alt="{{ p.name }}" loading="lazy">
         </div>
         <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.6rem;">
           <span class="pill">{{ p.category }}</span>
@@ -1615,7 +1615,7 @@
           var label = (r.count === 1 ? "" : r.count + "x ") + r.product.name;
           return '<div class="sim-row ' + statusClass + '" style="animation-delay:' + (idx * 0.1) + 's;">' +
             '<div class="sim-row-top">' +
-            '<span class="thumb sim-thumb"><img src="/static/images/products/' + r.product.slug + '.jpg" alt=""></span>' +
+            '<span class="thumb sim-thumb"><img src="/static/images/products/' + r.product.slug + '.jpg?v=2" alt=""></span>' +
             '<div class="sim-row-name"><strong>' + escapeHtmlHome(label) + '</strong>' +
             (isRecommended ? ' <span class="sim-badge">Cheapest that fits</span>' : '') +
             '<span class="sim-row-sub">' + escapeHtmlHome(r.product.category) + '</span></div>' +

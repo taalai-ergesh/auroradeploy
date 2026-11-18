@@ -38,7 +38,7 @@
     <div class="card build-reveal">
       <div class="card-top">
         <div style="display:flex; align-items:center; gap:0.8rem;">
-          <span class="thumb"><img src="{{ url_for('static', filename='images/products/' + build.product.slug + '.jpg') }}" alt="{{ build.product.name }}"></span>
+          <span class="thumb"><img src="{{ url_for('static', filename='images/products/' + build.product.slug + '.jpg') }}?v=2" alt="{{ build.product.name }}"></span>
           <div>
             <h2 style="margin:0;">{{ build_label }}</h2>
             {% if build.product.slug == 'h100x8' %}
