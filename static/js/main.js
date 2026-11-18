@@ -583,12 +583,19 @@
           img.classList.add("img-loaded");
           if (container) container.classList.add("img-ready");
         }
+        function markFailed() {
+          if (container) container.classList.add("img-ready");
+        }
         if (img.complete && img.naturalWidth > 0) {
           markLoaded();
+        } else if (img.complete) {
+          markFailed();
         } else {
           img.addEventListener("load", markLoaded);
-          img.addEventListener("error", markLoaded);
-          setTimeout(markLoaded, 2500);
+          img.addEventListener("error", markFailed);
+          setTimeout(function () {
+            if (!img.classList.contains("img-loaded")) markFailed();
+          }, 2500);
         }
       });
     }
