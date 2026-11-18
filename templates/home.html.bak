@@ -1,0 +1,2077 @@
+{% extends "base.html" %}
+{% import "icons.html" as icons %}
+{% block title %}{{ STORE_NAME }} — Catalog{% endblock %}
+{% block content %}
+  <section class="hero-enterprise">
+    <canvas id="hero-particles"></canvas>
+    <img src="{{ url_for('static', filename='images/products/gb300nvl72.jpg') }}" alt="NVIDIA GB300 NVL72 rack" class="hero-enterprise-bg">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-enterprise-scrim"></div>
+    <div class="hero-enterprise-content hero-split">
+      <div class="hero-glass">
+        <span class="pill" style="background:rgba(255,255,255,0.14); color:#fff;">GPU infrastructure procurement</span>
+        <h1 style="color:#fff; margin-top:0.9rem;">GPU hardware for training and inference.</h1>
+        <p class="subtitle" style="color:rgba(255,255,255,0.82); max-width:560px;">
+          Desktop cards through full datacenter racks, priced against current listings and
+          specified in the terms that determine fit: GPU memory, power draw, and lead time.
+        </p>
+        <div style="display:flex; gap:0.8rem; flex-wrap:wrap; margin-top:0.4rem;">
+          <a href="#catalog-grid" class="btn btn-glow">Browse hardware</a>
+          <a href="{{ url_for('configurator') }}" class="btn-secondary" style="background:rgba(255,255,255,0.08); color:#fff; border-color:rgba(255,255,255,0.25);">Build Configurator</a>
+        </div>
+
+        <ul class="trust-strip">
+          <li><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12l5 5L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg> Verified specifications</li>
+          <li><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12l5 5L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg> Manufacturer warranty applies</li>
+          <li><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12l5 5L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg> Direct manufacturer support</li>
+          <li><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12l5 5L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg> No fantasy pricing</li>
+        </ul>
+      </div>
+
+      <div class="hero-chip-wrap" aria-hidden="true">
+        <div class="hero-chip-glow"></div>
+        <svg class="hero-rack-svg" viewBox="0 0 300 420" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Animated illustration of a server rack with glowing GPU sleds">
+          <!-- Backplane traces running the height of the rack, with a flowing pulse -->
+          <g stroke="#8fd400" stroke-width="1.4" stroke-linecap="round" opacity="0.55">
+            <path class="trace" d="M18 24 V396" />
+            <path class="trace" d="M282 24 V396" />
+          </g>
+          <!-- Traveling light pulses along the backplane -->
+          <g class="rack-pulse-group">
+            <circle class="rack-pulse" cx="18" cy="0" r="3.2" fill="#a3e600"/>
+            <circle class="rack-pulse rack-pulse-2" cx="282" cy="0" r="3.2" fill="#a3e600"/>
+          </g>
+
+          <!-- Rack frame -->
+          <rect class="hero-rack-frame" x="10" y="14" width="280" height="392" rx="14" fill="rgba(5,10,6,0.7)" stroke="#8fd400" stroke-width="2"/>
+
+          <!-- 5 GPU sleds — each slides into the chassis on load, then idles -->
+          <g class="rack-sled">
+            <g class="rack-sled-inner">
+              <rect x="26" y="30" width="248" height="62" rx="6" fill="rgba(10,20,6,0.7)" stroke="rgba(143,212,0,0.5)" stroke-width="1.4"/>
+              <rect class="sled-die" x="38" y="42" width="130" height="38" rx="4" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1.2"/>
+              <g stroke="rgba(163,230,0,0.4)" stroke-width="0.8"><path d="M50 42 V80 M65 42 V80 M80 42 V80 M95 42 V80 M110 42 V80 M125 42 V80 M140 42 V80 M155 42 V80"/></g>
+              <g class="hero-fan" style="transform-origin: 226px 61px;">
+                <circle cx="226" cy="61" r="17" fill="rgba(5,10,6,0.8)" stroke="#8fd400" stroke-width="1.4"/>
+                <path d="M226 61 L226 47 M226 61 L238 68 M226 61 L214 68" stroke="#a3e600" stroke-width="2" stroke-linecap="round"/>
+              </g>
+              <g class="hero-led"><circle cx="34" cy="86" r="1.8" fill="#a3e600"/><circle cx="42" cy="86" r="1.8" fill="#f0b64c"/></g>
+            </g>
+          </g>
+          <g class="rack-sled" transform="translate(0,80)">
+            <g class="rack-sled-inner">
+              <rect x="26" y="30" width="248" height="62" rx="6" fill="rgba(10,20,6,0.7)" stroke="rgba(143,212,0,0.5)" stroke-width="1.4"/>
+              <rect class="sled-die" x="38" y="42" width="130" height="38" rx="4" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1.2"/>
+              <g stroke="rgba(163,230,0,0.4)" stroke-width="0.8"><path d="M50 42 V80 M65 42 V80 M80 42 V80 M95 42 V80 M110 42 V80 M125 42 V80 M140 42 V80 M155 42 V80"/></g>
+              <g class="hero-fan hero-fan-rev" style="transform-origin: 226px 61px;">
+                <circle cx="226" cy="61" r="17" fill="rgba(5,10,6,0.8)" stroke="#8fd400" stroke-width="1.4"/>
+                <path d="M226 61 L226 47 M226 61 L238 68 M226 61 L214 68" stroke="#a3e600" stroke-width="2" stroke-linecap="round"/>
+              </g>
+              <g class="hero-led" style="animation-delay:0.3s;"><circle cx="34" cy="86" r="1.8" fill="#a3e600"/><circle cx="42" cy="86" r="1.8" fill="#f0b64c"/></g>
+            </g>
+          </g>
+          <g class="rack-sled" transform="translate(0,160)">
+            <g class="rack-sled-inner">
+              <rect x="26" y="30" width="248" height="62" rx="6" fill="rgba(10,20,6,0.7)" stroke="rgba(143,212,0,0.5)" stroke-width="1.4"/>
+              <rect class="sled-die" x="38" y="42" width="130" height="38" rx="4" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1.2"/>
+              <g stroke="rgba(163,230,0,0.4)" stroke-width="0.8"><path d="M50 42 V80 M65 42 V80 M80 42 V80 M95 42 V80 M110 42 V80 M125 42 V80 M140 42 V80 M155 42 V80"/></g>
+              <g class="hero-fan" style="transform-origin: 226px 61px;">
+                <circle cx="226" cy="61" r="17" fill="rgba(5,10,6,0.8)" stroke="#8fd400" stroke-width="1.4"/>
+                <path d="M226 61 L226 47 M226 61 L238 68 M226 61 L214 68" stroke="#a3e600" stroke-width="2" stroke-linecap="round"/>
+              </g>
+              <g class="hero-led" style="animation-delay:0.6s;"><circle cx="34" cy="86" r="1.8" fill="#a3e600"/><circle cx="42" cy="86" r="1.8" fill="#f0b64c"/></g>
+            </g>
+          </g>
+          <g class="rack-sled" transform="translate(0,240)">
+            <g class="rack-sled-inner">
+              <rect x="26" y="30" width="248" height="62" rx="6" fill="rgba(10,20,6,0.7)" stroke="rgba(143,212,0,0.5)" stroke-width="1.4"/>
+              <rect class="sled-die" x="38" y="42" width="130" height="38" rx="4" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1.2"/>
+              <g stroke="rgba(163,230,0,0.4)" stroke-width="0.8"><path d="M50 42 V80 M65 42 V80 M80 42 V80 M95 42 V80 M110 42 V80 M125 42 V80 M140 42 V80 M155 42 V80"/></g>
+              <g class="hero-fan hero-fan-rev" style="transform-origin: 226px 61px;">
+                <circle cx="226" cy="61" r="17" fill="rgba(5,10,6,0.8)" stroke="#8fd400" stroke-width="1.4"/>
+                <path d="M226 61 L226 47 M226 61 L238 68 M226 61 L214 68" stroke="#a3e600" stroke-width="2" stroke-linecap="round"/>
+              </g>
+              <g class="hero-led" style="animation-delay:0.9s;"><circle cx="34" cy="86" r="1.8" fill="#a3e600"/><circle cx="42" cy="86" r="1.8" fill="#f0b64c"/></g>
+            </g>
+          </g>
+          <g class="rack-sled" transform="translate(0,320)">
+            <g class="rack-sled-inner">
+              <rect x="26" y="30" width="248" height="52" rx="6" fill="rgba(10,20,6,0.7)" stroke="rgba(143,212,0,0.5)" stroke-width="1.4"/>
+              <rect class="sled-die" x="38" y="40" width="130" height="32" rx="4" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1.2"/>
+              <text x="103" y="61" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#a3e600" letter-spacing="0.5">AI GPU</text>
+              <g class="hero-fan" style="transform-origin: 222px 56px;">
+                <circle cx="222" cy="56" r="15" fill="rgba(5,10,6,0.8)" stroke="#8fd400" stroke-width="1.4"/>
+                <path d="M222 56 L222 44 M222 56 L233 62 M222 56 L211 62" stroke="#a3e600" stroke-width="1.8" stroke-linecap="round"/>
+              </g>
+              <g class="hero-led" style="animation-delay:1.2s;"><circle cx="34" cy="76" r="1.8" fill="#a3e600"/><circle cx="42" cy="76" r="1.8" fill="#f0b64c"/></g>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <div class="flow-connector" aria-hidden="true"><span class="flow-node"></span></div>
+
+  <p class="subtitle" style="margin-top:2rem;">
+    Five NVIDIA products, priced and specified against current listings. Each spec includes a
+    plain-language note explaining what it means for hardware selection.
+    Unsure what you need? Use the <a href="{{ url_for('models') }}">model advisor</a> or the
+    <a href="{{ url_for('guide') }}">guided build</a>.
+  </p>
+
+  <div class="command-center">
+    <span class="hud-corner hud-corner-tl" aria-hidden="true"></span>
+    <span class="hud-corner hud-corner-tr" aria-hidden="true"></span>
+    <span class="hud-corner hud-corner-bl" aria-hidden="true"></span>
+    <span class="hud-corner hud-corner-br" aria-hidden="true"></span>
+    <span class="story-kicker">Chapter 1 &middot; The infrastructure, live</span>
+    <div class="command-center-title">
+      AI Infrastructure Command Center
+    </div>
+
+    <div class="stats-bar hud-panel reveal-group">
+      <div class="stat-chip"><div class="stat-chip-value" data-count-to="5">0</div><div class="stat-chip-label">Products in catalog</div></div>
+      <div class="stat-chip"><div class="stat-chip-value" data-count-to="{{ total_gpu_memory_gb }}">0</div><div class="stat-chip-label">Total catalog GPU memory, GB</div></div>
+      <div class="stat-chip"><div class="stat-chip-value" data-count-to="3">0</div><div class="stat-chip-label">Leaderboard models advised on</div></div>
+      <div class="stat-chip"><div class="stat-chip-value">$1,999&ndash;$3.7M</div><div class="stat-chip-label">Price range, desktop to rack</div></div>
+      <div class="stat-chip">
+        <div class="stat-chip-value"><span class="live-dot" aria-hidden="true"></span><span data-count-to="{{ request_count }}">0</span></div>
+        <div class="stat-chip-label">Quote requests submitted, live</div>
+      </div>
+    </div>
+
+    <p class="command-center-note">
+      Example sizing using {{ example_builds.model.name }} ({{ "{:,.0f}".format(example_builds.model.total_params_b) }}B) —
+      pick your own model in the <a href="{{ url_for('models') }}">model advisor</a> for exact numbers.
+    </p>
+    <div class="command-center-builds">
+      <div class="cc-build-card">
+        <div class="cc-build-label">Recommended startup build</div>
+        {% if example_builds.startup.build %}
+          <div class="cc-build-name">{{ example_builds.startup.label }}</div>
+          <div class="cc-build-stats">
+            <span>{{ "{:,.0f}".format(example_builds.startup.build.total_memory_gb) }} GB</span>
+            <span>{{ "{:,.0f}".format(example_builds.startup.build.total_watts) }} W</span>
+            <span>${{ "{:,.0f}".format(example_builds.startup.build.total_price) }}</span>
+          </div>
+        {% else %}
+          <div class="cc-build-name">No catalog match</div>
+        {% endif %}
+      </div>
+      <div class="cc-build-card">
+        <div class="cc-build-label">Recommended scale-up build</div>
+        {% if example_builds.scale.build %}
+          <div class="cc-build-name">{{ example_builds.scale.label }}</div>
+          <div class="cc-build-stats">
+            <span>{{ "{:,.0f}".format(example_builds.scale.build.total_memory_gb) }} GB</span>
+            <span>{{ "{:,.0f}".format(example_builds.scale.build.total_watts) }} W</span>
+            <span>${{ "{:,.0f}".format(example_builds.scale.build.total_price) }}</span>
+          </div>
+        {% else %}
+          <div class="cc-build-name">No catalog match</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <span class="story-kicker">Chapter 2 &middot; Can your model run?</span>
+  <h2>Type any model size, watch the whole catalog react</h2>
+  <p class="subtitle" style="margin-bottom:1.2rem;">
+    No fixed list, no memorizing parameter counts — pick a well-known model or type a number,
+    and every product below is checked at once with real memory math.
+  </p>
+
+  <div class="card" id="home-sim-card" style="margin-bottom:2.6rem;">
+    <div style="margin-bottom:1rem;">
+      <label for="home-calc-preset">Pick a well-known model</label>
+      <select id="home-calc-preset" style="margin-bottom:0;">
+        <option value="">Choose a model&hellip;</option>
+      </select>
+    </div>
+    <div style="margin-bottom:0;">
+      <label for="home-calc-params">Or type any parameter count, in billions</label>
+      <input type="number" id="home-calc-params" min="0" step="0.1" placeholder="e.g. 70" style="margin-bottom:0;">
+    </div>
+    <div id="home-calc-math" style="margin-top:1rem;"></div>
+    <div id="home-calc-result" class="sim-grid" style="margin-top:1rem;"></div>
+    <div id="home-calc-cta"></div>
+    <p style="margin-top:1rem;">
+      <a href="{{ url_for('models') }}" style="font-size:0.85rem; font-weight:600; color:var(--text-dim); text-decoration:none;">More model options &amp; full memory math on the model advisor &rarr;</a>
+    </p>
+  </div>
+
+  <div class="card" style="margin-bottom:2.6rem;">
+    <div style="display:flex; align-items:flex-start; gap:0.9rem;">
+      <span class="pill-icon" style="flex-shrink:0;">{{ icons.lightbulb() }}</span>
+      <div>
+        <strong style="font-size:1.02rem;">Before you shop: which numbers actually matter here?</strong>
+        <p style="color:var(--text-dim); font-size:0.9rem; margin:0.5rem 0 0;">
+          A normal computer spec sheet leads with <strong style="color:var(--text);">CPU</strong> and
+          <strong style="color:var(--text);">RAM</strong>. For running a big AI model, <strong style="color:var(--text);">skip
+          both</strong> — they barely matter here. The model's weights load into <strong style="color:var(--text);">GPU
+          memory</strong> and run on the GPU's own cores; the CPU and regular system RAM mostly just shuttle data around
+          and keep the machine's operating system alive. A faster CPU or more RAM will not make an undersized GPU able
+          to hold a bigger model, and it will not speed up the model's output. That's why every product below is specced
+          by <strong style="color:var(--text);">GPU memory</strong> and <strong style="color:var(--text);">watts</strong>
+          — those two numbers, plus price, are the ones that actually decide what you can run and what it costs.
+        </p>
+        <div class="simple-explain">
+          <span class="simple-explain-label">In simple terms</span>
+          Think of GPU memory like a backpack. The AI model is like a giant textbook — it has to fit
+          inside the backpack before the computer can even open it and start reading. If the backpack
+          is too small, it doesn't matter how fast the computer can think — the book just won't fit,
+          so nothing happens at all.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <span class="story-kicker">Chapter 3 &middot; How to think about hardware</span>
+  <h2>Understanding AI hardware</h2>
+  <p class="subtitle" style="margin-bottom:1.2rem;">
+    Five short answers to the questions that actually determine which system fits your workload.
+    For the full mechanics, see the <a href="{{ url_for('technical_guide') }}">technical guide</a>.
+  </p>
+
+  <div class="learn-list reveal-group">
+    <details class="learn-item" open>
+      <summary>How to choose AI hardware</summary>
+      <div class="learn-body">
+        <p>
+          Start from your model's memory requirement (parameters &times; 1&nbsp;GB, plus 20%
+          working room) — not clock speed or a marketing FLOPS number. Pick the cheapest hardware
+          that clears that number. If you're training rather than just running a model, budget
+          3&ndash;4x the memory of the raw weights for gradients and optimizer state. Budget and
+          lead time narrow the choice from there: built-to-order enterprise hardware can take
+          weeks to months.
+        </p>
+        <div class="simple-explain">
+          <span class="simple-explain-label">In simple terms</span>
+          Picking hardware is like picking a suitcase for a trip. First figure out how much stuff
+          (the AI model) you need to pack, then get the smallest, cheapest suitcase that actually
+          fits it all — don't buy a giant one just because it looks impressive, and don't buy a
+          tiny one because it's cheap if your stuff won't fit inside it.
+        </div>
+      </div>
+    </details>
+    <details class="learn-item">
+      <summary>Training vs. inference</summary>
+      <div class="learn-body">
+        <p>
+          Inference just runs a fixed model to produce output — it needs the model's weights plus
+          a working buffer, and often fits on one card. Training or fine-tuning updates the
+          weights, which means also holding gradients and optimizer state in memory — commonly
+          3&ndash;4x more, which is why training hardware recommendations lean toward multi-GPU
+          servers even for models that would fit a single card for inference alone.
+        </p>
+        <div class="simple-explain">
+          <span class="simple-explain-label">In simple terms</span>
+          Inference is like reading a book that's already written — you just need room to hold it
+          open. Training is like WRITING the book yourself — you need a much bigger desk for all
+          your notes, drafts, and crossed-out pages, not just space for the final, finished book.
+        </div>
+      </div>
+    </details>
+    <details class="learn-item">
+      <summary>Why VRAM matters</summary>
+      <div class="learn-body">
+        <p>
+          A model's weights have to fit entirely in GPU memory before the GPU can run any of it —
+          there's no partial fallback to system RAM. If a model needs more memory than a card has,
+          that card is off the table regardless of how fast or expensive it is. This is why every
+          product on this page leads with memory, not clock speed.
+        </p>
+        <div class="simple-explain">
+          <span class="simple-explain-label">In simple terms</span>
+          It's like a moving truck: your furniture (the AI model) either fits inside the truck or
+          it doesn't. There's no "squeeze half of it into a different, smaller truck" — if it
+          doesn't fit, you need a bigger truck, full stop.
+        </div>
+      </div>
+    </details>
+    <details class="learn-item">
+      <summary>Power and cooling, explained</summary>
+      <div class="learn-body">
+        <p>
+          Watts measure electricity draw, not compute capability — a higher-watt GPU usually means
+          more raw speed, but also a bigger power bill and more heat to remove from the room.
+          Desktop and workstation cards use ordinary air cooling; multi-GPU servers need
+          datacenter-grade airflow or liquid cooling; full racks like the GB300 NVL72 require a
+          facility built for it, not an office closet.
+        </p>
+        <div class="simple-explain">
+          <span class="simple-explain-label">In simple terms</span>
+          Watts are how hungry a machine is for electricity, not how smart it is. A hungrier
+          machine also runs hotter, kind of like how sprinting makes you sweat more than walking —
+          the biggest machines need giant fans and special rooms just to stay cool.
+        </div>
+      </div>
+    </details>
+    <details class="learn-item">
+      <summary>Common mistakes</summary>
+      <div class="learn-body">
+        <p>
+          Buying based on a marketing FLOPS number instead of checking memory fit first. Sizing
+          for inference and then discovering training needs 3&ndash;4x more memory. Ordering
+          rack-scale hardware without confirming the facility has the power and cooling to support
+          it. Assuming several desktop cards plugged into one PC over ordinary PCIe is a "cluster"
+          — it isn't, and it performs far worse than real NVLink-connected hardware. Not accounting
+          for built-to-order lead times, which can run months for enterprise-scale systems.
+        </p>
+        <div class="simple-explain">
+          <span class="simple-explain-label">In simple terms</span>
+          It's like buying shoes by only looking at the picture on the box instead of trying them
+          on. The box might look great, but if they don't actually fit your feet (the model),
+          they're useless — always check the real fit before buying, not just the label.
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <div class="datacenter-console" id="datacenter-console">
+    <div class="console-header">
+      <span class="console-title">&#9608; LIVE DATACENTER CONSOLE</span>
+      <span class="console-dot"></span>
+    </div>
+    <p class="console-disclosure">
+      Simulated status display for visual effect — this is a UI demonstration, not live
+      infrastructure telemetry.
+    </p>
+    <div class="console-log" id="console-log" aria-live="off"></div>
+  </div>
+
+  <div class="flow-connector" aria-hidden="true"><span class="flow-node"></span></div>
+
+  <span class="story-kicker">Chapter 4 &middot; Compare at a glance</span>
+  <h2>Compare at a glance</h2>
+  <p class="subtitle" style="margin-bottom:1rem;">Filter by category, sort any column, or click a row to jump to its full specs below.</p>
+
+  <div class="filter-chips" id="filter-chips">
+    <button type="button" class="chip active" data-filter="all">All</button>
+    {% for cat in products|map(attribute='category')|unique %}
+      <button type="button" class="chip" data-filter="{{ cat }}">{{ cat }}</button>
+    {% endfor %}
+  </div>
+
+  <div class="table-wrap" style="margin-bottom:2.6rem;">
+    <table id="catalog-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-sort="name" data-dir="none" tabindex="0" role="button" aria-label="Sort by product name">Product<span class="sort-arrow"></span></th>
+          <th class="sortable" data-sort="memory" data-dir="none" tabindex="0" role="button" aria-label="Sort by memory">Memory<span class="sort-arrow"></span></th>
+          <th class="sortable" data-sort="watts" data-dir="none" tabindex="0" role="button" aria-label="Sort by power">Power<span class="sort-arrow"></span></th>
+          <th class="sortable" data-sort="price" data-dir="none" tabindex="0" role="button" aria-label="Sort by price">Price<span class="sort-arrow"></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+          {% set pc = power_context(p.watts) %}
+          <tr onclick="location.href='#product-{{ p.slug }}'" style="cursor:pointer;" data-category="{{ p.category }}"
+              data-name="{{ p.name }}" data-memory="{{ p.memory_gb }}" data-watts="{{ p.watts }}" data-price="{{ p.price }}">
+            <td>
+              <div style="display:flex; align-items:center; gap:0.7rem;">
+                <span class="thumb"><img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}"></span>
+                <div>
+                  <div style="font-weight:700;">{{ p.name }}</div>
+                  <div style="color:var(--text-dim); font-size:0.78rem;">{{ p.category }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{% if p.memory_gb >= 1000 %}{{ "%.1f"|format(p.memory_gb/1000) }} TB{% else %}{{ p.memory_gb }} GB{% endif %}</td>
+            <td>
+              {% if p.watts >= 1000 %}{{ "%.1f"|format(p.watts/1000) }} kW{% else %}{{ p.watts }} W{% endif %}
+              <div style="color:var(--text-dim); font-size:0.76rem;">&asymp;{{ "%.1f"|format(pc.home_equivalents) }} homes</div>
+            </td>
+            <td style="font-weight:700;">${{ "{:,.0f}".format(p.price) }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <span class="story-kicker">Chapter 5 &middot; By the numbers</span>
+  <h2>By the numbers</h2>
+  <p class="subtitle" style="margin-bottom:1.2rem;">
+    The same real price, memory, and power figures shown above — plotted so you can see the
+    spread at a glance. This catalog runs from a $1,999 desktop card to a $3.7M datacenter rack,
+    so bars use a <strong style="color:var(--text);">log scale</strong>: it keeps the smaller
+    products visible instead of squashing them to a hairline next to the rack. Every label is
+    still the real, un-rounded number.
+  </p>
+
+  <div class="benchmark-grid reveal-group">
+    {% for key, title, unit_note in [("price", "Price", "US dollars"), ("memory", "GPU memory", "gigabytes, log scale"), ("power", "Power draw", "watts, log scale")] %}
+      <div class="card benchmark-card">
+        <h3>{{ title }}</h3>
+        <div class="benchmark-unit">{{ unit_note }}</div>
+        {% for bar in charts[key] %}
+          <div class="bench-row">
+            <a href="#product-{{ bar.slug }}" class="bench-name">{{ bar.name }}</a>
+            <div class="bench-track">
+              <div class="bench-fill" data-pct="{{ bar.pct }}" style="width:0%;"></div>
+            </div>
+            <span class="bench-value">{{ bar.label }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <span class="story-kicker">Chapter 6 &middot; The full catalog</span>
+  <h2>Every product, in full</h2>
+  <p class="subtitle" style="margin-bottom:1.2rem;">The same five systems from every angle above, now with complete specs and a path to a quote.</p>
+
+  <div class="grid reveal-group" id="catalog-grid">
+    {% for p in products %}
+      {% set pc = power_context(p.watts) %}
+      {% set meters = meters_by_slug[p.slug] %}
+      <div class="card hoverable card-glow" id="product-{{ p.slug }}" data-category="{{ p.category }}">
+        <div class="product-photo">
+          <img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}">
+          <span class="product-icon-badge">{{ icons.category(p.category) }}</span>
+          <button type="button" class="quickview-btn" data-slug="{{ p.slug }}" style="position:absolute; bottom:0.7rem; right:0.7rem;">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" stroke="currentColor" stroke-width="1.8"></path><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"></circle></svg>
+            Quick view
+          </button>
+        </div>
+        <div class="card-top">
+          <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+            <span class="pill">{{ p.category }}</span>
+            <span class="pill" style="background:var(--bg-alt); color:var(--text-dim);">{{ p.best_for }}</span>
+            <span class="availability-dot {{ 'in-stock' if p.in_stock else 'built-to-order' }}">
+              <span class="dot"></span> {{ "In stock" if p.in_stock else "Built to order" }}
+            </span>
+          </div>
+          <div style="display:flex; gap:0.4rem;">
+            <button type="button" class="icon-btn favorite-btn" data-slug="{{ p.slug }}" title="Save to favorites" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 20s-7-4.35-9.5-8.5C1 8 2.5 4.5 6 4c2-.3 4 .7 6 3 2-2.3 4-3.3 6-3 3.5.5 5 4 3.5 7.5C19 15.65 12 20 12 20Z" stroke="currentColor" stroke-width="1.8"></path></svg>
+            </button>
+            <button type="button" class="icon-btn compare-btn" data-slug="{{ p.slug }}" title="Add to compare" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 3v18M3 9h6M3 15h6M15 3v18M15 9h6M15 15h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+            </button>
+          </div>
+        </div>
+        <h2><a href="{{ url_for('product_detail', slug=p.slug) }}" style="color:inherit; text-decoration:none;">{{ p.name }}</a></h2>
+        <p style="color:var(--text-dim); font-size:0.88rem; margin-top:-0.3rem;">{{ p.blurb }}</p>
+
+        <div class="card-meters" style="margin-top:0.7rem;">
+          <div class="card-meter">
+            <span class="card-meter-label">{{ term('price-sourcing', 'Price') }}</span>
+            <div class="card-meter-track"><div class="card-meter-fill card-meter-price" data-pct="{{ meters.price_pct }}" style="width:0%;"></div></div>
+            <span class="card-meter-value">${{ "{:,.0f}".format(p.price) }}</span>
+          </div>
+          <div class="card-meter">
+            <span class="card-meter-label">Memory</span>
+            <div class="card-meter-track"><div class="card-meter-fill {{ 'card-meter-flow' if p.category == 'Workstation card' else '' }}" data-pct="{{ meters.memory_pct }}" style="width:0%;"></div></div>
+            <span class="card-meter-value">{% if p.memory_gb >= 1000 %}{{ "%.1f"|format(p.memory_gb/1000) }} TB{% else %}{{ p.memory_gb }} GB{% endif %}</span>
+          </div>
+          <div class="card-meter">
+            <span class="card-meter-label">Power</span>
+            <div class="card-meter-track"><div class="card-meter-fill card-meter-warn {{ 'card-meter-thermal' if p.watts >= 5000 else '' }}" data-pct="{{ meters.power_pct }}" style="width:0%;"></div></div>
+            <span class="card-meter-value">{% if p.watts >= 1000 %}{{ "%.1f"|format(p.watts/1000) }} kW{% else %}{{ p.watts }} W{% endif %}</span>
+          </div>
+          <div class="diagram-caption" style="margin:0.5rem 0 0;">Bars show where this sits on the catalog's log-scale range — not an absolute score.</div>
+        </div>
+
+        <div class="spec-box" style="margin-bottom:0.9rem; margin-top:0.9rem;">
+          <div class="spec-label">Tensor / AI compute</div>
+          <div class="spec-value" style="font-size:0.95rem;">{{ p.tensor_performance }}</div>
+        </div>
+
+        <div class="power-line {{ 'thermal-hot' if p.watts >= 5000 else ('steady-draw' if p.category == 'Desktop card' else '') }}">
+          {{ icons.bolt() }}
+          <span>&approx;{{ "%.1f"|format(pc.home_equivalents) }}x a home's draw &middot; ~{{ "{:,.0f}".format(pc.daily_kwh) }} kWh/day &middot; {{ p.lead_time_short }}</span>
+          {% if p.watts >= 5000 %}<span class="thermal-badge" title="High power draw — requires datacenter-grade cooling">&#9650; High draw</span>{% endif %}
+          {% if p.category == 'Desktop card' %}<span class="steady-badge" title="Runs on ordinary household power — no special circuit needed">&#9679; Efficient</span>{% endif %}
+          {% if p.category == 'Workstation card' %}<span class="memory-badge" title="Extra memory headroom in a single card — no multi-GPU wiring needed">&#9670; High memory</span>{% endif %}
+        </div>
+
+        <div style="display:flex; gap:0.7rem; flex-wrap:wrap; margin-top:0.9rem;">
+          <a class="btn-secondary" href="{{ url_for('quote') }}?build={{ ('1x ' + p.name) | urlencode }}&price={{ p.price }}&watts={{ p.watts }}&slug={{ p.slug }}">Request a quote</a>
+          <a href="{{ url_for('product_detail', slug=p.slug) }}" style="align-self:center; color:var(--text-dim); font-size:0.85rem; font-weight:600; text-decoration:none;">Full specification &rarr;</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="card" id="catalog-empty-state" style="text-align:center; padding:2.6rem 1.6rem;" hidden>
+    <h2 style="margin-top:0;">No products in this category</h2>
+    <p class="subtitle" style="margin:0.5rem auto 1.2rem; max-width:380px;">
+      Nothing in the current catalog matches this filter. Select "All" to see every product.
+    </p>
+  </div>
+
+  <div class="flow-connector flow-connector-branch" aria-hidden="true">
+    <span class="flow-node"></span>
+    <span class="flow-branch flow-branch-left"></span>
+    <span class="flow-branch flow-branch-right"></span>
+  </div>
+
+  <div class="journey-continue">
+    <a href="{{ url_for('models') }}" class="journey-step">
+      <span class="pill-icon">{{ icons.brain() }}</span>
+      <div><strong>Model advisor</strong><span>Match a model to hardware</span></div>
+    </a>
+    <a href="{{ url_for('quote') }}" class="journey-step">
+      <span class="pill-icon">{{ icons.bolt() }}</span>
+      <div><strong>Request a quote</strong><span>No payment, no account</span></div>
+    </a>
+  </div>
+
+  <div hidden>
+    {% for p in products %}
+      {% set pc = power_context(p.watts) %}
+      <div id="qv-source-{{ p.slug }}">
+        <div class="product-photo" style="margin-bottom:1.3rem;">
+          <img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}">
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.6rem;">
+          <span class="pill">{{ p.category }}</span>
+          <span class="pill" style="background:var(--bg-alt); color:var(--text-dim);">{{ p.best_for }}</span>
+          <span class="availability-dot {{ 'in-stock' if p.in_stock else 'built-to-order' }}">
+            <span class="dot"></span> {{ "In stock" if p.in_stock else "Built to order" }}
+          </span>
+        </div>
+        <h2 class="qv-name" style="margin-top:0;">{{ p.name }}</h2>
+        <p style="color:var(--text-dim); font-size:0.9rem;">{{ p.blurb }}</p>
+
+        <div class="stat-row">
+          <span class="stat-label">{{ term('price-sourcing', 'Price') }}</span>
+          <span class="stat-value">${{ "{:,.0f}".format(p.price) }}</span>
+        </div>
+
+        <div class="spec-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="spec-box">
+            <div class="spec-label">Memory</div>
+            <div class="spec-value">
+              {% if p.memory_gb >= 1000 %}{{ "%.1f"|format(p.memory_gb/1000) }} TB{% else %}{{ p.memory_gb }} GB{% endif %}
+              {{ term(p.memory_type) }}
+            </div>
+          </div>
+          <div class="spec-box">
+            <div class="spec-label">Power</div>
+            <div class="spec-value">
+              {% if p.watts >= 1000 %}{{ "%.1f"|format(p.watts/1000) }} kW{% else %}{{ p.watts }} W{% endif %}
+            </div>
+          </div>
+          <div class="spec-box">
+            <div class="spec-label">Tensor / AI compute</div>
+            <div class="spec-value" style="font-size:0.9rem;">{{ p.tensor_performance }}</div>
+          </div>
+        </div>
+
+        {% if p.extra_specs %}
+          <div class="more-specs-panel" style="max-height:none; opacity:1; padding-top:0.6rem; border-top:1px solid var(--border); margin-top:0.4rem;">
+            {% for label, value in p.extra_specs %}
+              <div class="stat-row">
+                <span class="stat-label">{{ label }}</span>
+                <span class="stat-value">{{ value }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="power-box">
+          {{ icons.bolt() }}
+          <span>
+            <strong>In real terms:</strong> about {{ "%.1f"|format(pc.home_equivalents) }}x the
+            continuous draw of an average home. Flat-out for a day, that's
+            ~{{ "{:,.0f}".format(pc.daily_kwh) }} kWh — roughly {{ "%.1f"|format(pc.ev_batteries_per_day) }}x
+            an electric car battery, every 24 hours.
+          </span>
+        </div>
+
+        <p style="color:var(--text-dim); font-size:0.82rem; margin:0.9rem 0 0;">
+          <strong style="color:var(--text-dim);">Lead time:</strong> {{ p.delivery_window_note }}
+        </p>
+        <p style="color:var(--text-dim); font-size:0.82rem; margin:0.35rem 0 0;">
+          <strong style="color:var(--text-dim);">Warranty:</strong> {{ p.warranty }}
+        </p>
+
+        <div style="display:flex; gap:0.7rem; flex-wrap:wrap; margin-top:1.2rem;">
+          <a class="btn btn-launch" href="{{ url_for('quote') }}?build={{ ('1x ' + p.name) | urlencode }}&price={{ p.price }}&watts={{ p.watts }}&slug={{ p.slug }}">Request a quote</a>
+          <a class="btn-secondary" href="{{ url_for('product_detail', slug=p.slug) }}">Full specification</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="compare-tray" id="compare-tray" hidden>
+    <div class="compare-tray-inner">
+      <span class="compare-tray-label">Comparing <strong id="compare-count">0</strong> products</span>
+      <div id="compare-tray-items" class="compare-tray-items"></div>
+      <button type="button" class="btn" id="compare-tray-view" disabled>View comparison</button>
+      <button type="button" class="icon-btn" id="compare-tray-clear" title="Clear comparison">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <style>
+    .hero-enterprise {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #05060a;
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 0 1px rgba(143, 212, 0, 0.18), 0 30px 70px rgba(0, 0, 0, 0.35);
+    }
+
+    .hero-enterprise-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.5;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(143, 212, 0, 0.14) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(143, 212, 0, 0.14) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(ellipse 70% 70% at 30% 40%, rgba(0,0,0,0.9), transparent 100%);
+      animation: heroGridDrift 22s linear infinite;
+    }
+    @keyframes heroGridDrift {
+      from { background-position: 0 0, 0 0; }
+      to { background-position: 84px 42px, 84px 42px; }
+    }
+
+    #hero-particles {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .hero-enterprise-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, rgba(5,6,10,0.92) 0%, rgba(5,6,10,0.75) 45%, rgba(5,6,10,0.35) 100%);
+    }
+
+    .hero-enterprise-content {
+      position: relative;
+      z-index: 2;
+      padding: 3.2rem 3rem;
+      max-width: 640px;
+    }
+
+    .hero-enterprise-content.hero-split {
+      max-width: none;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+    .hero-split .hero-glass { max-width: 560px; flex-shrink: 0; }
+
+    .hero-chip-wrap {
+      position: relative;
+      width: 260px;
+      height: 380px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-chip-glow {
+      position: absolute;
+      inset: 4% 10%;
+      background: radial-gradient(ellipse, rgba(143, 212, 0, 0.4), transparent 70%);
+      filter: blur(24px);
+      border-radius: 50%;
+      animation: chipGlowPulse 3.2s ease-in-out infinite;
+    }
+    @keyframes chipGlowPulse {
+      0%, 100% { opacity: 0.5; transform: scale(0.96); }
+      50% { opacity: 0.85; transform: scale(1.04); }
+    }
+    .hero-rack-svg { width: 100%; height: 100%; position: relative; z-index: 1; filter: drop-shadow(0 0 20px rgba(143, 212, 0, 0.3)); }
+
+    /* Self-assembly: chassis fades/scales in first, then each sled slides into place, then the
+       idle animations (fan spin, die pulse, traveling pulses) take over. */
+    .hero-rack-frame {
+      opacity: 0;
+      transform: scale(0.94);
+      transform-origin: 150px 210px;
+      animation: heroFrameIn 0.5s var(--ease) forwards;
+    }
+    @keyframes heroFrameIn { to { opacity: 1; transform: scale(1); } }
+
+    .rack-sled-inner {
+      opacity: 0;
+      transform: translateX(-34px);
+      animation: heroSledIn 0.55s var(--ease) forwards;
+    }
+    .rack-sled:nth-of-type(1) .rack-sled-inner { animation-delay: 0.3s; }
+    .rack-sled:nth-of-type(2) .rack-sled-inner { animation-delay: 0.48s; }
+    .rack-sled:nth-of-type(3) .rack-sled-inner { animation-delay: 0.66s; }
+    .rack-sled:nth-of-type(4) .rack-sled-inner { animation-delay: 0.84s; }
+    .rack-sled:nth-of-type(5) .rack-sled-inner { animation-delay: 1.02s; }
+    @keyframes heroSledIn { to { opacity: 1; transform: translateX(0); } }
+
+    .trace { stroke-dasharray: 6 10; animation: traceFlow 1.6s linear infinite; }
+    @keyframes traceFlow { to { stroke-dashoffset: -32; } }
+
+    .sled-die { animation: sledDiePulse 2.8s ease-in-out infinite; }
+    .rack-sled:nth-of-type(2) .sled-die { animation-delay: 0.4s; }
+    .rack-sled:nth-of-type(3) .sled-die { animation-delay: 0.8s; }
+    .rack-sled:nth-of-type(4) .sled-die { animation-delay: 1.2s; }
+    .rack-sled:nth-of-type(5) .sled-die { animation-delay: 1.6s; }
+    @keyframes sledDiePulse { 0%, 100% { opacity: 0.75; } 50% { opacity: 1; } }
+
+    .hero-fan { animation: fanSpin 3s linear infinite; }
+    .hero-fan-rev { animation-direction: reverse; animation-duration: 3.6s; }
+    @keyframes fanSpin { to { transform: rotate(360deg); } }
+
+    .hero-led circle:first-child { animation: heroLedBlink 1.6s ease-in-out infinite; }
+    .hero-led circle:last-child { animation: heroLedBlink 1.6s ease-in-out infinite 0.5s; }
+    @keyframes heroLedBlink { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+
+    .rack-pulse { animation: rackPulseTravel 2.6s ease-in infinite; animation-delay: 1.3s; }
+    .rack-pulse-2 { animation-delay: 2.6s; }
+    @keyframes rackPulseTravel {
+      0% { transform: translateY(24px); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(396px); opacity: 0; }
+    }
+
+    @media (max-width: 900px) {
+      .hero-split { flex-direction: column; text-align: left; }
+      .hero-chip-wrap { width: 190px; height: 280px; }
+    }
+    @media (max-width: 700px) {
+      .hero-chip-wrap { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-chip-glow { animation: none; opacity: 0.65; }
+      .hero-rack-frame { animation: none; opacity: 1; transform: none; }
+      .rack-sled-inner { animation: none; opacity: 1; transform: none; }
+      .trace { animation: none; }
+      .sled-die { animation: none; opacity: 0.9; }
+      .hero-fan { animation: none; }
+      .rack-pulse { animation: none; opacity: 0; }
+      .hero-led circle { animation: none; opacity: 0.8; }
+    }
+
+    a.btn.btn-glow { box-shadow: var(--shadow-2), 0 0 24px 2px rgba(143, 212, 0, 0.35); }
+    a.btn.btn-glow:hover { box-shadow: var(--shadow-3), 0 0 32px 4px rgba(163, 230, 0, 0.5); }
+
+    .hero-glass {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 18px;
+      padding: 1.8rem 2rem;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    @media (max-width: 700px) {
+      .hero-enterprise { min-height: 380px; }
+      .hero-enterprise-content { padding: 2.2rem 1.6rem; }
+      .hero-glass { padding: 1.4rem 1.4rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-grid { animation: none; }
+    }
+
+    html[data-datacenter="on"] .hero-enterprise {
+      box-shadow: 0 0 0 1px rgba(57, 255, 143, 0.4), 0 0 80px rgba(57, 255, 143, 0.18), 0 30px 70px rgba(0, 0, 0, 0.5);
+    }
+    html[data-datacenter="on"] .hero-enterprise::after {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background: radial-gradient(ellipse 60% 60% at 70% 40%, rgba(57, 255, 143, 0.22), transparent 70%);
+      pointer-events: none;
+      animation: heroGlowBreathe 6s ease-in-out infinite;
+      z-index: 1;
+    }
+    @keyframes heroGlowBreathe {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html[data-datacenter="on"] .hero-enterprise::after { animation: none; }
+    }
+
+    .trust-strip {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.4rem;
+      margin: 1.8rem 0 0;
+      padding: 1.1rem 0 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .trust-strip li {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.72);
+    }
+    .trust-strip svg { width: 15px; height: 15px; color: var(--accent-bright); flex-shrink: 0; }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 2.4rem;
+    }
+
+    html[data-datacenter="on"] .hud-panel {
+      background: rgba(57, 255, 143, 0.25);
+      box-shadow: 0 0 30px rgba(57, 255, 143, 0.1);
+    }
+    html[data-datacenter="on"] .hud-panel .stat-chip {
+      background: rgba(3, 21, 12, 0.75);
+    }
+    html[data-datacenter="on"] .hud-panel .stat-chip-value {
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      text-shadow: 0 0 10px var(--accent-bg);
+    }
+    html[data-datacenter="on"] .hud-panel .stat-chip-label {
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.66rem;
+    }
+
+    .stat-chip { background: var(--card); padding: 1.1rem 1rem; text-align: center; }
+    .stat-chip-value { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; color: var(--accent); }
+    .stat-chip-label { font-size: 0.74rem; color: var(--text-dim); margin-top: 0.25rem; }
+
+    .command-center { margin-bottom: 2.6rem; position: relative; }
+
+    .hud-corner { display: none; position: absolute; width: 16px; height: 16px; border: 2px solid var(--accent); opacity: 0.85; pointer-events: none; }
+    html[data-datacenter="on"] .hud-corner { display: block; }
+    .hud-corner-tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+    .hud-corner-tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+    .hud-corner-bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+    .hud-corner-br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+    html[data-datacenter="on"] .command-center {
+      padding: 1.5rem 1.3rem 1.3rem;
+      border: 1px solid rgba(57, 255, 143, 0.16);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(57, 255, 143, 0.04), transparent 60%);
+      overflow: hidden;
+    }
+    html[data-datacenter="on"] .command-center::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(57, 255, 143, 0.55), transparent);
+      animation: hudSweep 5.5s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes hudSweep {
+      0% { top: 0; opacity: 0; }
+      6% { opacity: 1; }
+      94% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html[data-datacenter="on"] .command-center::after { display: none; }
+    }
+    .command-center-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 0.9rem;
+      letter-spacing: -0.01em;
+    }
+    html[data-datacenter="on"] .command-center-title {
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #7dffb3;
+    }
+    .command-center-note { color: var(--text-dim); font-size: 0.8rem; margin: 0.9rem 0 0.9rem; }
+    .command-center-builds { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 700px) { .command-center-builds { grid-template-columns: 1fr; } }
+    .cc-build-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem 1.3rem;
+      transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+    }
+    .cc-build-card:hover { border-color: var(--accent); box-shadow: var(--shadow-2); }
+    .cc-build-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); }
+    .cc-build-name { font-size: 1rem; font-weight: 800; margin-top: 0.3rem; }
+    .cc-build-stats { display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+    html[data-datacenter="on"] .cc-build-card { background: rgba(3, 21, 12, 0.75); border-color: rgba(57, 255, 143, 0.3); }
+
+    .live-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-right: 0.35rem;
+      box-shadow: 0 0 0 0 var(--accent-bg);
+      animation: liveDotPulse 2s ease-out infinite;
+      vertical-align: middle;
+    }
+    @keyframes liveDotPulse {
+      0% { box-shadow: 0 0 0 0 var(--accent-bg); }
+      70% { box-shadow: 0 0 0 6px transparent; }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .live-dot { animation: none; }
+    }
+
+    @media (max-width: 900px) {
+      .stats-bar { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 700px) {
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .filter-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
+
+    .chip {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .chip:hover { border-color: var(--accent); color: var(--text); }
+    .chip.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: border-color 0.15s ease, color 0.15s ease, transform 0.12s ease, background 0.15s ease;
+    }
+    .icon-btn svg { width: 17px; height: 17px; }
+    .icon-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+    .icon-btn:active { transform: translateY(0) scale(0.94); }
+    .favorite-btn[aria-pressed="true"] { color: #ef4444; border-color: #ef4444; }
+    .favorite-btn[aria-pressed="true"] svg { fill: #ef4444; }
+    .compare-btn[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-bg); }
+
+    .compare-tray {
+      position: fixed;
+      left: 50%;
+      bottom: 1.4rem;
+      transform: translateX(-50%) translateY(0);
+      z-index: 60;
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+      border-radius: 999px;
+      padding: 0.55rem 0.7rem 0.55rem 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+    .compare-tray[hidden] { display: flex; opacity: 0; transform: translateX(-50%) translateY(120%); pointer-events: none; }
+    .compare-tray-label { font-size: 0.84rem; color: var(--text-dim); white-space: nowrap; }
+    .compare-tray-items { display: flex; gap: 0.4rem; }
+    .compare-tray-chip {
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: var(--bg-alt);
+      border-radius: 999px;
+      padding: 0.25rem 0.7rem;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .compare-tray #compare-tray-view { padding: 0.5rem 1.1rem; font-size: 0.84rem; }
+    .compare-tray #compare-tray-view:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    @media (max-width: 700px) {
+      .compare-tray { left: 1rem; right: 1rem; transform: none; width: auto; flex-wrap: wrap; }
+      .compare-tray[hidden] { transform: translateY(120%); }
+    }
+
+    .product-photo .quickview-btn {
+      background: rgba(5, 6, 10, 0.72);
+      border-color: rgba(255, 255, 255, 0.18);
+      color: #fff;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+    }
+    .card.hoverable:hover .product-photo .quickview-btn,
+    .product-photo .quickview-btn:focus-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .product-photo .quickview-btn:hover { border-color: var(--accent-bright); color: var(--accent-bright); }
+
+    @media (max-width: 780px) {
+      .product-photo .quickview-btn { opacity: 1; transform: none; }
+    }
+
+    .benchmark-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+      margin-bottom: 2.6rem;
+    }
+    @media (max-width: 900px) {
+      .benchmark-grid { grid-template-columns: 1fr; }
+    }
+
+    .benchmark-card h3 { margin: 0 0 0.15rem; font-size: 1.02rem; }
+    .benchmark-unit { color: var(--text-dim); font-size: 0.76rem; margin-bottom: 1.1rem; }
+
+    .bench-row {
+      display: grid;
+      grid-template-columns: 108px 1fr auto;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.7rem;
+    }
+    .bench-name {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-decoration: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .bench-name:hover { color: var(--accent); }
+    .bench-track {
+      background: var(--bg-alt);
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+    .bench-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-bright), var(--accent));
+      transition: width 0.9s var(--ease), box-shadow 0.4s var(--ease);
+      position: relative;
+    }
+    /* Glossy top highlight, like a physical progress indicator */
+    .bench-fill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255,255,255,0.35), transparent 60%);
+    }
+    .bench-value {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      transition: color var(--dur) var(--ease);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bench-fill { transition: none; }
+    }
+
+    .availability-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-dim);
+    }
+    .availability-dot .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); flex-shrink: 0; }
+    .availability-dot.in-stock { color: var(--accent); }
+    .availability-dot.in-stock .dot { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
+    .availability-dot.built-to-order .dot { background: var(--warn); }
+    .availability-dot.built-to-order { color: var(--warn); }
+
+    #catalog-grid .card.hoverable {
+      --mx: 50%;
+      --my: 50%;
+      --tilt-x: 0deg;
+      --tilt-y: 0deg;
+      position: relative;
+      transform-style: preserve-3d;
+    }
+    #catalog-grid .card.hoverable::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at var(--mx) var(--my), var(--accent-bg), transparent 62%);
+      opacity: 0;
+      transition: opacity var(--dur) var(--ease);
+      pointer-events: none;
+      z-index: 0;
+    }
+    #catalog-grid .card.hoverable:hover::after { opacity: 1; }
+    #catalog-grid .card.hoverable:hover {
+      transition: transform 0.12s linear, box-shadow var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+      transform: perspective(900px) translateY(-6px) rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
+      box-shadow: var(--shadow-4), 0 0 0 1px var(--accent-bg);
+    }
+    #catalog-grid .card.hoverable > * { position: relative; z-index: 1; }
+
+    /* Glowing gradient border: two background layers, inner solid + outer gradient */
+    #catalog-grid .card.card-glow {
+      border: 1.5px solid transparent;
+      background-image: linear-gradient(var(--card), var(--card)), linear-gradient(var(--card), var(--card));
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+    }
+    #catalog-grid .card.card-glow:hover {
+      background-image: linear-gradient(var(--card-hover), var(--card-hover)), linear-gradient(125deg, var(--accent-bright), var(--accent) 45%, #4fd1c5 75%, var(--accent-bright));
+      box-shadow: var(--shadow-4), 0 0 28px 2px var(--accent-bg);
+    }
+    @media (prefers-reduced-motion: reduce), (hover: none) {
+      #catalog-grid .card.card-glow:hover { box-shadow: var(--shadow-2); }
+    }
+
+    .product-icon-badge {
+      position: absolute;
+      top: 0.7rem;
+      left: 0.7rem;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: rgba(5, 6, 10, 0.55);
+      backdrop-filter: blur(4px);
+      color: #a3e600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform var(--dur) var(--ease-snap);
+    }
+    .product-icon-badge svg { width: 18px; height: 18px; }
+    #catalog-grid .card.hoverable:hover .product-icon-badge { transform: scale(1.1) rotate(-4deg); }
+
+    .card-meters { display: flex; flex-direction: column; gap: 0.55rem; }
+    .card-meter { display: grid; grid-template-columns: 48px 1fr 70px; align-items: center; gap: 0.6rem; }
+    .card-meter-label { font-size: 0.72rem; font-weight: 700; color: var(--text-dim); }
+    .card-meter-value { font-size: 0.78rem; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+    .card-meter-track { background: var(--bg-alt); border-radius: 999px; height: 7px; overflow: hidden; }
+    .card-meter-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-bright), var(--accent));
+      transition: width 0.8s var(--ease);
+    }
+    .card-meter-fill.card-meter-warn { background: linear-gradient(90deg, var(--warn), #f0b64c); }
+    .card-meter-fill.card-meter-price { background: linear-gradient(90deg, #5b8fd4, #3a6bc4); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-meter-fill { transition: none; }
+      .product-icon-badge { transition: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce), (hover: none) {
+      #catalog-grid .card.hoverable:hover { transform: none; transition: box-shadow var(--dur-fast) linear; }
+    }
+
+    .power-line.thermal-hot {
+      position: relative;
+      overflow: hidden;
+    }
+    .power-line.thermal-hot::before {
+      content: "";
+      position: absolute;
+      inset: -4px -8px;
+      background: linear-gradient(100deg, transparent 30%, rgba(240, 182, 76, 0.1) 50%, transparent 70%);
+      background-size: 220% 100%;
+      animation: heatShimmer 3.5s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+    @keyframes heatShimmer {
+      0% { background-position: -100% 0; }
+      100% { background-position: 100% 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .power-line.thermal-hot::before { animation: none; }
+    }
+
+    .thermal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--warn);
+      background: var(--warn-bg);
+      border-radius: 999px;
+      padding: 0.15rem 0.55rem;
+      margin-left: auto;
+      animation: thermalPulse 2.6s ease-in-out infinite;
+    }
+    @keyframes thermalPulse {
+      0%, 100% { box-shadow: 0 0 0 0 var(--warn-bg); }
+      50% { box-shadow: 0 0 0 5px var(--warn-bg); }
+    }
+    .card-meter-fill.card-meter-thermal { animation: thermalMeterPulse 2.2s ease-in-out infinite; }
+    @keyframes thermalMeterPulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.25); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .thermal-badge, .card-meter-fill.card-meter-thermal { animation: none; }
+    }
+
+    /* Same pill treatment as .thermal-badge above, so every card gets an equally visible
+       callout in the same spot — just a different color/label per what actually stands out
+       about that product (efficient power draw, or extra memory in a single card). */
+    .steady-badge, .memory-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 0.15rem 0.55rem;
+      margin-left: auto;
+    }
+    .steady-badge {
+      color: var(--accent);
+      background: var(--accent-bg);
+      animation: steadyBadgePulse 2.6s ease-in-out infinite;
+    }
+    @keyframes steadyBadgePulse {
+      0%, 100% { box-shadow: 0 0 0 0 var(--accent-bg); }
+      50% { box-shadow: 0 0 0 5px var(--accent-bg); }
+    }
+    .memory-badge {
+      color: #3a6bc4;
+      background: rgba(58, 107, 196, 0.14);
+      animation: memoryBadgePulse 2.6s ease-in-out infinite;
+    }
+    @keyframes memoryBadgePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(58, 107, 196, 0.2); }
+      50% { box-shadow: 0 0 0 5px rgba(58, 107, 196, 0.2); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .steady-badge, .memory-badge { animation: none; }
+    }
+
+    /* Desktop cards run at ordinary outlet power, so instead of a "high draw" warning they get
+       a calm, steady glow on the same power icon — same location/language as the thermal state
+       above, just signalling "nothing to worry about" rather than "needs real cooling." */
+    .power-line.steady-draw svg {
+      color: var(--accent);
+      transform-origin: center;
+      animation: steadyDrawGlow 2.2s ease-in-out infinite;
+    }
+    @keyframes steadyDrawGlow {
+      0%, 100% { opacity: 0.75; filter: drop-shadow(0 0 0 transparent); transform: scale(1); }
+      50% { opacity: 1; filter: drop-shadow(0 0 5px var(--accent)); transform: scale(1.2); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .power-line.steady-draw svg { animation: none; }
+    }
+
+    /* Workstation cards get a brightness pulse plus a traveling highlight on the memory bar —
+       a "memory trace" pulse, since their standout spec is memory capacity for a single slot.
+       The brightness pulse is the part guaranteed to read clearly even when the bar itself is
+       narrow (a modest memory_pct); the sweep is a bonus on top when there's room for it. */
+    .card-meter-fill.card-meter-flow {
+      position: relative;
+      overflow: hidden;
+      animation: memoryBrightPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes memoryBrightPulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.4); }
+    }
+    .card-meter-fill.card-meter-flow::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.55) 50%, transparent 65%);
+      background-size: 220% 100%;
+      animation: memoryTraceFlow 2.4s ease-in-out infinite;
+    }
+    @keyframes memoryTraceFlow {
+      0% { background-position: 180% 0; }
+      100% { background-position: -80% 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .card-meter-fill.card-meter-flow, .card-meter-fill.card-meter-flow::after { animation: none; }
+    }
+
+    .flow-connector {
+      display: flex;
+      justify-content: center;
+      height: 44px;
+      position: relative;
+    }
+    .flow-connector::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: linear-gradient(180deg, transparent, var(--accent) 30%, var(--accent) 70%, transparent);
+      opacity: 0.4;
+    }
+    .flow-node {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 0 var(--accent-bg);
+      animation: flowNodePulse 2.4s ease-in-out infinite;
+    }
+    @keyframes flowNodePulse {
+      0%, 100% { box-shadow: 0 0 0 0 var(--accent-bg); }
+      50% { box-shadow: 0 0 0 6px var(--accent-bg); }
+    }
+
+    .flow-connector-branch { height: 60px; }
+    .flow-branch {
+      position: absolute;
+      top: 50%;
+      width: 38%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      opacity: 0.35;
+    }
+    .flow-branch-left { right: 50%; background: linear-gradient(270deg, var(--accent), transparent); }
+    .flow-branch-right { left: 50%; }
+
+    html[data-datacenter="on"] .flow-connector::before,
+    html[data-datacenter="on"] .flow-branch { opacity: 0.7; }
+    html[data-datacenter="on"] .flow-node { box-shadow: 0 0 12px 2px var(--accent-bg); }
+
+    .journey-continue {
+      display: flex;
+      justify-content: center;
+      gap: 1.4rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.6rem;
+    }
+    .journey-step {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.9rem 1.3rem;
+      text-decoration: none;
+      color: var(--text);
+      transform: translateZ(0);
+      transition: border-color var(--dur) var(--ease), transform var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease);
+    }
+    .journey-step strong { display: block; font-size: 0.9rem; }
+    .journey-step span { color: var(--text-dim); font-size: 0.78rem; }
+    .journey-step:hover { border-color: var(--accent); transform: translateY(-2px) translateZ(0); box-shadow: var(--shadow-3); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .flow-node { animation: none; }
+      .journey-step:hover { transform: none; }
+    }
+
+    th.sortable { cursor: pointer; user-select: none; white-space: nowrap; transition: color var(--dur-fast) var(--ease); }
+    th.sortable:hover { color: var(--accent); }
+    .sort-arrow {
+      display: inline-block;
+      width: 0.7rem;
+      margin-left: 0.25rem;
+      opacity: 0.35;
+      transform: rotate(0deg);
+      transition: transform var(--dur) var(--ease), opacity var(--dur-fast) var(--ease);
+    }
+    .sort-arrow::after { content: "\2191"; }
+    th.sortable[data-dir="asc"] .sort-arrow { opacity: 1; transform: rotate(0deg); color: var(--accent); }
+    th.sortable[data-dir="desc"] .sort-arrow { opacity: 1; transform: rotate(180deg); color: var(--accent); }
+    @media (prefers-reduced-motion: reduce) {
+      .sort-arrow { transition: opacity var(--dur-fast) linear; }
+    }
+
+    .learn-list { margin: 1.4rem 0 2.6rem; }
+    .learn-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      margin-bottom: 0.7rem;
+      overflow: hidden;
+      box-shadow: var(--shadow-1);
+      transition: box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+    }
+    .learn-item:hover { box-shadow: var(--shadow-2); border-color: var(--accent); }
+    .learn-item summary {
+      padding: 1rem 1.2rem;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: background var(--dur-fast) var(--ease);
+    }
+    .learn-item summary:hover { background: var(--bg-alt); }
+    .learn-item summary::-webkit-details-marker { display: none; }
+    .learn-item summary::after {
+      content: "";
+      flex-shrink: 0;
+      width: 9px;
+      height: 9px;
+      border-right: 2px solid var(--text-dim);
+      border-bottom: 2px solid var(--text-dim);
+      transform: rotate(45deg);
+      transition: transform var(--dur) var(--ease);
+    }
+    .learn-item[open] summary::after { transform: rotate(-135deg); }
+    .learn-item[open] summary { border-bottom: 1px solid var(--border); }
+    .learn-body { padding: 0 1.2rem 1.1rem; color: var(--text-dim); font-size: 0.88rem; line-height: 1.6; }
+    .learn-body p { margin: 0.9rem 0 0; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .learn-item, .learn-item summary, .learn-item summary::after { transition: none; }
+    }
+
+    .datacenter-console { display: none; }
+    html[data-datacenter="on"] .datacenter-console {
+      display: block;
+      background: linear-gradient(160deg, #030805, #061109 70%);
+      border: 1px solid rgba(57, 255, 143, 0.3);
+      border-radius: 14px;
+      padding: 1.3rem 1.5rem;
+      margin-bottom: 2.6rem;
+      box-shadow: 0 0 30px rgba(57, 255, 143, 0.08);
+    }
+    .console-header { display: flex; align-items: center; justify-content: space-between; }
+    .console-title {
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #7dffb3;
+    }
+    .console-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #39ff8f;
+      box-shadow: 0 0 0 0 rgba(57, 255, 143, 0.6);
+      animation: liveDotPulse 2s ease-out infinite;
+    }
+    .console-disclosure { color: rgba(163, 230, 0, 0.55); font-size: 0.74rem; margin: 0.4rem 0 0.9rem; font-style: italic; }
+    .console-log {
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 0.78rem;
+      color: #a3e600;
+      max-height: 180px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 0.35rem;
+    }
+    .console-line { opacity: 0; animation: consoleLineIn 0.4s ease forwards; }
+    .console-line .console-ts { color: rgba(163, 230, 0, 0.5); margin-right: 0.5rem; }
+    @keyframes consoleLineIn { to { opacity: 1; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .console-dot { animation: none; }
+      .console-line { opacity: 1; animation: none; }
+    }
+  </style>
+
+  <script id="home-sim-catalog-data" type="application/json">{{ catalog_json | tojson }}</script>
+  <script id="home-sim-known-models-data" type="application/json">{{ known_models_json | tojson }}</script>
+  <script>
+    (function () {
+      var result = document.getElementById("home-calc-result");
+      if (!result) return;
+
+      var CATALOG = JSON.parse(document.getElementById("home-sim-catalog-data").textContent);
+      var KNOWN_MODELS = JSON.parse(document.getElementById("home-sim-known-models-data").textContent);
+      var WORKING_ROOM = {{ working_room_multiplier }};
+      var HOME_W = {{ home_watts }};
+
+      var presetSelect = document.getElementById("home-calc-preset");
+      presetSelect.innerHTML = '<option value="">Choose a model&hellip;</option>' + KNOWN_MODELS.map(function (m, idx) {
+        var sub = m.active_params_b ? m.total_params_b + "B total, " + m.active_params_b + "B active" : m.total_params_b + "B parameters";
+        return '<option value="' + idx + '">' + escapeHtmlHome(m.name) + " — " + sub + '</option>';
+      }).join("");
+
+      function fmtHome(n) { return n.toLocaleString(undefined, { maximumFractionDigits: 0 }); }
+
+      function escapeHtmlHome(str) {
+        return String(str).replace(/[&<>"']/g, function (ch) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
+        });
+      }
+
+      function checkProductHome(p, requiredGb) {
+        var canRun, count, note;
+        if (p.memory_gb >= requiredGb) {
+          canRun = true; count = 1;
+          note = "Runs on a single unit, with room to spare.";
+        } else if (p.clusterable) {
+          count = Math.ceil(requiredGb / p.memory_gb);
+          if (count >= 2) {
+            canRun = null;
+            note = "Needs " + count + "x units clustered together (not a single unit).";
+          } else {
+            canRun = true; count = 1;
+            note = "Runs on a single unit, with room to spare.";
+          }
+        } else {
+          canRun = false; count = 1;
+          note = "Does not have enough memory, and this product does not cluster.";
+        }
+        var totalMemoryGb = p.memory_gb * count;
+        var totalPrice = p.price * count;
+        var totalWatts = p.watts * count;
+        return {
+          product: p, canRun: canRun, count: count, note: note,
+          totalMemoryGb: totalMemoryGb, totalPrice: totalPrice, totalWatts: totalWatts,
+          havePct: Math.min(100, (totalMemoryGb / requiredGb) * 100)
+        };
+      }
+
+      var homeSimGen = 0;
+      var homeSimDebounce = null;
+
+      function renderHomeSim() {
+        clearTimeout(homeSimDebounce);
+        homeSimDebounce = setTimeout(renderHomeSimNow, 250);
+      }
+
+      function renderHomeSimNow() {
+        var gen = ++homeSimGen;
+        var paramsInput = document.getElementById("home-calc-params");
+        var mathBox = document.getElementById("home-calc-math");
+        var cta = document.getElementById("home-calc-cta");
+        var rawValue = paramsInput.value.trim();
+        var params = parseFloat(rawValue);
+
+        if (!rawValue || isNaN(params) || params <= 0 || params > 100000) {
+          mathBox.innerHTML = rawValue ? '<p class="field-error" style="margin:0;">Enter a positive parameter count, in billions.</p>' : "";
+          result.innerHTML = "";
+          cta.innerHTML = "";
+          return;
+        }
+
+        var requiredGb = params * WORKING_ROOM;
+        var results = CATALOG.map(function (p) { return checkProductHome(p, requiredGb); });
+        var runnable = results.filter(function (r) { return r.canRun === true || r.canRun === null; });
+        var recommended = runnable.length ? runnable.slice().sort(function (a, b) { return a.totalPrice - b.totalPrice; })[0] : null;
+
+        mathBox.innerHTML = '<div class="math-box"><div class="label">The memory math, shown:</div>' +
+          '<div class="formula">' + params + 'B params &times; 1 GB = ' + fmtHome(params) + ' GB' +
+          ' &nbsp;+&nbsp; 20% working room &nbsp;=&nbsp; <strong>' + requiredGb.toFixed(1) + ' GB required</strong></div></div>';
+
+        result.innerHTML = results.map(function (r, idx) {
+          var statusClass = r.canRun === true ? "sim-yes" : (r.canRun === null ? "sim-maybe" : "sim-no");
+          var icon = r.canRun === true ? "&#10003;" : (r.canRun === null ? "&#8776;" : "&#10007;");
+          var isRecommended = recommended && recommended.product.slug === r.product.slug;
+          var label = (r.count === 1 ? "" : r.count + "x ") + r.product.name;
+          return '<div class="sim-row ' + statusClass + '" style="animation-delay:' + (idx * 0.1) + 's;">' +
+            '<div class="sim-row-top">' +
+            '<span class="thumb sim-thumb"><img src="/static/images/products/' + r.product.slug + '.jpg" alt=""></span>' +
+            '<div class="sim-row-name"><strong>' + escapeHtmlHome(label) + '</strong>' +
+            (isRecommended ? ' <span class="sim-badge">Cheapest that fits</span>' : '') +
+            '<span class="sim-row-sub">' + escapeHtmlHome(r.product.category) + '</span></div>' +
+            '<span class="sim-icon">' + icon + '</span>' +
+            '</div>' +
+            '<div class="sim-bar-track"><div class="sim-bar-fill" data-pct="' + r.havePct + '" style="width:0%;"></div></div>' +
+            '<div class="sim-row-stats"><span>' + fmtHome(r.totalMemoryGb) + ' GB total</span><span>$' + fmtHome(r.totalPrice) + '</span><span>' + fmtHome(r.totalWatts) + ' W</span></div>' +
+            '<div class="sim-row-note">' + escapeHtmlHome(r.note) + '</div>' +
+            '</div>';
+        }).join("");
+
+        var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var rows = result.querySelectorAll(".sim-row");
+        rows.forEach(function (row, idx) {
+          var fill = row.querySelector(".sim-bar-fill");
+          if (reduceMotion) {
+            row.classList.add("scanned");
+            fill.style.width = (fill.dataset.pct || 0) + "%";
+          } else {
+            setTimeout(function () {
+              if (gen !== homeSimGen) return;
+              row.classList.add("scanning");
+              setTimeout(function () {
+                if (gen !== homeSimGen) return;
+                row.classList.add("scanned");
+                fill.style.width = (fill.dataset.pct || 0) + "%";
+              }, 400);
+            }, idx * 110);
+          }
+        });
+
+        cta.innerHTML = "";
+        if (recommended) {
+          var recLabel = (recommended.count === 1 ? "1x " : recommended.count + "x ") + recommended.product.name;
+          var delay = reduceMotion ? 0 : rows.length * 110 + 450;
+          setTimeout(function () {
+            if (gen !== homeSimGen) return;
+            cta.innerHTML = '<div style="margin-top:1.2rem;"><a class="btn btn-launch" href="/quote?build=' +
+              encodeURIComponent(recLabel) + '&price=' + recommended.totalPrice +
+              '&watts=' + recommended.totalWatts + '&slug=' + recommended.product.slug + '">Request a quote for ' + escapeHtmlHome(recLabel) + '</a></div>';
+          }, delay);
+        }
+      }
+
+      presetSelect.addEventListener("change", function () {
+        if (presetSelect.value === "") return;
+        var m = KNOWN_MODELS[+presetSelect.value];
+        document.getElementById("home-calc-params").value = m.total_params_b;
+        renderHomeSimNow();
+      });
+      document.getElementById("home-calc-params").addEventListener("input", renderHomeSim);
+    })();
+
+    (function () {
+      var logEl = document.getElementById("console-log");
+      if (!logEl) return;
+      var messages = [
+        "GPU MEMORY CHECK PASSED",
+        "CLUSTER FABRIC READY",
+        "POWER ESTIMATE GENERATED",
+        "NVLINK TOPOLOGY VERIFIED",
+        "QUOTE PIPELINE NOMINAL",
+        "CATALOG INDEX SYNCED",
+        "THERMAL MARGIN NOMINAL",
+        "MEMORY MATH RECOMPUTED"
+      ];
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var intervalId = null;
+      var maxLines = 8;
+
+      function ts() {
+        var d = new Date();
+        return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") + ":" + String(d.getSeconds()).padStart(2, "0");
+      }
+
+      function addLine() {
+        var msg = messages[Math.floor(Math.random() * messages.length)];
+        var el = document.createElement("div");
+        el.className = "console-line";
+        el.innerHTML = '<span class="console-ts">' + ts() + "</span>" + msg;
+        logEl.appendChild(el);
+        while (logEl.children.length > maxLines) logEl.removeChild(logEl.firstChild);
+      }
+
+      function start() {
+        if (intervalId) return;
+        if (reduceMotion) {
+          for (var i = 0; i < 5; i++) addLine();
+          return;
+        }
+        addLine();
+        intervalId = setInterval(addLine, 2400);
+      }
+      function stop() {
+        if (intervalId) { clearInterval(intervalId); intervalId = null; }
+      }
+
+      if (document.documentElement.getAttribute("data-datacenter") === "on") start();
+
+      new MutationObserver(function () {
+        if (document.documentElement.getAttribute("data-datacenter") === "on") start();
+        else stop();
+      }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-datacenter"] });
+
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) stop();
+        else if (document.documentElement.getAttribute("data-datacenter") === "on" && !reduceMotion) start();
+      });
+    })();
+
+    (function () {
+      var counters = document.querySelectorAll("[data-count-to]");
+      if (!counters.length) return;
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function animateCount(el) {
+        var target = parseInt(el.dataset.countTo, 10) || 0;
+        if (reduceMotion) { el.textContent = target; return; }
+        var start = 0;
+        var duration = 900;
+        var startTime = null;
+        function step(ts) {
+          if (!startTime) startTime = ts;
+          var progress = Math.min((ts - startTime) / duration, 1);
+          el.textContent = Math.round(start + (target - start) * progress);
+          if (progress < 1) requestAnimationFrame(step);
+          else el.textContent = target;
+        }
+        requestAnimationFrame(step);
+      }
+
+      if ("IntersectionObserver" in window) {
+        var counterObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) { animateCount(entry.target); counterObserver.unobserve(entry.target); }
+          });
+        }, { threshold: 0.4 });
+        counters.forEach(function (el) { counterObserver.observe(el); });
+      } else {
+        counters.forEach(animateCount);
+      }
+      setTimeout(function () {
+        counters.forEach(function (el) { if (el.textContent === "0") animateCount(el); });
+      }, 1200);
+    })();
+
+    (function () {
+      var table = document.getElementById("catalog-table");
+      if (!table) return;
+      var tbody = table.querySelector("tbody");
+
+      var reduceMotionTable = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function sortBy(th) {
+        var key = th.dataset.sort;
+        var nextDir = th.dataset.dir === "asc" ? "desc" : "asc";
+
+        table.querySelectorAll("th.sortable").forEach(function (h) { h.dataset.dir = "none"; h.removeAttribute("aria-sort"); });
+        th.dataset.dir = nextDir;
+        th.setAttribute("aria-sort", nextDir === "asc" ? "ascending" : "descending");
+
+        var rows = Array.prototype.slice.call(tbody.querySelectorAll("tr"));
+
+        // FLIP: capture each row's position (keyed by element, stable across the sort below).
+        var oldRectByRow = reduceMotionTable ? null : new Map();
+        if (oldRectByRow) rows.forEach(function (row) { oldRectByRow.set(row, row.getBoundingClientRect()); });
+
+        rows.sort(function (a, b) {
+          var av = a.dataset[key], bv = b.dataset[key];
+          if (key !== "name") { av = parseFloat(av); bv = parseFloat(bv); }
+          var cmp = av > bv ? 1 : av < bv ? -1 : 0;
+          return nextDir === "asc" ? cmp : -cmp;
+        });
+        rows.forEach(function (row) { tbody.appendChild(row); });
+
+        if (!oldRectByRow) return;
+
+        rows.forEach(function (row) {
+          var oldRect = oldRectByRow.get(row);
+          var newRect = row.getBoundingClientRect();
+          var deltaY = oldRect.top - newRect.top;
+          if (Math.abs(deltaY) < 1) return;
+          row.style.transition = "none";
+          row.style.transform = "translateY(" + deltaY + "px)";
+          requestAnimationFrame(function () {
+            row.style.transition = "transform var(--dur) var(--ease)";
+            row.style.transform = "";
+            row.addEventListener("transitionend", function handler() {
+              row.style.transition = "";
+              row.removeEventListener("transitionend", handler);
+            });
+          });
+        });
+      }
+
+      table.querySelectorAll("th.sortable").forEach(function (th) {
+        th.addEventListener("click", function () { sortBy(th); });
+        th.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sortBy(th); }
+        });
+      });
+    })();
+
+    document.querySelectorAll("#filter-chips .chip").forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        document.querySelectorAll("#filter-chips .chip").forEach(function (c) { c.classList.remove("active"); });
+        chip.classList.add("active");
+        var filter = chip.dataset.filter;
+
+        document.querySelectorAll("table tbody tr[data-category]").forEach(function (row) {
+          row.style.display = (filter === "all" || row.dataset.category === filter) ? "" : "none";
+        });
+        var visibleCount = 0;
+        document.querySelectorAll(".grid .card[data-category]").forEach(function (card) {
+          var show = filter === "all" || card.dataset.category === filter;
+          card.style.display = show ? "" : "none";
+          if (show) visibleCount++;
+        });
+        var emptyState = document.getElementById("catalog-empty-state");
+        if (emptyState) emptyState.hidden = visibleCount !== 0;
+      });
+    });
+
+    (function () {
+      var canvas = document.getElementById("hero-particles");
+      if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      var ctx = canvas.getContext("2d");
+      var particles = [];
+      var w, h, dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var rafId = null;
+      var startTime = null;
+      var LINK_DIST = 90;
+
+      function resize() {
+        w = canvas.offsetWidth;
+        h = canvas.offsetHeight;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function init() {
+        resize();
+        particles = [];
+        var count = Math.min(70, Math.round((w * h) / 16000));
+        for (var i = 0; i < count; i++) {
+          particles.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * 1.6 + 0.6,
+            vx: (Math.random() - 0.5) * 0.12,
+            vy: (Math.random() - 0.5) * 0.12,
+            a: Math.random() * 0.4 + 0.15,
+          });
+        }
+      }
+
+      function tick(ts) {
+        if (!startTime) startTime = ts;
+        var introFade = Math.min((ts - startTime) / 1200, 1);
+
+        ctx.clearRect(0, 0, w, h);
+
+        // Faint connective lines between nearby particles — a subtle "network" motif
+        for (var i = 0; i < particles.length; i++) {
+          for (var j = i + 1; j < particles.length; j++) {
+            var dx = particles[i].x - particles[j].x;
+            var dy = particles[i].y - particles[j].y;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < LINK_DIST) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = "rgba(143, 212, 0, " + (0.12 * (1 - dist / LINK_DIST) * introFade) + ")";
+              ctx.lineWidth = 1;
+              ctx.stroke();
+            }
+          }
+        }
+
+        particles.forEach(function (p) {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
+          if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(143, 212, 0, " + (p.a * introFade) + ")";
+          ctx.fill();
+        });
+        rafId = requestAnimationFrame(tick);
+      }
+
+      function start() {
+        if (rafId) return;
+        rafId = requestAnimationFrame(tick);
+      }
+      function stop() {
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      }
+
+      var resizeTimer;
+      window.addEventListener("resize", function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(init, 200);
+      });
+
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) stop(); else start();
+      });
+
+      init();
+      start();
+    })();
+
+    (function () {
+      var FAV_KEY = "aistore_favorites";
+      var CMP_KEY = "aistore_compare";
+      var MAX_COMPARE = 3;
+
+      function readList(key) {
+        try { return JSON.parse(localStorage.getItem(key)) || []; } catch (e) { return []; }
+      }
+      function writeList(key, list) {
+        try { localStorage.setItem(key, JSON.stringify(list)); } catch (e) { /* storage unavailable, no-op */ }
+      }
+
+      function syncFavoriteButtons() {
+        var favs = readList(FAV_KEY);
+        document.querySelectorAll(".favorite-btn").forEach(function (btn) {
+          btn.setAttribute("aria-pressed", favs.indexOf(btn.dataset.slug) !== -1 ? "true" : "false");
+        });
+      }
+
+      function syncCompareButtons() {
+        var cmp = readList(CMP_KEY);
+        document.querySelectorAll(".compare-btn").forEach(function (btn) {
+          btn.setAttribute("aria-pressed", cmp.indexOf(btn.dataset.slug) !== -1 ? "true" : "false");
+        });
+      }
+
+      function renderTray() {
+        var cmp = readList(CMP_KEY);
+        var tray = document.getElementById("compare-tray");
+        var itemsEl = document.getElementById("compare-tray-items");
+        var countEl = document.getElementById("compare-count");
+        var viewBtn = document.getElementById("compare-tray-view");
+        if (!tray) return;
+
+        tray.hidden = cmp.length === 0;
+        countEl.textContent = cmp.length;
+        itemsEl.innerHTML = cmp.map(function (slug) {
+          var card = document.getElementById("product-" + slug);
+          var name = card ? card.querySelector("h2").textContent : slug;
+          return '<span class="compare-tray-chip">' + name + '</span>';
+        }).join("");
+        viewBtn.disabled = cmp.length < 2;
+      }
+
+      document.querySelectorAll(".favorite-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var favs = readList(FAV_KEY);
+          var slug = btn.dataset.slug;
+          var idx = favs.indexOf(slug);
+          if (idx === -1) favs.push(slug); else favs.splice(idx, 1);
+          writeList(FAV_KEY, favs);
+          syncFavoriteButtons();
+        });
+      });
+
+      document.querySelectorAll(".compare-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var cmp = readList(CMP_KEY);
+          var slug = btn.dataset.slug;
+          var idx = cmp.indexOf(slug);
+          if (idx !== -1) {
+            cmp.splice(idx, 1);
+          } else {
+            if (cmp.length >= MAX_COMPARE) cmp.shift();
+            cmp.push(slug);
+          }
+          writeList(CMP_KEY, cmp);
+          syncCompareButtons();
+          renderTray();
+        });
+      });
+
+      var clearBtn = document.getElementById("compare-tray-clear");
+      if (clearBtn) {
+        clearBtn.addEventListener("click", function () {
+          writeList(CMP_KEY, []);
+          syncCompareButtons();
+          renderTray();
+        });
+      }
+
+      var viewBtn = document.getElementById("compare-tray-view");
+      if (viewBtn) {
+        viewBtn.addEventListener("click", function () {
+          var cmp = readList(CMP_KEY);
+          if (cmp.length < 2) return;
+          window.location.href = "{{ url_for('compare') }}?slugs=" + cmp.join(",");
+        });
+      }
+
+      syncFavoriteButtons();
+      syncCompareButtons();
+      renderTray();
+    })();
+
+    (function () {
+      if (window.matchMedia("(hover: none)").matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      document.querySelectorAll("#catalog-grid .card.hoverable").forEach(function (card) {
+        card.addEventListener("mousemove", function (e) {
+          var rect = card.getBoundingClientRect();
+          var px = (e.clientX - rect.left) / rect.width;
+          var py = (e.clientY - rect.top) / rect.height;
+          card.style.setProperty("--mx", (px * 100) + "%");
+          card.style.setProperty("--my", (py * 100) + "%");
+          card.style.setProperty("--tilt-x", ((px - 0.5) * 6) + "deg");
+          card.style.setProperty("--tilt-y", ((0.5 - py) * 6) + "deg");
+        });
+        card.addEventListener("mouseleave", function () {
+          card.style.setProperty("--tilt-x", "0deg");
+          card.style.setProperty("--tilt-y", "0deg");
+        });
+      });
+    })();
+
+    (function () {
+      var fills = document.querySelectorAll(".bench-fill, .card-meter-fill");
+      if (!fills.length) return;
+
+      function activate(el) {
+        var pct = el.dataset.pct;
+        if (!pct) return;
+        el.style.width = pct + "%";
+        el.addEventListener("transitionend", function handler(e) {
+          if (e.propertyName !== "width") return;
+          el.style.boxShadow = "0 0 12px 1px var(--accent-bg)";
+          setTimeout(function () { el.style.boxShadow = ""; }, 400);
+          el.removeEventListener("transitionend", handler);
+        });
+      }
+
+      if ("IntersectionObserver" in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              activate(entry.target);
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.3 });
+        fills.forEach(function (el) { observer.observe(el); });
+      } else {
+        fills.forEach(activate);
+      }
+
+      setTimeout(function () { fills.forEach(activate); }, 1200);
+    })();
+  </script>
+{% endblock %}

@@ -1,0 +1,2818 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ STORE_NAME }}{% endblock %}</title>
+  <meta name="description" content="GPU hardware for AI training and inference — desktop cards through full datacenter racks, priced against current listings with GPU memory, power, and lead time specified plainly.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='8'%20fill='%2314151a'/%3E%3Crect%20x='9'%20y='9'%20width='14'%20height='14'%20rx='2'%20fill='none'%20stroke='%2376b900'%20stroke-width='2'/%3E%3Ccircle%20cx='16'%20cy='16'%20r='3'%20fill='%2376b900'/%3E%3C/svg%3E">
+  <meta name="view-transition" content="same-origin">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ STORE_NAME }}">
+  <meta property="og:title" content="{{ self.title() }}">
+  <meta property="og:description" content="GPU hardware for AI training and inference — desktop cards through full datacenter racks, priced against current listings.">
+  <meta property="og:image" content="{{ url_for('static', filename='images/products/gb300nvl72.jpg', _external=True) }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ self.title() }}">
+  <meta name="twitter:description" content="GPU hardware for AI training and inference — desktop cards through full datacenter racks, priced against current listings.">
+  <meta name="twitter:image" content="{{ url_for('static', filename='images/products/gb300nvl72.jpg', _external=True) }}">
+  <script>
+    (function () {
+      var saved = localStorage.getItem("aistore-theme") || "light";
+      document.documentElement.setAttribute("data-theme", saved);
+      var dc = localStorage.getItem("aistore-datacenter") === "on";
+      document.documentElement.setAttribute("data-datacenter", dc ? "on" : "off");
+      var simple = localStorage.getItem("aistore-simple") === "on";
+      document.documentElement.setAttribute("data-simple", simple ? "on" : "off");
+    })();
+  </script>
+  <style>
+    :root {
+      --bg: #f6f7f4;
+      --bg-alt: #eef0ea;
+      --card: #ffffff;
+      --card-hover: #fbfcf9;
+      --border: rgba(20, 21, 26, 0.09);
+      --text: #14151a;
+      --text-dim: #5b5f6b;
+      --accent: #4f7a00;
+      --accent-bright: #5c8f00;
+      --accent-bg: rgba(118, 185, 0, 0.13);
+      --accent-ink: #0d1a00;
+      --warn: #9a6400;
+      --warn-bg: rgba(240, 182, 76, 0.18);
+      --danger: #b3261e;
+      --danger-bg: rgba(179, 38, 30, 0.1);
+      --header-bg: rgba(246, 247, 244, 0.82);
+      --shadow: 0 10px 30px rgba(20, 21, 26, 0.07);
+      --radius: 16px;
+
+      /* Elevation: layered, soft, directional — never a single hard shadow */
+      --shadow-1: 0 1px 2px rgba(20, 21, 26, 0.04), 0 1px 1px rgba(20, 21, 26, 0.03);
+      --shadow-2: 0 2px 6px rgba(20, 21, 26, 0.05), 0 8px 20px rgba(20, 21, 26, 0.06);
+      --shadow-3: 0 6px 16px rgba(20, 21, 26, 0.07), 0 20px 45px rgba(20, 21, 26, 0.10);
+      --shadow-4: 0 12px 28px rgba(20, 21, 26, 0.10), 0 32px 70px rgba(20, 21, 26, 0.14);
+      --ring: 0 0 0 1px var(--accent-bg), 0 0 0 4px transparent;
+
+      /* Motion: one expressive curve, one snappy curve, used everywhere */
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+      --dur-fast: 0.15s;
+      --dur: 0.28s;
+      --dur-slow: 0.5s;
+
+      /* 4px-based spacing scale */
+      --sp-1: 0.25rem;
+      --sp-2: 0.5rem;
+      --sp-3: 0.75rem;
+      --sp-4: 1rem;
+      --sp-5: 1.5rem;
+      --sp-6: 2rem;
+      --sp-7: 3rem;
+      --sp-8: 4.5rem;
+    }
+
+    html[data-theme="dark"] {
+      --bg: #0c0d12;
+      --bg-alt: #101219;
+      --card: #15171f;
+      --card-hover: #1a1d27;
+      --border: rgba(255, 255, 255, 0.09);
+      --text: #f3f4f7;
+      --text-dim: #8d92a3;
+      --accent: #8fd400;
+      --accent-bright: #a3e600;
+      --accent-bg: rgba(143, 212, 0, 0.15);
+      --accent-ink: #0a1400;
+      --warn: #f0b64c;
+      --warn-bg: rgba(240, 182, 76, 0.14);
+      --danger: #f0465b;
+      --danger-bg: rgba(240, 70, 91, 0.12);
+      --header-bg: rgba(12, 13, 18, 0.82);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+      --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 1px rgba(0, 0, 0, 0.2);
+      --shadow-2: 0 2px 6px rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.35);
+      --shadow-3: 0 6px 16px rgba(0, 0, 0, 0.35), 0 20px 45px rgba(0, 0, 0, 0.45);
+      --shadow-4: 0 12px 28px rgba(0, 0, 0, 0.4), 0 32px 70px rgba(0, 0, 0, 0.55);
+    }
+
+    html[data-datacenter="on"] {
+      --bg: #030805;
+      --bg-alt: #061109;
+      --card: #071510;
+      --card-hover: #0b1f16;
+      --border: rgba(80, 255, 160, 0.22);
+      --text: #d6ffe4;
+      --text-dim: #6fae8a;
+      --accent: #39ff8f;
+      --accent-bright: #7dffb3;
+      --accent-bg: rgba(57, 255, 143, 0.16);
+      --accent-ink: #011007;
+      --header-bg: rgba(3, 8, 5, 0.85);
+    }
+    html[data-datacenter="on"] body {
+      background-image:
+        radial-gradient(ellipse 900px 500px at 50% -10%, var(--accent-bg), transparent),
+        repeating-linear-gradient(0deg, rgba(57, 255, 143, 0.035) 0px, rgba(57, 255, 143, 0.035) 1px, transparent 1px, transparent 3px);
+    }
+    html[data-datacenter="on"] h1, html[data-datacenter="on"] h2 {
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      text-shadow: 0 0 14px var(--accent-bg);
+    }
+    /* Datacenter mode must only re-skin colors/glow in the header, never its structure — a
+       monospace swap here measurably widens the brand text and destabilizes the header grid
+       at laptop widths. Glow only, same font/size/layout as normal mode. */
+    html[data-datacenter="on"] .brand {
+      text-shadow: 0 0 14px var(--accent-bg);
+    }
+    html[data-datacenter="on"] #datacenter-toggle { color: var(--accent); border-color: var(--accent); }
+
+    #datacenter-rain {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: none;
+      filter: blur(0.3px);
+    }
+    html[data-datacenter="on"] #datacenter-rain { display: block; }
+
+    /* Layer 1: a deep, near-static architectural grid — the "floor" of the control room */
+    #datacenter-depth-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      display: none;
+      background-image:
+        linear-gradient(rgba(57, 255, 143, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57, 255, 143, 0.05) 1px, transparent 1px);
+      background-size: 64px 64px;
+    }
+    html[data-datacenter="on"] #datacenter-depth-grid {
+      display: block;
+      animation: depthGridDrift 40s linear infinite;
+    }
+    @keyframes depthGridDrift { to { background-position: 64px 64px; } }
+
+    /* Layer 2: slow neon depth beams drifting across the viewport for a sense of parallax depth */
+    #datacenter-depth-lines {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      display: none;
+      overflow: hidden;
+    }
+    html[data-datacenter="on"] #datacenter-depth-lines { display: block; }
+    #datacenter-depth-lines span {
+      position: absolute;
+      top: -10%;
+      width: 1px;
+      height: 120%;
+      background: linear-gradient(180deg, transparent, rgba(57, 255, 143, 0.22), transparent);
+      animation: depthLineDrift linear infinite;
+    }
+    #datacenter-depth-lines span:nth-child(1) { left: 8%; animation-duration: 22s; animation-delay: 0s; }
+    #datacenter-depth-lines span:nth-child(2) { left: 26%; animation-duration: 30s; animation-delay: -6s; }
+    #datacenter-depth-lines span:nth-child(3) { left: 48%; animation-duration: 26s; animation-delay: -14s; }
+    #datacenter-depth-lines span:nth-child(4) { left: 67%; animation-duration: 34s; animation-delay: -3s; }
+    #datacenter-depth-lines span:nth-child(5) { left: 85%; animation-duration: 24s; animation-delay: -10s; }
+    @keyframes depthLineDrift {
+      0%, 100% { transform: translateY(0) scaleY(1); opacity: 0.5; }
+      50% { transform: translateY(6%) scaleY(1.08); opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #datacenter-depth-grid { animation: none; }
+      #datacenter-depth-lines span { animation: none; opacity: 0.5; }
+    }
+
+    #datacenter-scanlines {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      pointer-events: none;
+      opacity: 0;
+      background: linear-gradient(180deg, transparent, rgba(57, 255, 143, 0.05) 50%, transparent);
+      background-size: 100% 6px;
+      transition: opacity var(--dur-slow) var(--ease);
+    }
+    html[data-datacenter="on"] #datacenter-scanlines {
+      opacity: 1;
+      animation: scanlineDrift 7s linear infinite;
+    }
+    @keyframes scanlineDrift { to { background-position: 0 400px; } }
+    @media (prefers-reduced-motion: reduce) {
+      html[data-datacenter="on"] #datacenter-scanlines { animation: none; }
+    }
+
+    .boot-sequence {
+      position: fixed;
+      bottom: 1.2rem;
+      right: 1.2rem;
+      z-index: 300;
+      background: rgba(3, 8, 5, 0.92);
+      border: 1px solid rgba(57, 255, 143, 0.4);
+      border-radius: 10px;
+      padding: 0.9rem 1.1rem;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 0.76rem;
+      color: #7dffb3;
+      min-width: 260px;
+      box-shadow: 0 0 30px rgba(57, 255, 143, 0.15);
+      animation: bootIn 0.3s ease;
+      transition: opacity 0.5s ease;
+    }
+    .boot-sequence.boot-fade-out { opacity: 0; }
+    .boot-line { padding: 0.1rem 0; opacity: 0; animation: bootLineIn 0.3s ease forwards; }
+    .boot-line-final { color: #fff; font-weight: 700; margin-top: 0.3rem; }
+    @keyframes bootIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bootLineIn { to { opacity: 1; } }
+
+    @media (max-width: 600px) {
+      .boot-sequence { left: 1rem; right: 1rem; min-width: auto; }
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    @media (prefers-reduced-motion: no-preference) {
+      ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.22s; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+    }
+
+    html { scroll-behavior: smooth; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      background-image: radial-gradient(ellipse 900px 500px at 50% -10%, var(--accent-bg), transparent);
+      color: var(--text);
+      margin: 0;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 4px;
+      transition: outline-offset var(--dur-fast) var(--ease);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid transparent;
+      padding: 1.3rem 1.5rem;
+      transition: padding var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+    }
+    /* The frosted-glass background lives on a separate layer behind the header's own content,
+       not on `header` itself — a sticky element with backdrop-filter directly on it is a known
+       Safari/WebKit bug that can make the whole bar disappear or flicker while scrolling. */
+    header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: var(--header-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: background var(--dur) var(--ease);
+    }
+    /* Three-zone header: logo left, nav truly centered in the remaining space, controls right —
+       the same layout convention as Stripe/Vercel/Apple, rather than a flex row with a big
+       arbitrary gap. .header-right becomes `display:contents` at this tier so nav and the
+       toggles group act as independent, directly-placed grid columns. */
+    .header-inner {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      min-width: 0;
+    }
+    .brand { grid-column: 1; justify-self: start; }
+    .header-right { display: contents; }
+    nav { grid-column: 2; justify-self: center; }
+    #nav-toggle { grid-column: 3; justify-self: end; }
+    .header-toggles { grid-column: 3; display: flex; align-items: center; gap: 0.5rem; justify-self: end; flex-shrink: 0; }
+
+    header.scrolled {
+      padding: 0.75rem 1.5rem;
+      box-shadow: var(--shadow-2);
+      border-bottom-color: var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-weight: 800;
+      font-size: 1.15rem;
+      text-decoration: none;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      width: 33px;
+      height: 33px;
+      border-radius: 9px;
+      background: var(--accent-ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform var(--dur) var(--ease-snap), box-shadow var(--dur) var(--ease);
+    }
+
+    .brand:hover .brand-mark { transform: rotate(-8deg) scale(1.06); box-shadow: 0 0 0 4px var(--accent-bg); }
+    .brand-mark svg { width: 20px; height: 20px; }
+
+    nav { display: flex; gap: 1.1rem; flex-wrap: nowrap; min-width: 0; }
+
+    nav a {
+      position: relative;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding-bottom: 4px;
+      white-space: nowrap;
+      transition: color var(--dur-fast) var(--ease), font-size var(--dur) var(--ease);
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform var(--dur) var(--ease);
+    }
+
+    nav a:hover { color: var(--text); }
+    nav a:hover::after { transform: scaleX(0.6); }
+    nav a.active { color: var(--text); }
+    nav a.active::after { transform: scaleX(1); }
+
+    /* Full-width tier: the "More" wrapper is invisible structure — its links sit inline in
+       the row exactly like the primary links, so nothing changes until space is actually tight. */
+    .nav-more { display: contents; }
+    .nav-more-toggle { display: none; }
+    .nav-more-menu { display: contents; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .brand:hover .brand-mark { transform: none; }
+      nav a::after { transition: none; }
+    }
+
+    #theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transform: translateZ(0);
+      transition: background var(--dur-fast) var(--ease), border-color var(--dur) var(--ease), transform var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease);
+    }
+
+    #theme-toggle:hover { background: var(--card-hover); border-color: var(--accent); box-shadow: var(--shadow-1); }
+    #theme-toggle:active { transform: scale(0.94) translateZ(0); }
+
+    .theme-icon-stack { position: relative; width: 15px; height: 15px; flex-shrink: 0; }
+    #theme-toggle svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .theme-icon-stack svg {
+      position: absolute;
+      inset: 0;
+      transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+    }
+    .theme-icon-stack .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+    .theme-icon-stack .icon-sun { opacity: 1; transform: rotate(0deg) scale(1); }
+    html[data-theme="dark"] .theme-icon-stack .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
+    html[data-theme="dark"] .theme-icon-stack .icon-moon { opacity: 1; transform: rotate(0deg) scale(1); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .theme-icon-stack svg { transition: opacity var(--dur-fast) linear; }
+      .theme-icon-stack .icon-moon, .theme-icon-stack .icon-sun { transform: none; }
+    }
+
+    #datacenter-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transform: translateZ(0);
+      transition: background var(--dur-fast) var(--ease), border-color var(--dur) var(--ease), transform var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease), color var(--dur-fast) var(--ease);
+    }
+    #datacenter-toggle svg { width: 15px; height: 15px; flex-shrink: 0; }
+    #datacenter-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    #datacenter-toggle:active { transform: scale(0.94) translateZ(0); }
+    #datacenter-toggle[aria-pressed="true"] { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+    @media (max-width: 700px) { #datacenter-label { display: none; } }
+
+    #simple-toggle {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transform: translateZ(0);
+      transition: background var(--dur-fast) var(--ease), border-color var(--dur) var(--ease), transform var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease), color var(--dur-fast) var(--ease);
+    }
+    #simple-toggle svg { width: 15px; height: 15px; flex-shrink: 0; }
+    #simple-toggle:hover { border-color: var(--warn); color: var(--warn); }
+    #simple-toggle:active { transform: scale(0.94) translateZ(0); }
+    #simple-toggle[aria-pressed="true"] { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); }
+    @media (max-width: 700px) { #simple-label { display: none; } }
+
+    .simple-discovery-hint {
+      position: absolute;
+      top: calc(100% + 12px);
+      right: -8px;
+      z-index: 60;
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.65rem 0.85rem;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      font-style: normal;
+      line-height: 1.45;
+      width: 190px;
+      white-space: normal;
+      text-align: left;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(-6px);
+      pointer-events: none;
+      transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+    }
+    .simple-discovery-hint::after {
+      content: "";
+      position: absolute;
+      bottom: 100%;
+      right: 20px;
+      border: 6px solid transparent;
+      border-bottom-color: var(--text);
+    }
+    .simple-discovery-hint.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    @media (max-width: 480px) {
+      .simple-discovery-hint { width: 160px; right: -40px; font-size: 0.74rem; }
+      .simple-discovery-hint::after { right: 50px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .simple-discovery-hint { transition: opacity 0.15s linear; }
+    }
+
+    /* Simple-mode explanation callouts — hidden unless the visitor turns on "Explain simply". */
+    .simple-explain {
+      display: none;
+      margin-top: 0.6rem;
+      padding: 0.7rem 0.9rem;
+      background: var(--warn-bg);
+      border: 1px dashed var(--warn);
+      border-radius: 10px;
+      font-size: 0.86rem;
+      line-height: 1.55;
+      color: var(--text);
+    }
+    .simple-explain-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--warn);
+      margin-bottom: 0.25rem;
+    }
+    html[data-simple="on"] .simple-explain { display: block; animation: simpleExplainIn 0.3s var(--ease); }
+    @keyframes simpleExplainIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) {
+      html[data-simple="on"] .simple-explain { animation: none; }
+    }
+
+    /* Briefly highlighted when the mascot walks over and points at something — a simple-explain
+       box or a glossary term — so a visitor following the cat can tell exactly what it's leading
+       them to. Same pulse works on both: a block gets a ring around it, an inline term gets a
+       tight glow hugging the word. */
+    .mascot-pointed { animation: mascotPointPulse 1.8s var(--ease); border-radius: 4px; }
+    .simple-explain.mascot-pointed { border-radius: 10px; }
+    @keyframes mascotPointPulse {
+      0% { box-shadow: 0 0 0 0 var(--warn); }
+      55% { box-shadow: 0 0 0 5px var(--warn); }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mascot-pointed { animation: none; }
+    }
+
+    .cmdk-kbd { font-size: 0.72rem; font-family: monospace; background: var(--bg-alt); padding: 0.08rem 0.35rem; border-radius: 5px; }
+
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 5.5rem;
+    }
+
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      margin-bottom: 1.4rem;
+      flex-wrap: wrap;
+    }
+
+    .breadcrumbs a { color: var(--text-dim); text-decoration: none; }
+    .breadcrumbs a:hover { color: var(--accent); }
+    .breadcrumbs .current { color: var(--text); font-weight: 600; }
+
+    .wizard-steps {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+      max-width: 560px;
+    }
+
+    .wizard-step {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-shrink: 0;
+    }
+
+    .wizard-step-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--card);
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      text-decoration: none;
+      transform: translateZ(0);
+      transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease-snap), box-shadow var(--dur) var(--ease);
+    }
+    .wizard-step-circle svg { width: 15px; height: 15px; }
+
+    .wizard-step.active .wizard-step-circle {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--accent-ink);
+      box-shadow: 0 0 0 5px var(--accent-bg);
+    }
+
+    .wizard-step.done .wizard-step-circle {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .wizard-step.done .wizard-step-circle:hover { background: var(--accent-bg); transform: scale(1.08) translateZ(0); }
+    .wizard-step.done .wizard-step-circle:active { transform: scale(0.95) translateZ(0); }
+
+    .wizard-step-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      white-space: nowrap;
+      transition: color var(--dur) var(--ease);
+    }
+    .wizard-step.active .wizard-step-label { color: var(--text); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .wizard-step-circle, .wizard-step.done .wizard-step-circle:hover { transform: none; }
+    }
+
+    .wizard-connector {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      margin: 0 0.7rem;
+      min-width: 24px;
+      transition: background var(--dur-slow) var(--ease);
+    }
+    .wizard-connector.done { background: var(--accent); }
+
+    @media (max-width: 620px) {
+      .wizard-step-label { display: none; }
+      .wizard-steps { max-width: 100%; }
+    }
+
+    h1 { font-size: clamp(2.1rem, 4.4vw, 3rem); margin: 0 0 0.7rem; letter-spacing: -0.03em; font-weight: 800; line-height: 1.08; text-wrap: balance; }
+    h2 { font-size: clamp(1.3rem, 2vw, 1.55rem); margin: 0 0 0.6rem; letter-spacing: -0.02em; font-weight: 750; line-height: 1.22; text-wrap: balance; }
+    h3 { font-size: 1.05rem; margin: 0 0 0.5rem; letter-spacing: -0.01em; font-weight: 700; line-height: 1.3; }
+    .subtitle { color: var(--text-dim); margin: 0 0 2.6rem; font-size: 1.1rem; max-width: 680px; line-height: 1.65; text-wrap: pretty; }
+
+    .story-kicker {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 0.6rem;
+    }
+    .story-kicker::before {
+      content: "";
+      width: 20px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.7;
+      flex-shrink: 0;
+    }
+    html[data-datacenter="on"] .story-kicker { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+    .subtitle a { color: var(--accent); font-weight: 600; text-decoration: none; background-image: linear-gradient(var(--accent), var(--accent)); background-size: 0% 1.5px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size var(--dur) var(--ease); padding-bottom: 0.05em; }
+    .subtitle a:hover { background-size: 100% 1.5px; }
+
+    /* Numerals (prices, specs, counters) read more precisely with tabular figures */
+    .stat-value, .stat-chip-value, .spec-value, .bench-value, .compare-value,
+    .spec-table-row span:last-child, td { font-variant-numeric: tabular-nums; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.8rem;
+      box-shadow: var(--shadow-1);
+      transform: translateZ(0);
+      transition: background var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+    }
+
+    a.card { color: var(--text); text-decoration: none; display: block; }
+
+    a.card:hover, .card.hoverable:hover {
+      background: var(--card-hover);
+      transform: translateY(-5px) rotate(-0.3deg) translateZ(0);
+      box-shadow: var(--shadow-4);
+      border-color: var(--accent);
+    }
+
+    a.card:active, .card.hoverable:active {
+      transform: translateY(-2px) rotate(-0.15deg) translateZ(0);
+      transition-duration: var(--dur-fast);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card, a.card:hover, .card.hoverable:hover, a.card:active, .card.hoverable:active {
+        transform: none;
+        transition: background var(--dur-fast) linear, box-shadow var(--dur-fast) linear, border-color var(--dur-fast) linear;
+      }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1.4rem;
+    }
+
+    [id^="product-"], #catalog-grid { scroll-margin-top: 90px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.28rem 0.65rem;
+      border-radius: 999px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .pill-icon { width: 34px; height: 34px; border-radius: 9px; background: var(--accent-bg); display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; }
+
+    .icon-float { animation: iconFloat 3.6s ease-in-out infinite; }
+    @keyframes iconFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    .icon-spin-slow { animation: iconSpinSlow 9s linear infinite; }
+    @keyframes iconSpinSlow { to { transform: rotate(360deg); } }
+    .icon-rack-rotate { transition: transform var(--dur-slow) var(--ease); }
+    .icon-rack-rotate:hover, .card.hoverable:hover .icon-rack-rotate { transform: rotateY(180deg); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .icon-float, .icon-spin-slow { animation: none; }
+      .icon-rack-rotate, .icon-rack-rotate:hover { transform: none; transition: none; }
+    }
+    .pill-icon svg { width: 19px; height: 19px; }
+
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.8rem; margin-bottom: 0.9rem; }
+
+    .product-photo {
+      background: #05060a;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: -0.2rem -0.2rem 1.1rem;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .product-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .card.hoverable:hover .product-photo img { transform: scale(1.06); }
+
+    .thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 9px;
+      overflow: hidden;
+      background: #05060a;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    .product-photo img, .thumb img {
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    .product-photo img.img-loaded, .thumb img.img-loaded {
+      opacity: 1;
+    }
+    .product-photo::before, .thumb::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, var(--bg-alt) 30%, var(--card-hover) 50%, var(--bg-alt) 70%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.3s ease-in-out infinite;
+      z-index: 0;
+    }
+    .product-photo.img-ready::before, .thumb.img-ready::before {
+      display: none;
+    }
+    @keyframes skeletonShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .product-photo img, .thumb img { opacity: 1; transition: none; }
+      .product-photo::before, .thumb::before { display: none; }
+    }
+
+    .hero-photo {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #05060a;
+      margin-bottom: 2.2rem;
+      aspect-ratio: 16 / 6;
+    }
+
+    .hero-photo img { width: 100%; height: 100%; object-fit: cover; opacity: 0.92; }
+
+    .hero-photo .hero-caption {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      padding: 1.4rem 1.7rem;
+      background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+      margin: 1.1rem 0 0.9rem;
+    }
+
+    .spec-box {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.7rem 0.8rem;
+    }
+
+    .spec-box .spec-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-dim); font-weight: 700; }
+    .spec-box .spec-value { font-size: 1.05rem; font-weight: 800; margin-top: 0.15rem; }
+
+    .explainer-list { margin: 0.8rem 0 0; padding: 0; list-style: none; }
+    .explainer-list li { color: var(--text-dim); font-size: 0.8rem; padding: 0.35rem 0; border-top: 1px solid var(--border); }
+    .explainer-list li strong { color: var(--text); font-weight: 700; }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+    }
+
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { font-weight: 700; font-size: 0.88rem; color: var(--text-dim); }
+    .stat-value { font-weight: 800; font-size: 1.1rem; white-space: nowrap; }
+
+    a.btn, button.btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      color: var(--accent-ink);
+      font-weight: 700;
+      padding: 0.75rem 1.4rem;
+      border-radius: 10px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.92rem;
+      overflow: hidden;
+      isolation: isolate;
+      box-shadow: var(--shadow-1), 0 0 0 0 var(--accent-bg);
+      transform: translateZ(0);
+      transition: box-shadow var(--dur) var(--ease), transform var(--dur-fast) var(--ease), filter var(--dur-fast) var(--ease);
+      will-change: transform;
+    }
+
+    /* Diagonal light sweep — plays once on hover, purely decorative, GPU-composited */
+    a.btn::before, button.btn::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: linear-gradient(75deg, transparent 40%, rgba(255, 255, 255, 0.35) 50%, transparent 60%);
+      transform: translateX(-120%);
+      pointer-events: none;
+    }
+    a.btn:hover::before, button.btn:hover::before {
+      transform: translateX(120%);
+      transition: transform 0.7s var(--ease);
+    }
+
+    a.btn:hover, button.btn:hover {
+      filter: brightness(1.06);
+      transform: translateY(-1px) translateZ(0);
+      box-shadow: var(--shadow-2), 0 0 0 5px var(--accent-bg);
+    }
+
+    a.btn:active, button.btn:active {
+      transform: scale(0.965) translateZ(0);
+      transition-duration: var(--dur-fast);
+      filter: brightness(0.98);
+    }
+
+    /* "Launch" burst: an expanding glow ring, used on the primary quote-request CTAs */
+    a.btn.btn-launch { position: relative; }
+    a.btn.btn-launch::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: 0 0 0 0 var(--accent-bg);
+      opacity: 0;
+      pointer-events: none;
+    }
+    a.btn.btn-launch:active::after {
+      animation: launchBurst 0.6s var(--ease);
+    }
+    @keyframes launchBurst {
+      0% { box-shadow: 0 0 0 0 var(--accent-bg); opacity: 1; }
+      100% { box-shadow: 0 0 0 16px transparent; opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      a.btn.btn-launch:active::after { animation: none; }
+    }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      transform: scale(0);
+      animation: ripple-anim 0.55s var(--ease);
+      pointer-events: none;
+    }
+
+    @keyframes ripple-anim { to { transform: scale(2.6); opacity: 0; } }
+    .btn-secondary .ripple { background: var(--accent-bg); }
+
+    a.btn-secondary, button.btn-secondary {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      background: var(--card);
+      color: var(--text);
+      font-weight: 700;
+      padding: 0.75rem 1.4rem;
+      border-radius: 10px;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 0.92rem;
+      overflow: hidden;
+      isolation: isolate;
+      transform: translateZ(0);
+      transition: background var(--dur-fast) var(--ease), border-color var(--dur) var(--ease), transform var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease), color var(--dur-fast) var(--ease);
+    }
+
+    a.btn-secondary:hover {
+      background: var(--card-hover);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: var(--shadow-2);
+      transform: translateY(-1px) translateZ(0);
+    }
+    a.btn-secondary:active { transform: scale(0.965) translateZ(0); transition-duration: var(--dur-fast); }
+
+    button.btn:disabled, a.btn[aria-disabled="true"], button.btn-secondary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      filter: none;
+      transform: none !important;
+      box-shadow: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      a.btn, button.btn, a.btn-secondary, button.btn-secondary { transition: filter var(--dur-fast) linear, background var(--dur-fast) linear; }
+      a.btn:hover, button.btn:hover, a.btn-secondary:hover { transform: none; }
+      a.btn:active, button.btn:active, a.btn-secondary:active { transform: none; }
+      a.btn::before, button.btn::before, a.btn:hover::before, button.btn:hover::before { display: none; }
+      .ripple { display: none; }
+    }
+
+    .power-line {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin-top: 0.9rem;
+      padding-top: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+    .power-line svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--warn); }
+
+    .power-box {
+      background: var(--warn-bg);
+      border-radius: 10px;
+      padding: 0.85rem 1.1rem;
+      font-size: 0.85rem;
+      color: var(--text);
+      margin-top: 0.7rem;
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+    }
+
+    .power-box svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 0.1rem; color: var(--warn); }
+    .power-box strong { color: var(--warn); }
+
+    .cluster-box {
+      background: var(--accent-bg);
+      border-radius: 14px;
+      padding: 1.2rem 1.4rem;
+      margin-top: 1.1rem;
+    }
+
+    .cluster-box strong { color: var(--accent); }
+    .cluster-box p { margin: 0.55rem 0 0; color: var(--text-dim); font-size: 0.88rem; }
+
+    .math-box {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .math-box .label { font-weight: 700; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+    .math-box .formula { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.98rem; color: var(--text); line-height: 1.7; }
+    .math-box .formula strong { color: var(--accent); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { text-align: left; color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.03em; padding: 0.85rem 0.9rem; border-bottom: 1px solid var(--border); }
+    td { padding: 0.85rem 0.9rem; border-bottom: 1px solid var(--border); transition: background var(--dur-fast) var(--ease); }
+    tbody tr { transition: transform var(--dur) var(--ease); }
+    tbody tr:nth-child(even) td { background: var(--bg-alt); }
+    tr:hover td { background: var(--card-hover) !important; }
+    tbody tr[onclick]:hover { transform: translateX(2px); }
+    @media (prefers-reduced-motion: reduce) {
+      tbody tr[onclick]:hover { transform: none; }
+    }
+
+    .table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: auto;
+      max-height: 70vh;
+    }
+
+    .table-wrap table { margin: 0; }
+    .table-wrap th { background: var(--bg-alt); position: sticky; top: 0; z-index: 5; }
+
+    label { display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.35rem; font-weight: 700; transition: color var(--dur-fast) var(--ease); }
+    input[type=text], input[type=email], input[type=number], textarea, select {
+      width: 100%;
+      padding: 0.7rem 0.85rem;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.95rem;
+      margin-bottom: 1.2rem;
+      font-family: inherit;
+      box-shadow: 0 0 0 0 var(--accent-bg);
+      transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease), background var(--dur-fast) var(--ease);
+    }
+
+    input::placeholder, textarea::placeholder { color: var(--text-dim); opacity: 0.65; transition: opacity var(--dur-fast) var(--ease); }
+    input:focus::placeholder, textarea:focus::placeholder { opacity: 0.4; }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-bg);
+      background: var(--card);
+    }
+
+    input[aria-invalid="true"], textarea[aria-invalid="true"] {
+      border-color: var(--danger);
+    }
+    input[aria-invalid="true"]:focus, textarea[aria-invalid="true"]:focus {
+      box-shadow: 0 0 0 4px var(--danger-bg);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      input[aria-invalid="true"], textarea[aria-invalid="true"] { animation: fieldShake 0.4s var(--ease); }
+    }
+    @keyframes fieldShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+
+    .error-box {
+      background: var(--danger-bg);
+      color: var(--danger);
+      padding: 0.75rem 1rem;
+      border-radius: 9px;
+      margin-bottom: 1.2rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      animation: noticeIn var(--dur) var(--ease);
+    }
+    .field-error { color: var(--danger); font-size: 0.78rem; font-weight: 600; margin: -0.6rem 0 0.9rem; animation: noticeIn var(--dur) var(--ease); }
+    .success-box {
+      background: var(--accent-bg);
+      padding: 1.1rem 1.3rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      border: 1px solid var(--accent);
+      box-shadow: var(--shadow-2);
+      animation: noticeIn var(--dur-slow) var(--ease);
+    }
+    .success-box strong { color: var(--accent); }
+
+    @keyframes noticeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .error-box, .field-error, .success-box { animation: none; }
+      input[aria-invalid="true"], textarea[aria-invalid="true"] { animation: none; }
+    }
+
+    .spec-table { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1.4rem; }
+    .spec-table-row { display: grid; grid-template-columns: 220px 1fr; padding: 0.85rem 1.2rem; font-size: 0.9rem; border-bottom: 1px solid var(--border); }
+    .spec-table-row:last-child { border-bottom: none; }
+    .spec-table-row:nth-child(even) { background: var(--bg-alt); }
+    .spec-table-row span:first-child { color: var(--text-dim); font-weight: 600; }
+    .spec-table-row span:last-child { color: var(--text); }
+    @media (max-width: 600px) {
+      .spec-table-row { grid-template-columns: 1fr; gap: 0.2rem; }
+    }
+
+    footer { position: relative; z-index: 1; color: var(--text-dim); font-size: 0.85rem; padding: 3rem 1.5rem 2.2rem; border-top: 1px solid var(--border); margin-top: 2rem; }
+    .footer-inner { max-width: 1120px; margin: 0 auto; }
+    .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 2.4rem; padding-bottom: 2rem; }
+    .footer-brand-name { color: var(--text); font-weight: 800; font-size: 1rem; }
+    .footer-brand-tag { margin-top: 0.6rem; max-width: 320px; line-height: 1.5; }
+    .footer-col h4 { color: var(--text); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 0.9rem; }
+    .footer-col a { display: block; color: var(--text-dim); text-decoration: none; font-size: 0.85rem; margin-bottom: 0.6rem; }
+    .footer-col a:hover { color: var(--accent); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; padding-top: 1.6rem; border-top: 1px solid var(--border); font-size: 0.76rem; }
+    @media (max-width: 700px) {
+      .footer-grid { grid-template-columns: 1fr; gap: 1.8rem; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px) scale(0.97) translateZ(0);
+      transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease);
+      transition-delay: var(--reveal-delay, 0s);
+    }
+
+    .reveal.visible { opacity: 1; transform: translateY(0) scale(1) translateZ(0); }
+
+    .reveal-group > * { --reveal-delay: 0s; }
+    .reveal-group > *:nth-child(2) { --reveal-delay: 0.06s; }
+    .reveal-group > *:nth-child(3) { --reveal-delay: 0.12s; }
+    .reveal-group > *:nth-child(4) { --reveal-delay: 0.18s; }
+    .reveal-group > *:nth-child(5) { --reveal-delay: 0.24s; }
+    .reveal-group > *:nth-child(n+6) { --reveal-delay: 0.3s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; transition-delay: 0s; }
+      .product-photo img, .hero-photo img { transition: none; }
+    }
+
+    #nav-toggle {
+      display: none;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      width: 38px;
+      height: 38px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    #nav-toggle svg { width: 18px; height: 18px; }
+
+    .floating-cta {
+      position: fixed;
+      right: 1.4rem;
+      bottom: 1.4rem;
+      z-index: 30;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .floating-cta.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+    .term {
+      position: relative;
+      border-bottom: 1.5px dotted var(--text-dim);
+      cursor: help;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .term:hover, .term:focus { border-bottom-color: var(--accent); color: var(--accent); }
+
+    .term .info-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--accent-bg);
+      color: var(--accent);
+      font-size: 0.62rem;
+      font-weight: 800;
+      font-style: normal;
+      margin-left: 0.2rem;
+      vertical-align: 1px;
+    }
+
+    .tooltip-bubble {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 0;
+      z-index: 50;
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.7rem 0.9rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      line-height: 1.5;
+      width: 240px;
+      white-space: normal;
+      box-shadow: var(--shadow);
+      cursor: default;
+    }
+
+    .tooltip-bubble.open { display: block; }
+
+    .tooltip-bubble::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 16px;
+      border: 6px solid transparent;
+      border-top-color: var(--text);
+    }
+
+    .more-specs-toggle {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      padding: 0.3rem 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .more-specs-toggle svg { width: 13px; height: 13px; transition: transform 0.2s ease; }
+    .more-specs-toggle.open svg { transform: rotate(180deg); }
+
+    .more-specs-panel {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.35s ease, opacity 0.3s ease, margin-top 0.35s ease;
+      border-top: 1px solid transparent;
+    }
+
+    .more-specs-panel.open {
+      max-height: 400px;
+      opacity: 1;
+      margin-top: 0.6rem;
+      padding-top: 0.6rem;
+      border-top-color: var(--border);
+    }
+
+    .more-specs-panel .stat-row { padding: 0.5rem 0; }
+    .more-specs-panel .stat-label, .more-specs-panel .stat-value { font-size: 0.82rem; }
+
+    .lightbox-overlay {
+      display: flex;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(5, 6, 10, 0);
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+      cursor: zoom-out;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity var(--dur) var(--ease), background-color var(--dur) var(--ease), visibility var(--dur);
+    }
+
+    .lightbox-overlay.open {
+      background: rgba(5, 6, 10, 0.92);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .lightbox-overlay img {
+      max-width: min(900px, 100%);
+      max-height: 100%;
+      border-radius: 16px;
+      box-shadow: var(--shadow-4);
+      cursor: default;
+      transform: scale(0.94);
+      transition: transform var(--dur) var(--ease);
+    }
+    .lightbox-overlay.open img { transform: scale(1); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .lightbox-overlay, .lightbox-overlay img { transition: opacity var(--dur-fast) linear; transform: none; }
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-close svg { width: 18px; height: 18px; }
+
+    .product-photo, .hero-photo { cursor: zoom-in; }
+
+    .quickview-overlay {
+      display: flex;
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      background: rgba(5, 6, 10, 0);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.2rem;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity var(--dur) var(--ease), background-color var(--dur) var(--ease), visibility var(--dur);
+    }
+    .quickview-overlay.open {
+      background: rgba(5, 6, 10, 0.6);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .quickview-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      max-width: 720px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-4);
+      position: relative;
+      padding: 2rem;
+      transform: translateY(14px) scale(0.97);
+      transition: transform var(--dur) var(--ease);
+    }
+    .quickview-overlay.open .quickview-panel { transform: translateY(0) scale(1); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .quickview-overlay, .quickview-panel { transition: opacity var(--dur-fast) linear; transform: none; }
+    }
+
+    .quickview-close {
+      position: absolute;
+      top: 1.1rem;
+      right: 1.1rem;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      transform: translateZ(0);
+      transition: color var(--dur-fast) var(--ease), border-color var(--dur) var(--ease), transform var(--dur-fast) var(--ease-snap), background var(--dur-fast) var(--ease);
+    }
+    .quickview-close:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-bg); transform: rotate(90deg); }
+    .quickview-close:active { transform: rotate(90deg) scale(0.88); }
+    .quickview-close svg { width: 16px; height: 16px; }
+
+    .cmdk-overlay {
+      display: flex;
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      background: rgba(5, 6, 10, 0);
+      align-items: flex-start;
+      justify-content: center;
+      padding: 12vh 1.2rem 2rem;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity var(--dur) var(--ease), background-color var(--dur) var(--ease), visibility var(--dur);
+    }
+    .cmdk-overlay.open {
+      background: rgba(5, 6, 10, 0.55);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .cmdk-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      max-width: 560px;
+      width: 100%;
+      max-height: 60vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-4);
+      overflow: hidden;
+      transform: translateY(-10px) scale(0.98);
+      transition: transform var(--dur) var(--ease);
+    }
+    .cmdk-overlay.open .cmdk-panel { transform: translateY(0) scale(1); }
+    @media (prefers-reduced-motion: reduce) {
+      .cmdk-overlay, .cmdk-panel { transition: opacity var(--dur-fast) linear; transform: none; }
+    }
+
+    .cmdk-input-row {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.9rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+    .cmdk-input-row svg { width: 17px; height: 17px; flex-shrink: 0; }
+    #cmdk-input { flex: 1; border: none; background: none; outline: none; font-size: 0.95rem; color: var(--text); }
+    #cmdk-input::placeholder { color: var(--text-dim); }
+
+    .cmdk-results { overflow-y: auto; padding: 0.5rem; }
+    .cmdk-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      padding: 0.7rem 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+    .cmdk-item .cmdk-item-sub { color: var(--text-dim); font-size: 0.76rem; }
+    .cmdk-item.active, .cmdk-item:hover { background: var(--accent-bg); }
+    .cmdk-empty { padding: 1.2rem; text-align: center; color: var(--text-dim); font-size: 0.86rem; }
+
+    .quickview-btn {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.78rem;
+      padding: 0.5rem 0.85rem;
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: border-color 0.15s ease, color 0.15s ease;
+    }
+    .quickview-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .quickview-btn svg { width: 14px; height: 14px; }
+
+    @media (max-width: 700px) {
+      .quickview-panel { padding: 1.4rem; max-height: 92vh; }
+    }
+
+    /* Medium laptop tier: nav + toggles still share one row, but compacted so nothing
+       wraps its own text or forces the header onto two lines. */
+    @media (max-width: 1600px) {
+      .header-inner { gap: 1rem; }
+      nav { gap: 0.8rem; }
+      nav a { font-size: 0.82rem; }
+      #theme-label, #datacenter-label, #simple-label { display: none; }
+      .header-toggles { gap: 0.4rem; }
+      #theme-toggle, #datacenter-toggle, #simple-toggle { padding: 0.5rem; }
+    }
+
+    /* 13"-MacBook / mid-size laptop tier: rather than keep shrinking font/gap indefinitely
+       (fragile — the exact bug that broke here), tuck the four less-essential links into a
+       "More" dropdown and keep the four primary links + logo + controls comfortably spaced. */
+    @media (max-width: 1180px) {
+      .nav-more {
+        display: inline-flex;
+        position: relative;
+      }
+      .nav-more-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: none;
+        border: none;
+        color: var(--text-dim);
+        font-size: 0.82rem;
+        font-weight: 600;
+        font-family: inherit;
+        padding: 0;
+        cursor: pointer;
+        transition: color var(--dur-fast) var(--ease);
+      }
+      .nav-more-toggle svg { transition: transform var(--dur) var(--ease); flex-shrink: 0; }
+      .nav-more-toggle:hover, .nav-more-toggle.active { color: var(--text); }
+      .nav-more-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+      .nav-more-menu {
+        display: none;
+        position: absolute;
+        top: calc(100% + 14px);
+        right: 0;
+        min-width: 190px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: var(--shadow-3);
+        padding: 0.4rem;
+        flex-direction: column;
+        gap: 0.1rem;
+      }
+      .nav-more-menu.open { display: flex; }
+      .nav-more-menu a {
+        font-size: 0.86rem;
+        padding: 0.6rem 0.7rem;
+        border-radius: 8px;
+        white-space: nowrap;
+      }
+      .nav-more-menu a::after { display: none; }
+      .nav-more-menu a:hover { background: var(--bg-alt); color: var(--text); }
+      .nav-more-menu a.active { background: var(--accent-bg); color: var(--accent); }
+    }
+
+    /* Small phones: logo text + hamburger + 3 icon toggles no longer fit together —
+       collapse the store name to just its icon mark, the same way many sites do on mobile. */
+    @media (max-width: 600px) {
+      header { padding: 1rem 0.9rem; }
+      .brand { font-size: 0; gap: 0; }
+      .header-inner { gap: 0.6rem; }
+      .header-right { gap: 0.6rem; }
+      .header-toggles { gap: 0.3rem; }
+      #theme-toggle, #datacenter-toggle, #simple-toggle { padding: 0.4rem; }
+      #nav-toggle { width: 34px; height: 34px; }
+    }
+
+    @media (max-width: 920px) {
+      /* Measured: brand text + 4 primary links + "More" + 3 icon toggles start overlapping
+         below ~880px even at compact spacing. Hamburger kicks in here with real margin, rather
+         than living right at the edge of breaking (which is exactly what caused this bug). */
+      /* Nav is a dropdown here, not an inline row item, so the wide-tier centering grid no
+         longer applies — go back to a simple two-group flex row (logo, then hamburger+toggles). */
+      .header-inner { display: flex; justify-content: space-between; }
+      .header-right { display: flex; align-items: center; gap: 0.6rem; }
+      #nav-toggle { display: flex; }
+
+      nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        flex-direction: column;
+        gap: 0;
+        padding: 0.5rem 0;
+        box-shadow: var(--shadow);
+      }
+
+      nav.open { display: flex; }
+
+      /* Merge the "More" group back into one flat, stacked list — a nested dropdown inside
+         the hamburger panel would just be a second menu-in-a-menu on small screens. */
+      .nav-more { display: contents; }
+      .nav-more-toggle { display: none; }
+      .nav-more-menu, .nav-more-menu.open { display: contents; }
+
+      nav a {
+        padding: 0.85rem 1.5rem;
+        width: 100%;
+        border-bottom: 1px solid var(--border);
+        border-left: 2px solid transparent;
+        transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease), padding-left var(--dur) var(--ease);
+      }
+
+      nav a::after { display: none; }
+      nav a:hover { padding-left: 1.8rem; background: var(--bg-alt); }
+      nav a.active { border-bottom-color: var(--border); border-left-color: var(--accent); background: var(--accent-bg); }
+
+      header { position: relative; }
+
+      .floating-cta span.cta-label { display: none; }
+      .floating-cta { padding: 0.8rem; border-radius: 50%; }
+
+      .tooltip-bubble {
+        width: 200px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .tooltip-bubble::after { left: 50%; margin-left: -6px; }
+    }
+
+    /* "Can my model run?" simulator rows — shared between the Model Advisor page and the
+       homepage teaser, so the two stay visually identical. */
+    .sim-grid { display: flex; flex-direction: column; gap: 0.7rem; }
+    .sim-row {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.9rem 1.1rem;
+      background: var(--bg);
+      opacity: 0;
+      transform: translateY(8px);
+      animation: simRowIn 0.35s var(--ease) forwards;
+    }
+    @keyframes simRowIn { to { opacity: 1; transform: translateY(0); } }
+    .sim-row::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, transparent 42%, var(--accent-bg) 50%, transparent 58%);
+      background-size: 250% 100%;
+      background-position: 150% 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .sim-row.scanning::before { animation: simScan 0.55s ease-out; }
+    @keyframes simScan {
+      0% { opacity: 1; background-position: 150% 0; }
+      100% { opacity: 0; background-position: -50% 0; }
+    }
+    .sim-row-top { display: flex; align-items: center; gap: 0.8rem; }
+    .sim-thumb { width: 44px; height: 44px; flex-shrink: 0; border-radius: 8px; overflow: hidden; }
+    .sim-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .sim-row-name { flex: 1; display: flex; flex-direction: column; gap: 0.15rem; }
+    .sim-row-sub { font-size: 0.76rem; color: var(--text-dim); }
+    .sim-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--accent);
+      background: var(--accent-bg);
+      border-radius: 999px;
+      padding: 0.12rem 0.5rem;
+      margin-left: 0.4rem;
+    }
+    .sim-icon {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-weight: 800;
+      opacity: 0; transform: scale(0.4);
+    }
+    .sim-row.scanned .sim-icon { opacity: 1; transform: scale(1); transition: opacity 0.3s var(--ease), transform 0.35s var(--ease); }
+    .sim-yes .sim-icon { background: var(--accent-bg); color: var(--accent); }
+    .sim-maybe .sim-icon { background: var(--warn-bg); color: var(--warn); }
+    .sim-no .sim-icon { background: var(--danger-bg); color: var(--danger); }
+    .sim-bar-track { background: var(--bg-alt); border-radius: 999px; height: 7px; overflow: hidden; margin-top: 0.7rem; }
+    .sim-bar-fill { height: 100%; border-radius: 999px; transition: width 0.7s var(--ease); }
+    .sim-yes .sim-bar-fill { background: linear-gradient(90deg, var(--accent-bright), var(--accent)); }
+    .sim-maybe .sim-bar-fill { background: linear-gradient(90deg, var(--warn), #f0b64c); }
+    .sim-no .sim-bar-fill { background: linear-gradient(90deg, var(--danger), #f0465b); }
+    .sim-row-stats {
+      display: flex; gap: 1.1rem; margin-top: 0.55rem;
+      font-size: 0.8rem; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums;
+    }
+    .sim-row-note { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.35rem; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sim-row { animation: none; opacity: 1; transform: none; }
+      .sim-row.scanning::before { animation: none; }
+      .sim-icon { opacity: 1; transform: none; transition: none; }
+      .sim-bar-fill { transition: none; }
+    }
+
+    /* Explain Simply mascot — a small, click-through cat that only appears in Explain Simply
+       mode. Entirely non-interactive (pointer-events: none) except its own dismiss button, so
+       it can never block a click on real page content. */
+    .mascot-cat {
+      position: fixed;
+      z-index: 15;
+      width: 60px;
+      height: 46px;
+      pointer-events: none;
+      opacity: 0;
+      transition: left 1.1s cubic-bezier(0.65, 0, 0.35, 1), top 1.1s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.3s var(--ease);
+    }
+    .mascot-cat.mascot-visible { opacity: 1; }
+    .mascot-cat.mascot-fast-move { transition: left 0.45s ease-in, top 0.45s ease-in, opacity 0.3s var(--ease); }
+    .mascot-clip { position: relative; width: 100%; height: 100%; overflow: hidden; }
+    .mascot-clip.mascot-hiding { height: 16px; }
+    .mascot-svg {
+      width: 60px;
+      height: 46px;
+      display: block;
+      filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.18));
+      transition: transform 0.3s var(--ease);
+    }
+    .mascot-cat[data-facing="left"] .mascot-svg { transform: scaleX(-1); }
+
+    .mascot-body-group { color: var(--text-dim); }
+    .mascot-svg .mascot-line { stroke: var(--text); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .mascot-svg .mascot-fill { fill: var(--card); stroke: var(--text); stroke-width: 1.6; }
+    .mascot-svg .mascot-accent { stroke: var(--accent); }
+
+    .mascot-eyes-closed, .mascot-zzz, .mascot-paw { display: none; }
+    .mascot-cat.state-sleep .mascot-eyes-open { display: none; }
+    .mascot-cat.state-sleep .mascot-eyes-closed { display: block; }
+    .mascot-cat.state-sleep .mascot-zzz { display: block; animation: mascotZzz 2.2s ease-in-out infinite; }
+    .mascot-cat.state-point .mascot-paw { display: block; animation: mascotPawPoint 1.1s ease-in-out infinite; }
+
+    .mascot-legs { animation: none; }
+    .mascot-cat.state-walk .mascot-legs { animation: mascotWalk 0.32s steps(2, end) infinite; }
+    .mascot-cat.state-walk .mascot-tail { animation: mascotTailWalk 0.5s ease-in-out infinite; }
+    .mascot-cat.state-flee .mascot-legs { animation: mascotWalk 0.16s steps(2, end) infinite; }
+    .mascot-cat.state-flee .mascot-tail { animation: mascotTailWalk 0.22s ease-in-out infinite; }
+
+    .mascot-tail { animation: mascotTailIdle 3.4s ease-in-out infinite; transform-origin: 6px 30px; }
+    .mascot-cat.state-sleep .mascot-tail, .mascot-cat.state-stretch .mascot-tail { animation: none; }
+
+    .mascot-cat.state-stretch .mascot-body-group { animation: mascotStretch 1.4s ease-in-out; }
+    .mascot-cat.state-jump { animation: mascotJump 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .mascot-cat.state-startle { animation: mascotStartle 0.25s ease-in-out; }
+
+    @keyframes mascotWalk {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-1.4px); }
+      100% { transform: translateY(0); }
+    }
+    @keyframes mascotTailWalk {
+      0%, 100% { transform: rotate(-8deg); }
+      50% { transform: rotate(10deg); }
+    }
+    @keyframes mascotTailIdle {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(6deg); }
+    }
+    @keyframes mascotStretch {
+      0%, 100% { transform: scaleX(1) scaleY(1); }
+      45% { transform: scaleX(1.22) scaleY(0.86) translateY(3px); }
+    }
+    @keyframes mascotJump {
+      0%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-16px); }
+      60% { transform: translateY(-16px); }
+    }
+    @keyframes mascotStartle {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(0.85, 1.15); }
+    }
+    @keyframes mascotZzz {
+      0% { opacity: 0; transform: translate(0, 0); }
+      20% { opacity: 1; }
+      100% { opacity: 0; transform: translate(6px, -10px); }
+    }
+    @keyframes mascotPawPoint {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(2px, -2px) rotate(-12deg); }
+    }
+
+    .mascot-ball {
+      position: fixed;
+      z-index: 14;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+      transition: left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s var(--ease);
+    }
+    .mascot-ball.mascot-visible { opacity: 1; }
+
+    .mascot-dismiss {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 11px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--dur-fast) var(--ease);
+    }
+    .mascot-cat:hover .mascot-dismiss, .mascot-dismiss:focus-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (max-width: 700px) {
+      .mascot-cat, .mascot-ball { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mascot-cat, .mascot-ball { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="datacenter-depth-grid" aria-hidden="true"></div>
+  <div id="datacenter-depth-lines" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+  <canvas id="datacenter-rain" aria-hidden="true"></canvas>
+  <header>
+   <div class="header-inner">
+    <a class="brand" href="{{ url_for('home') }}">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="16" height="16" rx="2.5" stroke="#76b900" stroke-width="2"></rect>
+          <circle cx="12" cy="12" r="3" fill="#76b900"></circle>
+          <line x1="12" y1="1.5" x2="12" y2="4" stroke="#76b900" stroke-width="2"></line>
+          <line x1="12" y1="20" x2="12" y2="22.5" stroke="#76b900" stroke-width="2"></line>
+          <line x1="1.5" y1="12" x2="4" y2="12" stroke="#76b900" stroke-width="2"></line>
+          <line x1="20" y1="12" x2="22.5" y2="12" stroke="#76b900" stroke-width="2"></line>
+        </svg>
+      </span>
+      {{ STORE_NAME }}
+    </a>
+    <div class="header-right">
+      <nav id="main-nav">
+        <a href="{{ url_for('home') }}" class="{{ 'active' if request.path == url_for('home') else '' }}">Catalog</a>
+        <a href="{{ url_for('configurator') }}" class="{{ 'active' if request.path == url_for('configurator') else '' }}">Build Configurator</a>
+        <a href="{{ url_for('models') }}" class="{{ 'active' if request.path == url_for('models') else '' }}">Model advisor</a>
+        <a href="{{ url_for('quote') }}" class="{{ 'active' if request.path == url_for('quote') else '' }}">Request a quote</a>
+        <div class="nav-more" id="nav-more">
+          <button type="button" class="nav-more-toggle{{ ' active' if request.path.startswith('/guide') or request.path == url_for('technical_guide') or request.path == url_for('requests_list') or request.path == url_for('faq') else '' }}" id="nav-more-toggle" aria-haspopup="true" aria-expanded="false">
+            More
+            <svg width="10" height="10" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="nav-more-menu" id="nav-more-menu">
+            <a href="{{ url_for('guide') }}" class="{{ 'active' if request.path.startswith('/guide') else '' }}">Guided build</a>
+            <a href="{{ url_for('technical_guide') }}" class="{{ 'active' if request.path == url_for('technical_guide') else '' }}">AI Hardware Lab</a>
+            <a href="{{ url_for('requests_list') }}" class="{{ 'active' if request.path == url_for('requests_list') else '' }}">Requests</a>
+            <a href="{{ url_for('faq') }}" class="{{ 'active' if request.path == url_for('faq') else '' }}">FAQ</a>
+          </div>
+        </div>
+      </nav>
+      <button id="nav-toggle" type="button" title="Menu" aria-label="Toggle navigation" aria-expanded="false" aria-controls="main-nav">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+          <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+          <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+        </svg>
+      </button>
+      <div class="header-toggles">
+        <button id="theme-toggle" type="button" title="Toggle light/dark mode" aria-label="Toggle light/dark mode">
+          <span class="theme-icon-stack">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2"></circle>
+              <line x1="12" y1="1.5" x2="12" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+              <line x1="12" y1="20" x2="12" y2="22.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+              <line x1="1.5" y1="12" x2="4" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+              <line x1="20" y1="12" x2="22.5" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+              <line x1="4.4" y1="4.4" x2="6.2" y2="6.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+              <line x1="17.8" y1="17.8" x2="19.6" y2="19.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+              <line x1="4.4" y1="19.6" x2="6.2" y2="17.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+              <line x1="17.8" y1="6.2" x2="19.6" y2="4.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z" fill="currentColor"></path>
+            </svg>
+          </span>
+          <span id="theme-label">Dark mode</span>
+        </button>
+        <button id="datacenter-toggle" type="button" title="Toggle Datacenter Mode" aria-label="Toggle Datacenter Mode" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="3" width="18" height="18" rx="1.5" stroke="currentColor" stroke-width="1.7"></rect>
+            <line x1="7" y1="8" x2="17" y2="8" stroke="currentColor" stroke-width="1.5"></line>
+            <line x1="7" y1="12" x2="14" y2="12" stroke="currentColor" stroke-width="1.5"></line>
+            <line x1="7" y1="16" x2="17" y2="16" stroke="currentColor" stroke-width="1.5"></line>
+          </svg>
+          <span id="datacenter-label">Datacenter mode</span>
+        </button>
+        <button id="simple-toggle" type="button" title="Toggle simple explanations" aria-label="Toggle simple explanations" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"></circle>
+            <circle cx="9" cy="10" r="1.1" fill="currentColor"></circle>
+            <circle cx="15" cy="10" r="1.1" fill="currentColor"></circle>
+            <path d="M8.5 14.5c1 1.2 2.2 1.8 3.5 1.8s2.5-0.6 3.5-1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+          </svg>
+          <span id="simple-label">Explain simply</span>
+          <span class="simple-discovery-hint" id="simple-discovery-hint" aria-hidden="true">New: click for plain-language explanations across the site.</span>
+        </button>
+      </div>
+    </div>
+   </div>
+  </header>
+
+  <div id="datacenter-scanlines" aria-hidden="true"></div>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand-name">{{ STORE_NAME }}</div>
+          <p class="footer-brand-tag">
+            Real NVIDIA hardware, real prices, and the memory math shown in plain English —
+            never a guessed or invented spec. Quote requests only: no payment processing,
+            no accounts.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Catalog</h4>
+          <a href="{{ url_for('home') }}">All hardware</a>
+          <a href="{{ url_for('configurator') }}">Build Configurator</a>
+          <a href="{{ url_for('models') }}">Model advisor</a>
+          <a href="{{ url_for('guide') }}">Guided build</a>
+          <a href="{{ url_for('technical_guide') }}">AI Hardware Lab</a>
+        </div>
+        <div class="footer-col">
+          <h4>Requests</h4>
+          <a href="{{ url_for('quote') }}">Request a quote</a>
+          <a href="{{ url_for('requests_list') }}">Track a request</a>
+          <a href="{{ url_for('faq') }}">FAQ</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>Product photography courtesy of NVIDIA's official press materials.</span>
+        <span>Prices verified as of July 2026 — see the FAQ for sourcing notes.</span>
+      </div>
+    </div>
+  </footer>
+
+  {% if request.path != url_for('guide') %}
+    <a class="btn floating-cta" id="floating-cta" href="{{ url_for('guide') }}">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;">
+        <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+      </svg>
+      <span class="cta-label">Get matched to a build</span>
+    </a>
+  {% endif %}
+
+  <div class="lightbox-overlay" id="lightbox-overlay">
+    <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+        <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+      </svg>
+    </button>
+    <img id="lightbox-img" src="" alt="">
+  </div>
+
+  <div class="quickview-overlay" id="quickview-overlay" role="dialog" aria-modal="true" aria-labelledby="quickview-title">
+    <div class="quickview-panel">
+      <button class="quickview-close" id="quickview-close" type="button" aria-label="Close quick view">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+          <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+        </svg>
+      </button>
+      <div id="quickview-body"></div>
+    </div>
+  </div>
+
+  <div class="cmdk-overlay" id="cmdk-overlay" role="dialog" aria-modal="true" aria-label="Search">
+    <div class="cmdk-panel">
+      <div class="cmdk-input-row">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle>
+          <line x1="21" y1="21" x2="16.5" y2="16.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+        </svg>
+        <input type="text" id="cmdk-input" placeholder="Search products and pages&hellip;" autocomplete="off" aria-label="Search products and pages">
+        <span class="cmdk-kbd">Esc</span>
+      </div>
+      <div id="cmdk-results" class="cmdk-results" role="listbox"></div>
+    </div>
+  </div>
+
+  <script id="nav-products-data" type="application/json">{{ NAV_PRODUCTS | tojson }}</script>
+
+  <script>
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      document.getElementById("theme-label").textContent = theme === "dark" ? "Light mode" : "Dark mode";
+    }
+    applyTheme(document.documentElement.getAttribute("data-theme") || "light");
+
+    document.getElementById("theme-toggle").addEventListener("click", function () {
+      var current = document.documentElement.getAttribute("data-theme") || "light";
+      var next = current === "light" ? "dark" : "light";
+      localStorage.setItem("aistore-theme", next);
+      applyTheme(next);
+    });
+
+    var datacenterRain = (function () {
+      var canvas = document.getElementById("datacenter-rain");
+      var ctx = canvas.getContext("2d");
+      var rafId = null;
+      var columns = [];
+      var chars = "01ABCDEF";
+      var fontSize = 16;
+      var w, h, dpr;
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+        w = window.innerWidth;
+        h = window.innerHeight;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        var slots = Math.ceil(w / fontSize);
+        columns = [];
+        // Sparse: only ~1 in 5 slots gets an active falling glyph — texture, not a wall of text.
+        for (var i = 0; i < slots; i++) {
+          if (Math.random() < 0.2) {
+            columns.push({ x: i * fontSize, y: Math.random() * -h, speed: 0.35 + Math.random() * 0.5, alpha: 0.1 + Math.random() * 0.14 });
+          }
+        }
+      }
+
+      function tick() {
+        // Trailing fade instead of a hard clear — soft streaks, not a flat flicker.
+        ctx.fillStyle = "rgba(3, 8, 5, 0.16)";
+        ctx.fillRect(0, 0, w, h);
+        ctx.font = fontSize + "px ui-monospace, Menlo, monospace";
+        for (var i = 0; i < columns.length; i++) {
+          var c = columns[i];
+          var ch = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillStyle = "rgba(57, 255, 143, " + c.alpha + ")";
+          ctx.fillText(ch, c.x, c.y);
+          c.y += c.speed * fontSize;
+          if (c.y > h + fontSize) { c.y = Math.random() * -60; c.alpha = 0.1 + Math.random() * 0.14; }
+        }
+        rafId = requestAnimationFrame(tick);
+      }
+
+      var resizeTimer;
+      function onResize() { clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 200); }
+
+      return {
+        start: function () {
+          if (rafId || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+          resize();
+          window.addEventListener("resize", onResize);
+          document.addEventListener("visibilitychange", visHandler);
+          rafId = requestAnimationFrame(tick);
+        },
+        stop: function () {
+          if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+          window.removeEventListener("resize", onResize);
+          document.removeEventListener("visibilitychange", visHandler);
+          ctx.clearRect(0, 0, w || canvas.width, h || canvas.height);
+        }
+      };
+
+      function visHandler() {
+        if (document.hidden) { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
+        else if (document.documentElement.getAttribute("data-datacenter") === "on") { rafId = requestAnimationFrame(tick); }
+      }
+    })();
+
+    function playBootSequence() {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      var lines = [
+        "INITIALIZING GPU FABRIC...",
+        "CHECKING POSTGRES CONNECTION...",
+        "LOADING MODEL ADVISOR...",
+        "CALIBRATING POWER TELEMETRY...",
+        "DATACENTER MODE ONLINE"
+      ];
+      var overlay = document.createElement("div");
+      overlay.className = "boot-sequence";
+      overlay.setAttribute("aria-live", "polite");
+      document.body.appendChild(overlay);
+
+      lines.forEach(function (line, i) {
+        setTimeout(function () {
+          var el = document.createElement("div");
+          el.className = "boot-line" + (i === lines.length - 1 ? " boot-line-final" : "");
+          el.textContent = "> " + line;
+          overlay.appendChild(el);
+        }, i * 380);
+      });
+
+      setTimeout(function () {
+        overlay.classList.add("boot-fade-out");
+        setTimeout(function () { overlay.remove(); }, 500);
+      }, lines.length * 380 + 700);
+    }
+
+    function applyDatacenterMode(on, isUserToggle) {
+      document.documentElement.setAttribute("data-datacenter", on ? "on" : "off");
+      var btn = document.getElementById("datacenter-toggle");
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      document.getElementById("datacenter-label").textContent = on ? "Datacenter mode: on" : "Datacenter mode";
+      if (on) datacenterRain.start(); else datacenterRain.stop();
+      if (on && isUserToggle) playBootSequence();
+    }
+    applyDatacenterMode(localStorage.getItem("aistore-datacenter") === "on", false);
+
+    document.getElementById("datacenter-toggle").addEventListener("click", function () {
+      var next = document.documentElement.getAttribute("data-datacenter") !== "on";
+      localStorage.setItem("aistore-datacenter", next ? "on" : "off");
+      applyDatacenterMode(next, true);
+    });
+
+    // ---- Explain Simply mascot: a small click-through cat, only active in Explain Simply mode ----
+    // Defined BEFORE applySimpleMode below, since applySimpleMode calls mascotEnable/mascotDisable
+    // synchronously on page load — if this ran after, the first call would throw (function not
+    // yet assigned) and abort every remaining top-level statement in this script block.
+    var mascotEnable, mascotDisable;
+    (function () {
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var isMobile = window.matchMedia("(max-width: 700px)").matches;
+      var catEl = null, ballEl = null;
+      var timers = [];
+      var running = false;
+      var pos = { x: 0, y: 0 };
+      var fleeCooldown = 0;
+
+      function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+      function after(ms, fn) { var id = setTimeout(fn, ms); timers.push(id); return id; }
+      // Long, randomized pause between activities — the cat mostly just sits there and only
+      // moves roughly once a minute on its own (or immediately if a visitor's cursor lands on
+      // it), so it reads as a quiet helper, never a distraction.
+      function idleGap() { return 60000 + Math.random() * 15000; }
+      function highlightExplain(el, on) { if (el) el.classList.toggle("mascot-pointed", on); }
+
+      function bounds() {
+        var header = document.querySelector("header");
+        var headerH = header ? header.getBoundingClientRect().height : 70;
+        return {
+          minX: 16,
+          maxX: Math.max(16, window.innerWidth - 76),
+          minY: headerH + 20,
+          maxY: Math.max(headerH + 40, window.innerHeight - 110)
+        };
+      }
+
+      function randomPoint() {
+        var b = bounds();
+        return {
+          x: b.minX + Math.random() * (b.maxX - b.minX),
+          y: b.minY + Math.random() * (b.maxY - b.minY)
+        };
+      }
+
+      function buildCat() {
+        var wrap = document.createElement("div");
+        wrap.className = "mascot-cat";
+        wrap.id = "mascot-cat";
+        wrap.setAttribute("aria-hidden", "true");
+        wrap.innerHTML =
+          '<button type="button" class="mascot-dismiss" title="Hide mascot" aria-label="Hide the Explain Simply mascot">&times;</button>' +
+          '<div class="mascot-clip" id="mascot-clip">' +
+          '<svg class="mascot-svg" viewBox="0 0 60 46" xmlns="http://www.w3.org/2000/svg">' +
+          '<path class="mascot-line mascot-tail" d="M6 30 C -2 26, -1 14, 8 12"/>' +
+          '<g class="mascot-legs">' +
+          '<path class="mascot-line" d="M18 40 V45 M26 40 V45 M36 40 V45 M44 40 V45"/>' +
+          "</g>" +
+          '<ellipse class="mascot-fill mascot-body-group" cx="30" cy="34" rx="17" ry="9"/>' +
+          '<g transform="translate(38,14)">' +
+          '<circle class="mascot-fill" cx="8" cy="10" r="10"/>' +
+          '<path class="mascot-fill" d="M1 4 L -3 -5 L 5 1 Z"/>' +
+          '<path class="mascot-fill" d="M15 4 L 19 -5 L 11 1 Z"/>' +
+          '<g class="mascot-eyes-open"><circle cx="5" cy="10" r="1.3" fill="var(--text)"/><circle cx="11" cy="10" r="1.3" fill="var(--text)"/></g>' +
+          '<g class="mascot-eyes-closed"><path class="mascot-line" d="M3.5 10 q1.5 1.5 3 0 M9.5 10 q1.5 1.5 3 0"/></g>' +
+          '<path class="mascot-line mascot-accent" d="M8 12.5 q-1.5 1.5 -3 0.3 M8 12.5 q1.5 1.5 3 0.3" style="stroke-width:1.1;"/>' +
+          '<text class="mascot-zzz" x="20" y="-4" font-size="9" fill="var(--text-dim)" font-family="ui-monospace, Menlo, monospace">z</text>' +
+          "</g>" +
+          '<g class="mascot-paw" transform="translate(46,26)"><path class="mascot-line" d="M0 8 q6 -4 10 -10"/></g>' +
+          "</svg>" +
+          "</div>";
+        document.body.appendChild(wrap);
+
+        var ball = document.createElement("div");
+        ball.className = "mascot-ball";
+        ball.id = "mascot-ball";
+        ball.setAttribute("aria-hidden", "true");
+        document.body.appendChild(ball);
+
+        wrap.querySelector(".mascot-dismiss").addEventListener("click", function (e) {
+          e.stopPropagation();
+          localStorage.setItem("aistore-mascot", "off");
+          mascotDisable();
+        });
+
+        return { cat: wrap, ball: ball };
+      }
+
+      function moveTo(point, fast) {
+        catEl.classList.toggle("mascot-fast-move", !!fast);
+        catEl.style.left = point.x + "px";
+        catEl.style.top = point.y + "px";
+        pos = point;
+      }
+
+      function setState(state) {
+        catEl.className = "mascot-cat mascot-visible state-" + state;
+      }
+
+      function showBallNear(point) {
+        ballEl.style.left = (point.x + 44) + "px";
+        ballEl.style.top = (point.y + 34) + "px";
+        ballEl.classList.add("mascot-visible");
+        after(900, function () {
+          ballEl.style.left = (point.x + 30) + "px";
+          ballEl.style.top = (point.y + 40) + "px";
+        });
+        after(2200, function () { ballEl.classList.remove("mascot-visible"); });
+      }
+
+      function walkTo(dest, onArrive) {
+        var dx = dest.x - pos.x, dy = dest.y - pos.y;
+        catEl.setAttribute("data-facing", dx < 0 ? "left" : "right");
+        setState("walk");
+        moveTo(dest, false);
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        var duration = Math.min(1600, Math.max(500, dist * 3));
+        after(duration, function () {
+          setState("sit");
+          if (onArrive) onArrive();
+        });
+      }
+
+      function findVisible(selector) {
+        var els = Array.prototype.slice.call(document.querySelectorAll(selector));
+        var b = bounds();
+        els = els.filter(function (el) {
+          var r = el.getBoundingClientRect();
+          return r.top > b.minY - 40 && r.bottom < window.innerHeight && r.width > 60;
+        });
+        return els.length ? els[Math.floor(Math.random() * els.length)] : null;
+      }
+
+      // Weighted so ~90% of what the cat does is calm/helpful (point at an explanation, stretch,
+      // sleep, walk to a new spot) and only ~10% is purely playful (hide, jump, play ball) — a
+      // clever helper that occasionally does something cute, not the main attraction.
+      function nextActivity() {
+        if (!running) return;
+        var roll = Math.random();
+        if (roll < 0.4) {
+          var card = findVisible(".simple-explain, .term");
+          if (card) {
+            var r = card.getBoundingClientRect();
+            walkTo({ x: Math.min(bounds().maxX, r.left + 10), y: Math.max(bounds().minY, r.top - 40) }, function () {
+              setState("point");
+              highlightExplain(card, true);
+              after(1800, function () {
+                highlightExplain(card, false);
+                setState("sit");
+                after(idleGap(), nextActivity);
+              });
+            });
+          } else {
+            walkTo(randomPoint(), function () { after(idleGap(), nextActivity); });
+          }
+        } else if (roll < 0.65) {
+          walkTo(randomPoint(), function () {
+            setState("stretch");
+            after(1400, function () { setState("sit"); after(idleGap(), nextActivity); });
+          });
+        } else if (roll < 0.8) {
+          walkTo(randomPoint(), function () {
+            setState("sleep");
+            after(3200, function () { setState("sit"); after(idleGap(), nextActivity); });
+          });
+        } else if (roll < 0.9) {
+          walkTo(randomPoint(), function () { after(idleGap(), nextActivity); });
+        } else if (roll < 0.95) {
+          var box = findVisible(".card, .table-wrap, .configurator-panel");
+          if (box) {
+            var br = box.getBoundingClientRect();
+            var target = { x: Math.max(bounds().minX, Math.min(bounds().maxX, br.left + 10)), y: Math.min(bounds().maxY + 60, br.bottom - 8) };
+            walkTo(target, function () {
+              var clip = document.getElementById("mascot-clip");
+              clip.classList.add("mascot-hiding");
+              after(1400, function () {
+                clip.classList.remove("mascot-hiding");
+                after(idleGap(), nextActivity);
+              });
+            });
+          } else {
+            walkTo(randomPoint(), function () { after(idleGap(), nextActivity); });
+          }
+        } else if (roll < 0.98) {
+          walkTo(randomPoint(), function () {
+            setState("jump");
+            after(700, function () { setState("sit"); after(idleGap(), nextActivity); });
+          });
+        } else {
+          walkTo(randomPoint(), function () {
+            showBallNear(pos);
+            after(2400, function () { after(idleGap(), nextActivity); });
+          });
+        }
+      }
+
+      function distanceToCat(clientX, clientY) {
+        var r = catEl.getBoundingClientRect();
+        var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        return Math.sqrt(Math.pow(clientX - cx, 2) + Math.pow(clientY - cy, 2));
+      }
+
+      // If the cursor lands right on the cat (e.g. it's sitting on top of text a visitor is
+      // trying to read), it moves clear out of the way — to whichever screen edge is farthest
+      // from the cursor — rather than a small step that might still be in the way.
+      function edgeAwayFrom(clientX, clientY) {
+        var b = bounds();
+        var distLeft = clientX - b.minX;
+        var distRight = b.maxX - clientX;
+        var distTop = clientY - b.minY;
+        var distBottom = b.maxY - clientY;
+        var farthest = Math.max(distLeft, distRight, distTop, distBottom);
+        var jitter = function (v, min, max) {
+          return Math.max(min, Math.min(max, v + (Math.random() * 200 - 100)));
+        };
+        if (farthest === distLeft) return { x: b.minX, y: jitter(clientY, b.minY, b.maxY) };
+        if (farthest === distRight) return { x: b.maxX, y: jitter(clientY, b.minY, b.maxY) };
+        if (farthest === distTop) return { x: jitter(clientX, b.minX, b.maxX), y: b.minY };
+        return { x: jitter(clientX, b.minX, b.maxX), y: b.maxY };
+      }
+
+      function onMouseMove(e) {
+        if (!running) return;
+        var now = Date.now();
+        if (now < fleeCooldown) return;
+        if (distanceToCat(e.clientX, e.clientY) < 48) {
+          fleeCooldown = now + 2000;
+          clearTimers();
+          setState("startle");
+          document.getElementById("mascot-ball") && ballEl.classList.remove("mascot-visible");
+          after(120, function () {
+            var dest = edgeAwayFrom(e.clientX, e.clientY);
+            catEl.setAttribute("data-facing", dest.x < pos.x ? "left" : "right");
+            setState("flee");
+            moveTo(dest, true);
+            after(450, function () {
+              setState("sit");
+              after(idleGap(), nextActivity);
+            });
+          });
+        }
+      }
+
+      function startLoop() {
+        var start = randomPoint();
+        catEl.style.left = start.x + "px";
+        catEl.style.top = start.y + "px";
+        pos = start;
+        setState("sit");
+        after(1200, nextActivity);
+      }
+
+      mascotEnable = function () {
+        if (reduceMotion || isMobile) return;
+        if (localStorage.getItem("aistore-mascot") === "off") return;
+        if (running) return;
+        running = true;
+        if (!catEl) {
+          var built = buildCat();
+          catEl = built.cat;
+          ballEl = built.ball;
+          document.addEventListener("mousemove", onMouseMove, { passive: true });
+          window.addEventListener("resize", function () {
+            if (catEl) {
+              var b = bounds();
+              pos.x = Math.min(pos.x, b.maxX);
+              pos.y = Math.min(pos.y, b.maxY);
+              catEl.style.left = pos.x + "px";
+              catEl.style.top = pos.y + "px";
+            }
+          });
+        }
+        catEl.classList.add("mascot-visible");
+        startLoop();
+      };
+
+      mascotDisable = function () {
+        running = false;
+        clearTimers();
+        if (catEl) catEl.classList.remove("mascot-visible");
+        if (ballEl) ballEl.classList.remove("mascot-visible");
+      };
+    })();
+
+    function applySimpleMode(on) {
+      document.documentElement.setAttribute("data-simple", on ? "on" : "off");
+      var btn = document.getElementById("simple-toggle");
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      document.getElementById("simple-label").textContent = on ? "Explain simply: on" : "Explain simply";
+      if (on) { mascotEnable(); } else { mascotDisable(); }
+    }
+    applySimpleMode(localStorage.getItem("aistore-simple") === "on");
+
+    document.getElementById("simple-toggle").addEventListener("click", function () {
+      var next = document.documentElement.getAttribute("data-simple") !== "on";
+      localStorage.setItem("aistore-simple", next ? "on" : "off");
+      applySimpleMode(next);
+    });
+
+    // One-time nudge so first-time visitors know the smiley icon reveals plain-language
+    // explanations. Shows once ever (per browser), auto-hides, dismisses on any click/scroll.
+    (function () {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      if (localStorage.getItem("aistore-simple-hint-seen") === "1") return;
+      if (localStorage.getItem("aistore-simple") === "on") return;
+      var hint = document.getElementById("simple-discovery-hint");
+      if (!hint) return;
+      var dismissed = false;
+      function dismiss() {
+        if (dismissed) return;
+        dismissed = true;
+        hint.classList.remove("show");
+        localStorage.setItem("aistore-simple-hint-seen", "1");
+        document.removeEventListener("click", dismiss);
+        document.removeEventListener("scroll", dismiss);
+      }
+      setTimeout(function () {
+        if (localStorage.getItem("aistore-simple") === "on") return;
+        hint.classList.add("show");
+        setTimeout(dismiss, 6000);
+        document.addEventListener("click", dismiss);
+        document.addEventListener("scroll", dismiss, { passive: true, once: true });
+      }, 1600);
+    })();
+
+    var navToggle = document.getElementById("nav-toggle");
+    var mainNav = document.getElementById("main-nav");
+    if (navToggle && mainNav) {
+      navToggle.addEventListener("click", function () {
+        var isOpen = mainNav.classList.toggle("open");
+        navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        closeNavMore();
+      });
+    }
+
+    // "More" dropdown — houses the four less-essential nav links at medium (laptop) widths.
+    var navMoreToggle = document.getElementById("nav-more-toggle");
+    var navMoreMenu = document.getElementById("nav-more-menu");
+    function closeNavMore() {
+      if (!navMoreMenu) return;
+      navMoreMenu.classList.remove("open");
+      navMoreToggle.setAttribute("aria-expanded", "false");
+    }
+    if (navMoreToggle && navMoreMenu) {
+      navMoreToggle.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var isOpen = navMoreMenu.classList.toggle("open");
+        navMoreToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      });
+      document.addEventListener("click", function (e) {
+        if (!navMoreMenu.contains(e.target) && e.target !== navMoreToggle) closeNavMore();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && navMoreMenu.classList.contains("open")) {
+          closeNavMore();
+          navMoreToggle.focus();
+        }
+      });
+      window.addEventListener("resize", closeNavMore);
+    }
+
+    document.querySelectorAll(
+      "main .card, main .table-wrap, main h1, main h2, main .stat-chip, main .learn-item, main .faq-item, main .spec-table"
+    ).forEach(function (el) {
+      el.classList.add("reveal");
+    });
+
+    // Safety net: no matter what — no scrolling, JS timing, or a bot that never fires the
+    // IntersectionObserver — every ".reveal" element must end up visible on its own within ~1s.
+    // Content must never depend on a real user scrolling to become visible.
+    setTimeout(function () {
+      document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("visible"); });
+    }, 900);
+
+    if ("IntersectionObserver" in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
+      document.querySelectorAll(".reveal").forEach(function (el) { observer.observe(el); });
+    } else {
+      document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("visible"); });
+    }
+
+    var floatingCta = document.getElementById("floating-cta");
+    var headerEl = document.querySelector("header");
+    window.addEventListener("scroll", function () {
+      if (floatingCta) {
+        if (window.scrollY > 300) floatingCta.classList.add("visible");
+        else floatingCta.classList.remove("visible");
+      }
+      if (headerEl) {
+        if (window.scrollY > 40) headerEl.classList.add("scrolled");
+        else headerEl.classList.remove("scrolled");
+      }
+    }, { passive: true });
+
+    document.querySelectorAll("a.btn, button.btn, a.btn-secondary, button.btn-secondary").forEach(function (btn) {
+      btn.addEventListener("click", function (e) {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        var rect = btn.getBoundingClientRect();
+        var ripple = document.createElement("span");
+        var size = Math.max(rect.width, rect.height) * 1.4;
+        ripple.className = "ripple";
+        ripple.style.width = ripple.style.height = size + "px";
+        ripple.style.left = (e.clientX - rect.left - size / 2) + "px";
+        ripple.style.top = (e.clientY - rect.top - size / 2) + "px";
+        btn.appendChild(ripple);
+        setTimeout(function () { ripple.remove(); }, 600);
+      });
+    });
+
+    document.addEventListener("click", function (e) {
+      var clickedTerm = e.target.closest(".term");
+      document.querySelectorAll(".tooltip-bubble.open").forEach(function (bubble) {
+        var owner = bubble.closest(".term");
+        if (owner !== clickedTerm) bubble.classList.remove("open");
+      });
+      if (clickedTerm) {
+        var bubble = clickedTerm.querySelector(".tooltip-bubble");
+        if (bubble) bubble.classList.toggle("open");
+      }
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        document.querySelectorAll(".tooltip-bubble.open").forEach(function (b) { b.classList.remove("open"); });
+        closeLightbox();
+        if (document.getElementById("quickview-overlay").classList.contains("open")) closeQuickView();
+      }
+    });
+
+    var lightboxOverlay = document.getElementById("lightbox-overlay");
+    var lightboxImg = document.getElementById("lightbox-img");
+
+    function openLightbox(src, alt) {
+      lightboxImg.src = src;
+      lightboxImg.alt = alt || "";
+      lightboxOverlay.classList.add("open");
+    }
+
+    function closeLightbox() {
+      lightboxOverlay.classList.remove("open");
+      setTimeout(function () { lightboxImg.src = ""; }, 300);
+    }
+
+    document.querySelectorAll(".product-photo img, .hero-photo img").forEach(function (img) {
+      img.addEventListener("click", function (e) {
+        e.stopPropagation();
+        openLightbox(img.currentSrc || img.src, img.alt);
+      });
+    });
+
+    function wireImageSkeletons(scope) {
+      scope.querySelectorAll(".product-photo img, .thumb img").forEach(function (img) {
+        var container = img.closest(".product-photo, .thumb");
+        function markLoaded() {
+          img.classList.add("img-loaded");
+          if (container) container.classList.add("img-ready");
+        }
+        if (img.complete && img.naturalWidth > 0) {
+          markLoaded();
+        } else {
+          img.addEventListener("load", markLoaded);
+          img.addEventListener("error", markLoaded);
+          setTimeout(markLoaded, 2500);
+        }
+      });
+    }
+    wireImageSkeletons(document);
+
+    (function () {
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var detailsEls = document.querySelectorAll("details");
+      if (!detailsEls.length) return;
+
+      detailsEls.forEach(function (details) {
+        var summary = details.querySelector("summary");
+        var body = details.querySelector(":scope > div");
+        if (!summary || !body) return;
+        details.dataset.animating = "false";
+
+        summary.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (details.dataset.animating === "true") return;
+
+          if (reduceMotion) { details.open = !details.open; return; }
+
+          body.style.overflow = "hidden";
+
+          if (!details.open) {
+            details.dataset.animating = "true";
+            details.open = true;
+            var targetHeight = body.offsetHeight;
+            var anim = body.animate(
+              [{ height: "0px", opacity: 0.3 }, { height: targetHeight + "px", opacity: 1 }],
+              { duration: 240, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "both" }
+            );
+            anim.onfinish = function () {
+              anim.cancel();
+              body.style.height = "auto";
+              body.style.overflow = "";
+              details.dataset.animating = "false";
+            };
+          } else {
+            details.dataset.animating = "true";
+            var startHeight = body.offsetHeight;
+            var closeAnim = body.animate(
+              [{ height: startHeight + "px", opacity: 1 }, { height: "0px", opacity: 0.3 }],
+              { duration: 200, easing: "cubic-bezier(0.7, 0, 0.84, 0)", fill: "both" }
+            );
+            closeAnim.onfinish = function () {
+              closeAnim.cancel();
+              details.open = false;
+              body.style.height = "";
+              body.style.overflow = "";
+              details.dataset.animating = "false";
+            };
+          }
+        });
+      });
+    })();
+
+    document.getElementById("lightbox-close").addEventListener("click", closeLightbox);
+    lightboxOverlay.addEventListener("click", function (e) {
+      if (e.target === lightboxOverlay) closeLightbox();
+    });
+
+    var quickviewOverlay = document.getElementById("quickview-overlay");
+    var quickviewBody = document.getElementById("quickview-body");
+    var quickviewLastFocus = null;
+
+    function openQuickView(slug) {
+      var source = document.getElementById("qv-source-" + slug);
+      if (!source || !quickviewBody) return;
+      quickviewBody.innerHTML = source.innerHTML;
+      var titleEl = quickviewBody.querySelector(".qv-name");
+      if (titleEl) titleEl.id = "quickview-title";
+      wireImageSkeletons(quickviewBody);
+      quickviewLastFocus = document.activeElement;
+      quickviewOverlay.classList.add("open");
+      document.getElementById("quickview-close").focus();
+    }
+
+    function closeQuickView() {
+      quickviewOverlay.classList.remove("open");
+      if (quickviewLastFocus) quickviewLastFocus.focus();
+      setTimeout(function () { quickviewBody.innerHTML = ""; }, 300);
+    }
+
+    document.addEventListener("click", function (e) {
+      var trigger = e.target.closest(".quickview-btn");
+      if (trigger) openQuickView(trigger.dataset.slug);
+    });
+
+    if (quickviewOverlay) {
+      document.getElementById("quickview-close").addEventListener("click", closeQuickView);
+      quickviewOverlay.addEventListener("click", function (e) {
+        if (e.target === quickviewOverlay) closeQuickView();
+      });
+    }
+
+    (function () {
+      var overlay = document.getElementById("cmdk-overlay");
+      var input = document.getElementById("cmdk-input");
+      var resultsEl = document.getElementById("cmdk-results");
+      var trigger = document.getElementById("cmdk-trigger");
+      if (!overlay || !input) return;
+
+      var products = [];
+      try { products = JSON.parse(document.getElementById("nav-products-data").textContent); } catch (e) { /* no product data */ }
+
+      var pages = [
+        { name: "Catalog", sub: "All hardware", href: "{{ url_for('home') }}" },
+        { name: "Build Configurator", sub: "Live interactive build sizing", href: "{{ url_for('configurator') }}" },
+        { name: "Model advisor", sub: "Match a model to hardware", href: "{{ url_for('models') }}" },
+        { name: "Guided build", sub: "Pick a path to one recommended build", href: "{{ url_for('guide') }}" },
+        { name: "AI Hardware Lab", sub: "GPU memory, quantization, training vs. inference", href: "{{ url_for('technical_guide') }}" },
+        { name: "Compare hardware", sub: "Side-by-side specs", href: "{{ url_for('compare') }}" },
+        { name: "Request a quote", sub: "No payment, no account", href: "{{ url_for('quote') }}" },
+        { name: "Requests", sub: "Track a submitted request", href: "{{ url_for('requests_list') }}" },
+        { name: "FAQ", sub: "Plain-language answers", href: "{{ url_for('faq') }}" },
+      ];
+
+      var items = pages.concat(products.map(function (p) {
+        return { name: p.name, sub: p.category + " — view full specification", href: "/product/" + p.slug };
+      }));
+
+      var activeIndex = 0;
+      var visibleItems = [];
+
+      function render(query) {
+        var q = (query || "").trim().toLowerCase();
+        visibleItems = !q ? items : items.filter(function (it) {
+          return it.name.toLowerCase().indexOf(q) !== -1 || it.sub.toLowerCase().indexOf(q) !== -1;
+        });
+        activeIndex = 0;
+
+        if (!visibleItems.length) {
+          resultsEl.innerHTML = '<div class="cmdk-empty">No matches. Try a product name or page.</div>';
+          return;
+        }
+
+        resultsEl.innerHTML = visibleItems.map(function (it, i) {
+          return '<div class="cmdk-item' + (i === 0 ? ' active' : '') + '" data-href="' + it.href + '" role="option">' +
+            '<span>' + it.name + '</span><span class="cmdk-item-sub">' + it.sub + '</span></div>';
+        }).join("");
+
+        resultsEl.querySelectorAll(".cmdk-item").forEach(function (el, i) {
+          el.addEventListener("click", function () { window.location.href = visibleItems[i].href; });
+          el.addEventListener("mouseenter", function () { setActive(i); });
+        });
+      }
+
+      function setActive(i) {
+        activeIndex = i;
+        resultsEl.querySelectorAll(".cmdk-item").forEach(function (el, idx) {
+          el.classList.toggle("active", idx === i);
+        });
+      }
+
+      function openPalette() {
+        overlay.classList.add("open");
+        input.value = "";
+        render("");
+        setTimeout(function () { input.focus(); }, 20);
+      }
+
+      function closePalette() {
+        overlay.classList.remove("open");
+      }
+
+      if (trigger) trigger.addEventListener("click", openPalette);
+      overlay.addEventListener("click", function (e) { if (e.target === overlay) closePalette(); });
+      input.addEventListener("input", function () { render(input.value); });
+
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowDown") { e.preventDefault(); setActive(Math.min(activeIndex + 1, visibleItems.length - 1)); }
+        else if (e.key === "ArrowUp") { e.preventDefault(); setActive(Math.max(activeIndex - 1, 0)); }
+        else if (e.key === "Enter") { e.preventDefault(); if (visibleItems[activeIndex]) window.location.href = visibleItems[activeIndex].href; }
+        else if (e.key === "Escape") { closePalette(); }
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+          e.preventDefault();
+          overlay.classList.contains("open") ? closePalette() : openPalette();
+        } else if (e.key === "Escape" && overlay.classList.contains("open")) {
+          closePalette();
+        }
+      });
+    })();
+
+    document.querySelectorAll(".more-specs-toggle").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var panel = document.getElementById(btn.dataset.target);
+        if (!panel) return;
+        var isOpen = panel.classList.toggle("open");
+        btn.classList.toggle("open", isOpen);
+        btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        btn.querySelector(".toggle-text").textContent = isOpen ? "Hide full specs" : "Show full specs";
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,427 @@
+{% extends "base.html" %}
+{% import "icons.html" as icons %}
+{% block title %}AI Build Configurator — {{ STORE_NAME }}{% endblock %}
+{% block content %}
+  <div class="breadcrumbs">
+    <a href="{{ url_for('home') }}">Catalog</a> <span>/</span> <span class="current">Build Configurator</span>
+  </div>
+
+  <span class="pill">Interactive</span>
+  <h1 style="margin-top:0.7rem;">AI Build Configurator</h1>
+  <p class="subtitle">
+    Pick a model, expected traffic, and an optional budget ceiling — the recommended build updates
+    live. This runs the same memory math and hardware matching used everywhere else on this site;
+    nothing here is simulated or fake.
+  </p>
+
+  <div class="configurator-grid">
+    <div class="card configurator-panel">
+      <h2>1. Model</h2>
+      <div class="cfg-model-list" id="cfg-model-list"></div>
+
+      <div class="cfg-custom-row">
+        <div style="flex:1;">
+          <label for="cfg-custom-params">Or a custom parameter count (billions)</label>
+          <input type="number" id="cfg-custom-params" min="0" step="0.1" placeholder="e.g. 70">
+        </div>
+      </div>
+
+      <h2 style="margin-top:1.6rem;">2. Expected traffic</h2>
+      <div class="cfg-traffic-list" id="cfg-traffic-list">
+        <button type="button" class="cfg-option active" data-multiplier="1">
+          <strong>Prototype</strong>
+          <span>Single user, development — minimum memory that clears the model</span>
+        </button>
+        <button type="button" class="cfg-option" data-multiplier="2">
+          <strong>Production</strong>
+          <span>Real traffic — 2x headroom for concurrent requests and longer context</span>
+        </button>
+        <button type="button" class="cfg-option" data-multiplier="3">
+          <strong>High-concurrency / enterprise</strong>
+          <span>Many simultaneous users — 3x headroom, the same multiple used for large deployments</span>
+        </button>
+      </div>
+      <div class="simple-explain">
+        <span class="simple-explain-label">In simple terms</span>
+        Think of a lemonade stand. If it's just one friend visiting (Prototype), one pitcher is
+        plenty. If a whole busy street shows up at once (Production or Enterprise), you need extra
+        pitchers ready so nobody's stuck waiting in a huge line — that's the "headroom" this
+        multiplier is buying, even though it's still the exact same lemonade recipe.
+      </div>
+
+      <h2 style="margin-top:1.6rem;">3. Budget ceiling (optional)</h2>
+      <label for="cfg-budget">Maximum price, in US dollars</label>
+      <input type="number" id="cfg-budget" min="0" step="1000" placeholder="Leave blank for no limit">
+    </div>
+
+    <div class="card configurator-result" id="cfg-result">
+      <div class="cfg-empty-state">
+        <span class="pill-icon icon-float">{{ icons.brain() }}</span>
+        <p>Pick a model above to see the recommended build.</p>
+      </div>
+    </div>
+  </div>
+
+  <script id="cfg-catalog-data" type="application/json">{{ catalog_json | tojson }}</script>
+  <script id="cfg-models-data" type="application/json">{{ models_json | tojson }}</script>
+  <script>
+    var CFG_CATALOG = JSON.parse(document.getElementById("cfg-catalog-data").textContent);
+    var CFG_MODELS = JSON.parse(document.getElementById("cfg-models-data").textContent);
+    var CFG_WORKING_ROOM = {{ working_room_multiplier }};
+    var CFG_HOME_WATTS = {{ home_watts }};
+    var CFG_EV_KWH = {{ ev_battery_kwh }};
+    var CFG_RATE = {{ electricity_rate }};
+
+    var cfgState = { modelSlug: null, customParams: null, multiplier: 1, budget: null };
+
+    var modelListEl = document.getElementById("cfg-model-list");
+    modelListEl.innerHTML = CFG_MODELS.map(function (m) {
+      var sub = m.active_params_b
+        ? m.total_params_b + "B total (" + m.active_params_b + "B active, mixture of experts)"
+        : m.total_params_b + "B parameters";
+      return '<button type="button" class="cfg-option" data-slug="' + m.slug + '" data-params="' + m.total_params_b + '">' +
+        '<strong>' + m.name + '</strong><span>' + sub + '</span></button>';
+    }).join("");
+
+    function selectFrom(container, el) {
+      container.querySelectorAll(".cfg-option").forEach(function (o) { o.classList.remove("active"); });
+      el.classList.add("active");
+    }
+
+    modelListEl.querySelectorAll(".cfg-option").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        selectFrom(modelListEl, btn);
+        cfgState.modelSlug = btn.dataset.slug;
+        cfgState.customParams = null;
+        document.getElementById("cfg-custom-params").value = "";
+        renderConfigurator();
+      });
+    });
+
+    document.getElementById("cfg-custom-params").addEventListener("input", function (e) {
+      var v = parseFloat(e.target.value);
+      if (v > 0) {
+        modelListEl.querySelectorAll(".cfg-option").forEach(function (o) { o.classList.remove("active"); });
+        cfgState.modelSlug = null;
+        cfgState.customParams = v;
+      } else {
+        cfgState.customParams = null;
+      }
+      renderConfigurator();
+    });
+
+    var trafficListEl = document.getElementById("cfg-traffic-list");
+    trafficListEl.querySelectorAll(".cfg-option").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        selectFrom(trafficListEl, btn);
+        cfgState.multiplier = parseFloat(btn.dataset.multiplier);
+        renderConfigurator();
+      });
+    });
+
+    document.getElementById("cfg-budget").addEventListener("input", function (e) {
+      var v = parseFloat(e.target.value);
+      cfgState.budget = v > 0 ? v : null;
+      renderConfigurator();
+    });
+
+    function cfgPowerContext(watts) {
+      var dailyKwh = watts * 24 / 1000;
+      var monthlyKwh = dailyKwh * 30;
+      return {
+        watts: watts,
+        homeEquivalents: watts / CFG_HOME_WATTS,
+        dailyKwh: dailyKwh,
+        evBatteriesPerDay: dailyKwh / CFG_EV_KWH,
+        monthlyCost: monthlyKwh * CFG_RATE,
+      };
+    }
+
+    function cfgFindBuild(requiredGb, maxBudget) {
+      var candidates = [];
+      CFG_CATALOG.forEach(function (p) {
+        if (p.memory_gb >= requiredGb) {
+          candidates.push({ product: p, count: 1 });
+        } else if (p.clusterable) {
+          var count = Math.ceil(requiredGb / p.memory_gb);
+          if (count >= 2) candidates.push({ product: p, count: count });
+        }
+      });
+      candidates.forEach(function (c) {
+        c.totalMemoryGb = c.product.memory_gb * c.count;
+        c.totalPrice = c.product.price * c.count;
+        c.totalWatts = c.product.watts * c.count;
+        c.isCluster = c.count > 1;
+      });
+      if (maxBudget) candidates = candidates.filter(function (c) { return c.totalPrice <= maxBudget; });
+      if (!candidates.length) return null;
+      candidates.sort(function (a, b) { return a.totalPrice - b.totalPrice; });
+      return candidates[0];
+    }
+
+    function animateNumber(el, target, decimals, prefix, suffix) {
+      var start = parseFloat(el.dataset.cfgLast || "0");
+      var duration = 500;
+      var startTime = null;
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / duration, 1);
+        var value = start + (target - start) * progress;
+        el.textContent = (prefix || "") + value.toLocaleString(undefined, { maximumFractionDigits: decimals, minimumFractionDigits: decimals }) + (suffix || "");
+        if (progress < 1) requestAnimationFrame(step);
+        else el.dataset.cfgLast = target;
+      }
+      requestAnimationFrame(step);
+    }
+
+    function flashResultShimmer() {
+      var result = document.getElementById("cfg-result");
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      result.classList.add("cfg-shimmer");
+      setTimeout(function () { result.classList.remove("cfg-shimmer"); }, 260);
+    }
+
+    function renderConfigurator() {
+      flashResultShimmer();
+      var result = document.getElementById("cfg-result");
+      var params = cfgState.customParams || (cfgState.modelSlug ? CFG_MODELS.filter(function (m) { return m.slug === cfgState.modelSlug; })[0].total_params_b : null);
+
+      if (!params) {
+        result.innerHTML = '<div class="cfg-empty-state"><span class="pill-icon icon-float">{{ icons.brain() | replace("\n", " ") }}</span><p>Pick a model above to see the recommended build.</p></div>';
+        return;
+      }
+
+      var requiredGb = params * CFG_WORKING_ROOM * cfgState.multiplier;
+      var build = cfgFindBuild(requiredGb, cfgState.budget);
+      var modelName = cfgState.modelSlug ? CFG_MODELS.filter(function (m) { return m.slug === cfgState.modelSlug; })[0].name : (params + "B custom model");
+
+      if (!build) {
+        result.innerHTML = '<div class="cfg-empty-state"><span class="pill-icon">{{ icons.database() | replace("\n", " ") }}</span>' +
+          '<p><strong>' + requiredGb.toFixed(1) + ' GB required</strong> for ' + modelName + (cfgState.budget ? ' — nothing in the catalog fits within a $' + cfgState.budget.toLocaleString() + ' budget.' : ' — nothing in the current catalog clears this.') + '</p></div>';
+        return;
+      }
+
+      var pc = cfgPowerContext(build.totalWatts);
+      var label = (build.count === 1 ? "1x " : build.count + "x ") + build.product.name;
+      var alreadyRendered = result.querySelector(".cfg-result-inner");
+
+      if (!alreadyRendered) {
+        result.innerHTML =
+          '<div class="cfg-result-inner">' +
+          '<div class="cfg-result-header">' +
+          '<span class="pill-icon icon-spin-slow">{{ icons.gpu_chip() | replace("\n", " ") }}</span>' +
+          '<div><div class="cfg-result-label" id="cfg-build-label"></div><div class="cfg-result-sub" id="cfg-build-sub"></div></div>' +
+          '</div>' +
+          '<div class="cfg-rack-visual" id="cfg-rack-visual"></div>' +
+          '<div class="cfg-cable-row" id="cfg-cable-row" aria-hidden="true"><span class="cfg-cable"></span><span class="cfg-cable"></span><span class="cfg-cable"></span></div>' +
+          '<div class="cfg-meter-list">' +
+          '<div class="cfg-meter"><span>Memory</span><div class="cfg-meter-track cfg-battery"><div class="cfg-meter-fill" id="cfg-meter-memory"></div></div><strong id="cfg-val-memory"></strong></div>' +
+          '<div class="cfg-meter"><span>Power</span><div class="cfg-meter-track"><div class="cfg-meter-fill cfg-meter-warn" id="cfg-meter-power"></div></div><strong id="cfg-val-power"></strong></div>' +
+          '<div class="cfg-meter"><span>Price</span><div class="cfg-meter-track"><div class="cfg-meter-fill cfg-meter-price" id="cfg-meter-price"></div></div><strong id="cfg-val-price"></strong></div>' +
+          '</div>' +
+          '<div class="power-line" style="border-top:1px solid var(--border); margin-top:1rem; padding-top:0.9rem;">' +
+          '{{ icons.bolt() | replace("\n", " ") }}<span id="cfg-power-note"></span></div>' +
+          '<div id="cfg-cluster-note"></div>' +
+          '<div style="margin-top:1.2rem;"><a class="btn btn-launch" id="cfg-quote-link" href="#">Request a quote for this build</a></div>' +
+          '</div>';
+      }
+
+      document.getElementById("cfg-build-label").textContent = label;
+      document.getElementById("cfg-build-sub").textContent = "Sized for " + modelName + " (" + requiredGb.toFixed(1) + " GB required)";
+
+      document.getElementById("cfg-cluster-note").innerHTML = build.isCluster
+        ? '<div class="cluster-box" style="margin-top:1rem;"><strong>' + build.count + '-unit cluster.</strong> Same real hardware matching used across this site — NVLink inside each unit, InfiniBand between them for true multi-server clusters.</div>'
+        : "";
+
+      var rackVisual = document.getElementById("cfg-rack-visual");
+      var visibleBlocks = Math.min(build.count, 12);
+      var blocksHtml = "";
+      for (var bi = 0; bi < visibleBlocks; bi++) {
+        blocksHtml += '<div class="cfg-rack-block" style="animation-delay:' + (bi * 0.06) + 's;"></div>';
+      }
+      if (build.count > visibleBlocks) {
+        blocksHtml += '<div class="cfg-rack-more">+' + (build.count - visibleBlocks) + '</div>';
+      }
+      rackVisual.innerHTML = blocksHtml;
+
+      var maxMem = Math.max.apply(null, CFG_CATALOG.map(function (p) { return p.memory_gb; })) * 1.2;
+      var maxWatt = Math.max.apply(null, CFG_CATALOG.map(function (p) { return p.watts; })) * 1.2 * 4;
+      var maxPrice = Math.max.apply(null, CFG_CATALOG.map(function (p) { return p.price; })) * 1.2 * 4;
+
+      requestAnimationFrame(function () {
+        document.getElementById("cfg-meter-memory").style.width = Math.min(100, (build.totalMemoryGb / maxMem) * 100) + "%";
+        var powerFill = document.getElementById("cfg-meter-power");
+        powerFill.style.width = Math.min(100, (build.totalWatts / maxWatt) * 100) + "%";
+        powerFill.classList.toggle("cfg-meter-thermal", build.totalWatts >= 5000);
+        document.getElementById("cfg-meter-price").style.width = Math.min(100, (build.totalPrice / maxPrice) * 100) + "%";
+      });
+
+      var cables = document.querySelectorAll("#cfg-cable-row .cfg-cable");
+      cables.forEach(function (cable, idx) {
+        cable.classList.remove("cfg-cable-lit");
+        void cable.offsetWidth;
+        setTimeout(function () { cable.classList.add("cfg-cable-lit"); }, idx * 90);
+      });
+
+      animateNumber(document.getElementById("cfg-val-memory"), build.totalMemoryGb, 0, "", " GB");
+      animateNumber(document.getElementById("cfg-val-power"), build.totalWatts, 0, "", " W");
+      animateNumber(document.getElementById("cfg-val-price"), build.totalPrice, 0, "$", "");
+
+      document.getElementById("cfg-power-note").textContent =
+        "≈" + pc.homeEquivalents.toFixed(1) + "x a home's draw · ~$" + pc.monthlyCost.toFixed(0) + "/month at full utilization";
+
+      var quoteLink = document.getElementById("cfg-quote-link");
+      quoteLink.href = "{{ url_for('quote') }}?build=" + encodeURIComponent(label + " — running " + modelName) +
+        "&price=" + build.totalPrice + "&watts=" + build.totalWatts + "&slug=" + build.product.slug;
+    }
+  </script>
+
+  <style>
+    .configurator-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; align-items: start; }
+    @media (max-width: 850px) { .configurator-grid { grid-template-columns: 1fr; } }
+
+    .cfg-custom-row { margin-top: 0.9rem; }
+
+    .cfg-model-list, .cfg-traffic-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .cfg-option {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.2rem;
+      text-align: left;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      cursor: pointer;
+      transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), transform var(--dur-fast) var(--ease);
+    }
+    .cfg-option strong { font-size: 0.92rem; color: var(--text); }
+    .cfg-option span { font-size: 0.78rem; color: var(--text-dim); }
+    .cfg-option:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .cfg-option.active { border-color: var(--accent); background: var(--accent-bg); box-shadow: 0 0 0 1px var(--accent); }
+
+    .configurator-result { min-height: 320px; position: sticky; top: 100px; overflow: hidden; }
+    .configurator-result.cfg-shimmer::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, transparent 35%, var(--accent-bg) 50%, transparent 65%);
+      background-size: 200% 100%;
+      animation: cfgShimmerSweep 0.5s ease-out;
+      pointer-events: none;
+    }
+    @keyframes cfgShimmerSweep {
+      from { background-position: 150% 0; }
+      to { background-position: -50% 0; }
+    }
+    .cfg-empty-state { text-align: center; padding: 2.5rem 1rem; color: var(--text-dim); }
+    .cfg-empty-state .pill-icon { margin: 0 auto 1rem; width: 44px; height: 44px; }
+
+    .cfg-result-header { display: flex; align-items: center; gap: 0.9rem; }
+    .cfg-result-label { font-weight: 800; font-size: 1.15rem; }
+    .cfg-result-sub { color: var(--text-dim); font-size: 0.84rem; margin-top: 0.2rem; }
+
+    .cfg-rack-visual {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 1.1rem;
+      padding: 0.9rem;
+      background: var(--bg-alt);
+      border-radius: 10px;
+      min-height: 44px;
+      align-items: center;
+    }
+    .cfg-rack-block {
+      position: relative;
+      width: 26px;
+      height: 26px;
+      border-radius: 5px;
+      background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+      box-shadow: 0 0 8px 1px var(--accent-bg);
+      opacity: 0;
+      transform: scale(0.5);
+      animation: cfgBlockIn 0.3s var(--ease) forwards;
+    }
+    @keyframes cfgBlockIn { to { opacity: 1; transform: scale(1); } }
+    .cfg-rack-block::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--accent-ink);
+      animation: cfgBlockLed 1.4s ease-in-out infinite;
+    }
+    .cfg-rack-block:nth-child(3n+2)::after { animation-delay: 0.3s; }
+    .cfg-rack-block:nth-child(3n+3)::after { animation-delay: 0.6s; }
+    @keyframes cfgBlockLed { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+      .cfg-rack-block::after { animation: none; opacity: 0.8; }
+    }
+    .cfg-rack-more {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      padding: 0 0.4rem;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cfg-rack-block { animation: none; opacity: 1; transform: none; }
+    }
+
+    .cfg-cable-row { display: flex; justify-content: space-around; padding: 0 0.6rem; height: 20px; margin-top: 0.3rem; }
+    .cfg-cable { position: relative; width: 2px; height: 100%; background: var(--border); }
+    .cfg-cable::after {
+      content: "";
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-bright);
+      box-shadow: 0 0 8px 2px var(--accent-bg);
+      opacity: 0;
+    }
+    .cfg-cable.cfg-cable-lit { background: linear-gradient(180deg, var(--accent-bright), var(--border)); }
+    .cfg-cable.cfg-cable-lit::after { animation: cfgCablePulse 0.65s ease-out; }
+    @keyframes cfgCablePulse {
+      0% { top: -4px; opacity: 1; }
+      100% { top: calc(100% - 3px); opacity: 0; }
+    }
+
+    .cfg-meter-list { margin-top: 0.3rem; display: flex; flex-direction: column; gap: 0.9rem; }
+    .cfg-meter { display: grid; grid-template-columns: 60px 1fr 90px; align-items: center; gap: 0.7rem; font-size: 0.82rem; color: var(--text-dim); }
+    .cfg-meter strong { color: var(--text); text-align: right; font-variant-numeric: tabular-nums; }
+    .cfg-meter-track { background: var(--bg-alt); border-radius: 999px; height: 9px; overflow: hidden; position: relative; }
+    .cfg-meter-track.cfg-battery::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(90deg, transparent 0, transparent calc(12.5% - 1.5px), var(--bg) calc(12.5% - 1.5px), var(--bg) 12.5%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .cfg-meter-fill { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--accent-bright), var(--accent)); transition: width 0.6s var(--ease); }
+    .cfg-meter-fill.cfg-meter-warn { background: linear-gradient(90deg, var(--warn), #f0b64c); }
+    .cfg-meter-fill.cfg-meter-price { background: linear-gradient(90deg, #5b8fd4, #3a6bc4); }
+    .cfg-meter-fill.cfg-meter-thermal { animation: cfgThermalPulse 2.2s ease-in-out infinite; }
+    @keyframes cfgThermalPulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.3); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cfg-option { transition: none; }
+      .cfg-meter-fill { transition: none; }
+      .cfg-meter-fill.cfg-meter-thermal { animation: none; }
+      .cfg-cable.cfg-cable-lit::after { animation: none; opacity: 0; }
+    }
+  </style>
+{% endblock %}

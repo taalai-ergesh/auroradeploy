@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% import "icons.html" as icons %}
+{% block title %}Your recommended build — {{ STORE_NAME }}{% endblock %}
+{% block content %}
+  <div class="breadcrumbs">
+    <a href="{{ url_for('home') }}">Catalog</a> <span>/</span>
+    <a href="{{ url_for('guide') }}">Guided build</a> <span>/</span>
+    <a href="{{ url_for('guide_pick_model', path=path) }}">{{ "I'm a startup" if path == "startup" else "I'm scaling up" }}</a> <span>/</span>
+    <span class="current">{{ model.name }}</span>
+  </div>
+
+  {{ icons.wizard_steps(3, path=path) }}
+
+  <h1>Your recommended build</h1>
+  <p class="subtitle">
+    {% if path == "startup" %}
+      Sized to run <strong style="color:var(--text);">{{ model.name }}</strong> as cheaply as
+      honestly possible — exactly enough memory, nothing wasted.
+    {% else %}
+      Sized to run <strong style="color:var(--text);">{{ model.name }}</strong> with room to grow —
+      double the memory headroom for more traffic and bigger workloads.
+    {% endif %}
+  </p>
+
+  <div class="math-box">
+    <div class="label">The memory math, shown:</div>
+    <div class="formula">
+      {{ model.total_params_b }}B params &times; 1 GB = {{ "{:,.0f}".format(model.total_params_b) }} GB
+      &nbsp;+&nbsp; {{ term('20% working room', '20% working room') }}
+      &nbsp;=&nbsp; <strong>{{ "{:,.1f}".format(required_gb) }} GB required</strong>
+      {% if path == "scale" %}
+        <br>&times; 2 for growth headroom &nbsp;=&nbsp; <strong>{{ "{:,.1f}".format(target_gb) }} GB target</strong>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if build %}
+    <div class="card build-reveal">
+      <div class="card-top">
+        <div style="display:flex; align-items:center; gap:0.8rem;">
+          <span class="thumb"><img src="{{ url_for('static', filename='images/products/' + build.product.slug + '.jpg') }}" alt="{{ build.product.name }}"></span>
+          <div>
+            <h2 style="margin:0;">{{ build_label }}</h2>
+            {% if build.product.slug == 'h100x8' %}
+              <div style="color:var(--text-dim); font-size:0.78rem;">Built on the {{ term('SXM') }} GPU form factor.</div>
+            {% elif build.product.slug == 'h200x8' %}
+              <div style="color:var(--text-dim); font-size:0.78rem;">Built on NVIDIA's {{ term('HGX') }} reference platform.</div>
+            {% endif %}
+          </div>
+        </div>
+        <span class="pill-icon">{{ icons.category(build.product.category) }}</span>
+      </div>
+
+      <div class="spec-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="spec-box">
+          <div class="spec-label">Combined memory</div>
+          <div class="spec-value">{{ "{:,.0f}".format(build.total_memory_gb) }} GB</div>
+        </div>
+        <div class="spec-box">
+          <div class="spec-label">Combined price</div>
+          <div class="spec-value">${{ "{:,.0f}".format(build.total_price) }}</div>
+        </div>
+        <div class="spec-box">
+          <div class="spec-label">Combined power</div>
+          <div class="spec-value">{{ "{:,.0f}".format(build.total_watts) }} W</div>
+        </div>
+      </div>
+
+      <div class="power-box">
+        {{ icons.bolt() }}
+        <span>
+          <strong>Power, in real terms:</strong> about {{ "%.1f"|format(build.power.home_equivalents) }}x
+          an average home's continuous draw. Run flat-out for a day, it would use about
+          {{ "{:,.0f}".format(build.power.daily_kwh) }} kWh — roughly
+          {{ "%.1f"|format(build.power.ev_batteries_per_day) }}x the capacity of an electric car
+          battery, every 24 hours.
+        </span>
+      </div>
+
+      {% if build.is_cluster %}
+        <div class="cluster-box">
+          <div style="display:flex; align-items:center; gap:0.6rem;">
+            <span class="pill-icon" style="width:28px;height:28px;">{{ icons.cluster_icon() }}</span>
+            <strong>This is a cluster — {{ build.count }} machines acting as one.</strong>
+          </div>
+          <p>
+            A "cluster" means multiple computers wired together and coordinated so they behave like a
+            single, bigger machine. This build combines {{ build.count }}x {{ build.product.name }}
+            units to reach {{ "{:,.0f}".format(build.total_memory_gb) }} GB of memory.
+          </p>
+          <p>
+            <strong style="color:var(--text);">Real deal vs. just plugging in cards:</strong> the 8
+            GPUs inside each server are already wired together with {{ term('NVLink') }} for
+            near-instant memory sharing. Linking multiple whole servers into a cluster also needs
+            {{ term('InfiniBand') }} networking between them — dedicated high-speed cabling and
+            switches. That's a different world from
+            plugging several desktop cards into one PC over ordinary PCIe: technically possible, but
+            far slower for a single large model, and not something a datacenter would actually do at
+            this scale. This price also doesn't include the extra networking gear a real cluster needs
+            on top of the machines themselves.
+          </p>
+        </div>
+      {% endif %}
+
+      <div style="margin-top:1.2rem;">
+        <a class="btn btn-launch" href="{{ url_for('quote') }}?build={{ (build_label + ' — running ' + model.name + (' (startup, minimum)' if path == 'startup' else ' (scale-up, 2x headroom)')) | urlencode }}&price={{ build.total_price }}&watts={{ build.total_watts }}&slug={{ build.product.slug }}">
+          Request a quote for this build
+        </a>
+      </div>
+    </div>
+  {% else %}
+    <p style="color:var(--text-dim);">Nothing in the current catalog clears this requirement.</p>
+  {% endif %}
+
+  <p style="margin-top:1.5rem;">
+    <a href="{{ url_for('guide_pick_model', path=path) }}" style="color:var(--text-dim); text-decoration:none;">&larr; pick a different model</a>
+  </p>
+
+  <style>
+    .build-reveal {
+      animation: buildRevealIn 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 0 1px var(--accent-bg), 0 12px 32px rgba(0, 0, 0, 0.08);
+    }
+    @keyframes buildRevealIn {
+      from { opacity: 0; transform: translateY(14px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .build-reveal { animation: none; }
+    }
+  </style>
+{% endblock %}

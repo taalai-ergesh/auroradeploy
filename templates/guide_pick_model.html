@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% import "icons.html" as icons %}
+{% block title %}Pick a model — {{ STORE_NAME }}{% endblock %}
+{% block content %}
+  <div class="breadcrumbs">
+    <a href="{{ url_for('home') }}">Catalog</a> <span>/</span>
+    <a href="{{ url_for('guide') }}">Guided build</a> <span>/</span>
+    <span class="current">{{ "I'm a startup" if path == "startup" else "I'm scaling up" }}</span>
+  </div>
+
+  {{ icons.wizard_steps(2, path=path) }}
+
+  <h1>{{ "I'm a startup" if path == "startup" else "I'm scaling up" }}</h1>
+  <p class="subtitle">Which model do you want to run? We'll size the build around it.</p>
+
+  <div class="grid">
+    {% for m in models %}
+      <a href="{{ url_for('guide_result', path=path, model_slug=m.slug) }}" class="card hoverable" style="text-decoration:none; display:block;">
+        <span class="pill">{{ m.license }}</span>
+        <h2 style="margin-top:0.7rem;">{{ m.name }}</h2>
+        <p style="color:var(--text-dim); font-size:0.88rem;">
+          {{ m.total_params_b }}B total parameters
+          {% if m.active_params_b %} ({{ m.active_params_b }}B active){% endif %}
+        </p>
+      </a>
+    {% endfor %}
+  </div>
+{% endblock %}

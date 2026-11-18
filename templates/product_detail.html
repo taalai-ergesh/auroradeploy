@@ -1,0 +1,556 @@
+{% extends "base.html" %}
+{% import "icons.html" as icons %}
+{% block title %}{{ p.name }} — {{ STORE_NAME }}{% endblock %}
+{% block content %}
+  <div class="breadcrumbs no-print">
+    <a href="{{ url_for('home') }}">Catalog</a> <span>/</span> <span class="current">{{ p.name }}</span>
+  </div>
+
+  <div class="spec-sheet-bar">
+    <span>Spec sheet &middot; SKU <strong style="font-family:monospace;">{{ p.sku }}</strong> &middot; verified {{ SPEC_DATE }}</span>
+    <button type="button" class="btn-secondary no-print" onclick="window.print()" style="padding:0.4rem 0.85rem; font-size:0.78rem;">Print spec sheet</button>
+  </div>
+
+  <div class="illustration-toggle-row no-print">
+    <button type="button" class="btn-secondary illus-toggle-btn" id="illus-toggle" aria-pressed="false">Show exploded view</button>
+  </div>
+
+  <div class="product-hero-illustration cat-{{ p.category | lower | replace(' ', '-') }}" id="illus-assembled" aria-hidden="true">
+    {% if p.category in ["Desktop card", "Workstation card"] %}
+      <svg viewBox="0 0 300 130" class="illus-svg">
+        <rect x="10" y="10" width="280" height="90" rx="8" fill="rgba(10,20,6,0.6)" stroke="#8fd400" stroke-width="2"/>
+        <rect class="illus-die" x="24" y="24" width="150" height="62" rx="5" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1.3"/>
+        <g stroke="rgba(163,230,0,0.35)" stroke-width="0.8"><path d="M40 24 V86 M56 24 V86 M72 24 V86 M88 24 V86 M104 24 V86 M120 24 V86 M136 24 V86 M152 24 V86"/></g>
+        <g class="illus-fan" style="transform-origin: 216px 55px;"><circle cx="216" cy="55" r="24" fill="rgba(5,10,6,0.75)" stroke="#8fd400" stroke-width="1.6"/><path d="M216 55 L216 35 M216 55 L233 65 M216 55 L199 65" stroke="#a3e600" stroke-width="2.2" stroke-linecap="round"/></g>
+        <g class="illus-fan illus-fan-rev" style="transform-origin: 260px 55px;"><circle cx="260" cy="55" r="16" fill="rgba(5,10,6,0.75)" stroke="#8fd400" stroke-width="1.4"/><path d="M260 55 L260 41 M260 55 L272 63 M260 55 L248 63" stroke="#a3e600" stroke-width="1.8" stroke-linecap="round"/></g>
+        <line x1="10" y1="106" x2="60" y2="106" stroke="#8fd400" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+    {% elif p.category == "Server" %}
+      <svg viewBox="0 0 300 140" class="illus-svg">
+        <rect x="10" y="10" width="280" height="120" rx="8" fill="rgba(10,20,6,0.6)" stroke="#8fd400" stroke-width="2"/>
+        <rect class="illus-die" x="24" y="24" width="170" height="34" rx="4" fill="rgba(143,212,0,0.12)" stroke="#a3e600" stroke-width="1.2"/>
+        <rect class="illus-die" x="24" y="66" width="170" height="34" rx="4" fill="rgba(143,212,0,0.12)" stroke="#a3e600" stroke-width="1.2"/>
+        <g class="illus-fan" style="transform-origin: 236px 41px;"><circle cx="236" cy="41" r="15" fill="rgba(5,10,6,0.75)" stroke="#8fd400" stroke-width="1.4"/><path d="M236 41 L236 29 M236 41 L246 48 M236 41 L226 48" stroke="#a3e600" stroke-width="1.8" stroke-linecap="round"/></g>
+        <g class="illus-fan illus-fan-rev" style="transform-origin: 266px 41px;"><circle cx="266" cy="41" r="15" fill="rgba(5,10,6,0.75)" stroke="#8fd400" stroke-width="1.4"/><path d="M266 41 L266 29 M266 41 L276 48 M266 41 L256 48" stroke="#a3e600" stroke-width="1.8" stroke-linecap="round"/></g>
+        <g class="illus-fan" style="transform-origin: 236px 83px;"><circle cx="236" cy="83" r="15" fill="rgba(5,10,6,0.75)" stroke="#8fd400" stroke-width="1.4"/><path d="M236 83 L236 71 M236 83 L246 90 M236 83 L226 90" stroke="#a3e600" stroke-width="1.8" stroke-linecap="round"/></g>
+        <g class="illus-fan illus-fan-rev" style="transform-origin: 266px 83px;"><circle cx="266" cy="83" r="15" fill="rgba(5,10,6,0.75)" stroke="#8fd400" stroke-width="1.4"/><path d="M266 83 L266 71 M266 83 L276 90 M266 83 L256 90" stroke="#a3e600" stroke-width="1.8" stroke-linecap="round"/></g>
+        <g class="illus-led"><circle cx="30" cy="112" r="2.4" fill="#a3e600"/><circle cx="40" cy="112" r="2.4" fill="#a3e600"/><circle cx="50" cy="112" r="2.4" fill="#a3e600"/></g>
+      </svg>
+    {% else %}
+      <svg viewBox="0 0 220 140" class="illus-svg">
+        <rect x="60" y="6" width="100" height="128" rx="8" fill="rgba(10,20,6,0.6)" stroke="#8fd400" stroke-width="2"/>
+        <rect class="illus-die" x="70" y="16" width="80" height="14" rx="2.5" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1"/>
+        <rect class="illus-die" x="70" y="34" width="80" height="14" rx="2.5" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1"/>
+        <rect class="illus-die" x="70" y="52" width="80" height="14" rx="2.5" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1"/>
+        <rect class="illus-die" x="70" y="70" width="80" height="14" rx="2.5" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1"/>
+        <rect class="illus-die" x="70" y="88" width="80" height="14" rx="2.5" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1"/>
+        <rect class="illus-die" x="70" y="106" width="80" height="20" rx="2.5" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1"/>
+        <g class="illus-led"><circle cx="140" cy="23" r="1.6" fill="#a3e600"/><circle cx="140" cy="41" r="1.6" fill="#a3e600"/><circle cx="140" cy="59" r="1.6" fill="#a3e600"/><circle cx="140" cy="77" r="1.6" fill="#a3e600"/><circle cx="140" cy="95" r="1.6" fill="#a3e600"/></g>
+        <path d="M60 70 H30 M160 70 H190" stroke="#8fd400" stroke-width="1.4" stroke-dasharray="5 6" class="illus-trace"/>
+      </svg>
+    {% endif %}
+  </div>
+
+  <div class="product-hero-illustration product-exploded-illustration cat-{{ p.category | lower | replace(' ', '-') }}" id="illus-exploded" aria-hidden="true" hidden>
+    {% if p.category in ["Desktop card", "Workstation card"] %}
+      <svg viewBox="0 0 300 220" class="illus-svg">
+        <g class="exploded-layer" style="animation-delay:0s;">
+          <rect x="60" y="4" width="180" height="26" rx="6" fill="rgba(10,20,6,0.7)" stroke="#8fd400" stroke-width="1.6"/>
+          <circle cx="110" cy="17" r="9" fill="rgba(5,10,6,0.8)" stroke="#a3e600" stroke-width="1.2"/>
+          <circle cx="190" cy="17" r="9" fill="rgba(5,10,6,0.8)" stroke="#a3e600" stroke-width="1.2"/>
+          <circle class="illus-badge" cx="248" cy="17" r="9"/><text class="illus-badge-num" x="248" y="17">1</text>
+        </g>
+        <line x1="150" y1="30" x2="150" y2="82" stroke="#8fd400" stroke-width="1" stroke-dasharray="3 5" opacity="0.6"/>
+        <g class="exploded-layer" style="animation-delay:0.12s;">
+          <rect x="50" y="86" width="200" height="48" rx="5" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1.3"/>
+          <g stroke="rgba(163,230,0,0.4)" stroke-width="0.8"><path d="M66 86 V134 M82 86 V134 M98 86 V134 M114 86 V134 M130 86 V134 M146 86 V134 M162 86 V134 M178 86 V134"/></g>
+          <circle class="illus-badge" cx="264" cy="110" r="9"/><text class="illus-badge-num" x="264" y="110">2</text>
+        </g>
+        <line x1="150" y1="134" x2="150" y2="182" stroke="#8fd400" stroke-width="1" stroke-dasharray="3 5" opacity="0.6"/>
+        <g class="exploded-layer" style="animation-delay:0.24s;">
+          <rect x="70" y="184" width="160" height="20" rx="4" fill="rgba(10,20,6,0.7)" stroke="#8fd400" stroke-width="1.4"/>
+          <line x1="80" y1="212" x2="130" y2="212" stroke="#8fd400" stroke-width="5" stroke-linecap="round"/>
+          <circle class="illus-badge" cx="248" cy="194" r="9"/><text class="illus-badge-num" x="248" y="194">3</text>
+        </g>
+      </svg>
+    {% elif p.category == "Server" %}
+      <svg viewBox="0 0 300 230" class="illus-svg">
+        <g class="exploded-layer" style="animation-delay:0s;">
+          <rect x="30" y="4" width="240" height="22" rx="5" fill="rgba(10,20,6,0.7)" stroke="#8fd400" stroke-width="1.6"/>
+          <circle cx="70" cy="15" r="7" fill="rgba(5,10,6,0.8)" stroke="#a3e600" stroke-width="1"/>
+          <circle cx="140" cy="15" r="7" fill="rgba(5,10,6,0.8)" stroke="#a3e600" stroke-width="1"/>
+          <circle cx="210" cy="15" r="7" fill="rgba(5,10,6,0.8)" stroke="#a3e600" stroke-width="1"/>
+          <circle class="illus-badge" cx="280" cy="15" r="9"/><text class="illus-badge-num" x="280" y="15">1</text>
+        </g>
+        <line x1="150" y1="26" x2="150" y2="80" stroke="#8fd400" stroke-width="1" stroke-dasharray="3 5" opacity="0.6"/>
+        <g class="exploded-layer" style="animation-delay:0.12s;">
+          <rect x="24" y="82" width="252" height="30" rx="4" fill="rgba(143,212,0,0.12)" stroke="#a3e600" stroke-width="1.2"/>
+          <rect x="24" y="118" width="252" height="30" rx="4" fill="rgba(143,212,0,0.12)" stroke="#a3e600" stroke-width="1.2"/>
+          <circle class="illus-badge" cx="286" cy="112" r="9"/><text class="illus-badge-num" x="286" y="112">2</text>
+        </g>
+        <line x1="150" y1="148" x2="150" y2="196" stroke="#8fd400" stroke-width="1" stroke-dasharray="3 5" opacity="0.6"/>
+        <g class="exploded-layer" style="animation-delay:0.24s;">
+          <rect x="30" y="198" width="240" height="26" rx="5" fill="rgba(10,20,6,0.7)" stroke="#8fd400" stroke-width="1.6"/>
+          <g class="illus-led"><circle cx="46" cy="211" r="2" fill="#a3e600"/><circle cx="56" cy="211" r="2" fill="#a3e600"/><circle cx="66" cy="211" r="2" fill="#a3e600"/></g>
+          <circle class="illus-badge" cx="280" cy="211" r="9"/><text class="illus-badge-num" x="280" y="211">3</text>
+        </g>
+      </svg>
+    {% else %}
+      <svg viewBox="0 0 280 220" class="illus-svg">
+        <g class="exploded-layer" style="animation-delay:0s;">
+          <rect x="70" y="4" width="90" height="60" rx="4" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="1.1"/>
+          <rect x="78" y="12" width="74" height="10" rx="2" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="0.8"/>
+          <rect x="78" y="26" width="74" height="10" rx="2" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="0.8"/>
+          <rect x="78" y="40" width="74" height="10" rx="2" fill="rgba(143,212,0,0.14)" stroke="#a3e600" stroke-width="0.8"/>
+          <circle class="illus-badge" cx="182" cy="34" r="9"/><text class="illus-badge-num" x="182" y="34">1</text>
+        </g>
+        <line x1="115" y1="64" x2="115" y2="102" stroke="#8fd400" stroke-width="1" stroke-dasharray="3 5" opacity="0.6"/>
+        <g class="exploded-layer" style="animation-delay:0.12s;">
+          <rect x="75" y="104" width="80" height="16" rx="3" fill="rgba(10,20,6,0.75)" stroke="#a3e600" stroke-width="1.2"/>
+          <path d="M78 112 H152" stroke="#a3e600" stroke-width="1" stroke-dasharray="4 4" class="illus-trace"/>
+          <circle class="illus-badge" cx="182" cy="112" r="9"/><text class="illus-badge-num" x="182" y="112">2</text>
+        </g>
+        <line x1="115" y1="120" x2="115" y2="158" stroke="#8fd400" stroke-width="1" stroke-dasharray="3 5" opacity="0.6"/>
+        <g class="exploded-layer" style="animation-delay:0.24s;">
+          <rect x="60" y="160" width="110" height="56" rx="5" fill="rgba(10,20,6,0.6)" stroke="#8fd400" stroke-width="1.6"/>
+          <g class="illus-led"><circle cx="150" cy="172" r="1.8" fill="#a3e600"/><circle cx="150" cy="184" r="1.8" fill="#a3e600"/><circle cx="150" cy="196" r="1.8" fill="#a3e600"/></g>
+          <circle class="illus-badge" cx="200" cy="188" r="9"/><text class="illus-badge-num" x="200" y="188">3</text>
+        </g>
+      </svg>
+    {% endif %}
+  </div>
+
+  <ol class="exploded-legend no-print" id="illus-exploded-legend" hidden>
+    {% if p.category in ["Desktop card", "Workstation card"] %}
+      <li><span class="exploded-legend-num">1</span> Cooling shroud + fans</li>
+      <li><span class="exploded-legend-num">2</span> GPU die + VRAM modules</li>
+      <li><span class="exploded-legend-num">3</span> PCIe interface + backplate</li>
+    {% elif p.category == "Server" %}
+      <li><span class="exploded-legend-num">1</span> Top cover + fan wall</li>
+      <li><span class="exploded-legend-num">2</span> 8x GPU tray (NVLink)</li>
+      <li><span class="exploded-legend-num">3</span> Chassis + power backplane</li>
+    {% else %}
+      <li><span class="exploded-legend-num">1</span> Compute trays (rack-scale)</li>
+      <li><span class="exploded-legend-num">2</span> NVLink / InfiniBand backplane</li>
+      <li><span class="exploded-legend-num">3</span> Rack frame + PDU</li>
+    {% endif %}
+  </ol>
+
+  <div class="product-detail-grid">
+    <div class="product-photo" style="margin:0;">
+      <img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}">
+    </div>
+
+    <div>
+      <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.7rem;">
+        <span class="pill">{{ p.category }}</span>
+        <span class="availability-dot {{ 'in-stock' if p.in_stock else 'built-to-order' }}">
+          <span class="dot"></span> {{ "In stock" if p.in_stock else "Built to order" }}
+        </span>
+      </div>
+      <h1 style="margin-top:0;">{{ p.name }}</h1>
+      <p class="subtitle" style="margin-bottom:1.3rem;">{{ p.blurb }}</p>
+
+      <div class="stat-row">
+        <span class="stat-label">SKU</span>
+        <span class="stat-value" style="font-family:monospace; font-size:0.88rem;">{{ p.sku }}</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">{{ term('price-sourcing', 'Price') }}</span>
+        <span class="stat-value">${{ "{:,.0f}".format(p.price) }}</span>
+      </div>
+
+      <div style="display:flex; gap:0.7rem; flex-wrap:wrap; margin-top:1.3rem;">
+        <a class="btn btn-launch" href="{{ url_for('quote') }}?build={{ ('1x ' + p.name) | urlencode }}&price={{ p.price }}&watts={{ p.watts }}&slug={{ p.slug }}">Request a quote</a>
+        <a class="btn-secondary" href="{{ url_for('home') }}#catalog-grid">Back to catalog</a>
+      </div>
+    </div>
+  </div>
+
+  <h2 style="margin-top:2.4rem;">Specifications</h2>
+  <div class="icon-spec-grid">
+    <div class="icon-spec-card">
+      <span class="pill-icon">{{ icons.database() }}</span>
+      <div><div class="icon-spec-label">GPU memory</div><div class="icon-spec-value">{% if p.memory_gb >= 1000 %}{{ "%.1f"|format(p.memory_gb/1000) }} TB{% else %}{{ p.memory_gb }} GB{% endif %} {{ term(p.memory_type) }}</div></div>
+    </div>
+    <div class="icon-spec-card">
+      <span class="pill-icon">{{ icons.bolt() }}</span>
+      <div><div class="icon-spec-label">Power draw</div><div class="icon-spec-value">{% if p.watts >= 1000 %}{{ "%.1f"|format(p.watts/1000) }} kW{% else %}{{ p.watts }} W{% endif %}</div></div>
+    </div>
+    <div class="icon-spec-card">
+      <span class="pill-icon">{{ icons.gpu_chip() }}</span>
+      <div><div class="icon-spec-label">Tensor / AI compute</div><div class="icon-spec-value">{{ p.tensor_performance }}</div></div>
+    </div>
+    <div class="icon-spec-card">
+      <span class="pill-icon">{{ icons.server_rack() }}</span>
+      <div><div class="icon-spec-label">Rack units</div><div class="icon-spec-value">{{ p.rack_units }}</div></div>
+    </div>
+  </div>
+  <div class="spec-table" style="margin-top:0.9rem;">
+    {% for label, value in p.extra_specs %}
+      <div class="spec-table-row"><span>{{ label }}</span><span>{{ value }}</span></div>
+    {% endfor %}
+  </div>
+
+  <h2 style="margin-top:2.2rem;">Which models this can run</h2>
+  <p class="subtitle" style="margin-bottom:1rem;">
+    Real memory math against the 3 models in the <a href="{{ url_for('models') }}">model advisor</a> —
+    parameters &times; 1&nbsp;GB, plus 20% working room.
+  </p>
+  <div class="simple-explain" style="margin-bottom:1.2rem;">
+    <span class="simple-explain-label">In simple terms</span>
+    Imagine an AI model's brain is made of billions of tiny sticky notes, and each one needs about
+    a gigabyte of shelf space. Every single sticky note has to fit on the computer's memory shelf
+    at the same time, with a little extra room to spare — if the shelf's too small, they just don't
+    fit, and the computer can't run that model at all, no matter how good the rest of it is.
+  </div>
+  <div class="compat-panel">
+    {% for row in compatibility %}
+      {% set have_pct = [100, (p.memory_gb / row.required_gb * 100)] | min %}
+      <div class="compat-row compat-{{ 'yes' if row.can_run == True else ('maybe' if row.can_run is none else 'no') }}">
+        <span class="compat-icon">{% if row.can_run == True %}&#10003;{% elif row.can_run is none %}&#8776;{% else %}&#10007;{% endif %}</span>
+        <div>
+          <strong>{{ row.model.name }}</strong>
+          <span class="compat-req">{{ "{:,.1f}".format(row.required_gb) }} GB required &middot; this unit has {% if p.memory_gb >= 1000 %}{{ "%.1f"|format(p.memory_gb/1000) }} TB{% else %}{{ p.memory_gb }} GB{% endif %}</span>
+          <div class="compat-bar-track" aria-hidden="true">
+            <div class="compat-bar-fill" data-pct="{{ have_pct }}" style="width:0%;"></div>
+          </div>
+        </div>
+        <span class="compat-note">{{ row.note }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <h2 style="margin-top:2.2rem;">Power and cooling</h2>
+  <div class="power-box" style="border:1px solid var(--warn); background:var(--warn-bg);">
+    {{ icons.bolt() }}
+    <span><strong>Electrical requirement:</strong> {{ power_note }}</span>
+  </div>
+  <div class="power-box">
+    {{ icons.bolt() }}
+    <span>
+      About {{ "%.1f"|format(pc.home_equivalents) }}x the continuous draw of an average home
+      ({{ HOME_WATTS }} W). Run flat-out for a month, that's roughly
+      {{ "{:,.0f}".format(pc.monthly_kwh) }} kWh — about ${{ "{:,.0f}".format(pc.monthly_electricity_cost) }}/month
+      at a ${{ "%.2f"|format(ELECTRICITY_RATE_PER_KWH) }}/kWh commercial rate (US average, EIA — your
+      actual rate depends on region and utility contract).
+    </span>
+  </div>
+  <div class="simple-explain">
+    <span class="simple-explain-label">In simple terms</span>
+    Watts are like how hungry a machine is for electricity — a bigger number means it "eats" more
+    electricity, kind of like a bigger animal eating more food. This one draws about as much
+    electricity as {{ "%.1f"|format(pc.home_equivalents) }} whole houses running non-stop, which is
+    why bigger machines like this need special rooms built to feed and cool them.
+  </div>
+  <div class="power-cost-meter">
+    <div class="power-cost-meter-label">
+      <span>Power cost, relative to the rest of the catalog</span>
+      <strong>${{ "{:,.0f}".format(pc.monthly_electricity_cost) }}/mo</strong>
+    </div>
+    <div class="power-cost-track"><div class="power-cost-fill {{ 'power-cost-hot' if p.watts >= 5000 else '' }}" data-pct="{{ power_pct }}" style="width:0%;"></div></div>
+  </div>
+  <p class="subtitle" style="margin-top:0.8rem;"><strong style="color:var(--text);">Cooling:</strong> {{ p.cooling }}</p>
+
+  <div class="detail-two-col">
+    <div>
+      <h2>What this is good for</h2>
+      <ul class="check-list good">
+        {% for item in p.good_for %}<li>{{ item }}</li>{% endfor %}
+      </ul>
+    </div>
+    <div>
+      <h2>What this is NOT good for</h2>
+      <ul class="check-list bad">
+        {% for item in p.not_good_for %}<li>{{ item }}</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <h2>Included components</h2>
+  <p class="subtitle" style="max-width:720px;">{{ p.included_components }}</p>
+
+  <h2 style="margin-top:2rem;">Lead time and warranty</h2>
+  <div class="spec-table">
+    <div class="spec-table-row"><span>Delivery window estimate</span><span>{{ p.delivery_window_note }}</span></div>
+    <div class="spec-table-row"><span>Warranty</span><span>{{ p.warranty }}</span></div>
+  </div>
+
+  <div style="margin-top:2rem;">
+    <a class="btn btn-launch" href="{{ url_for('quote') }}?build={{ ('1x ' + p.name) | urlencode }}&price={{ p.price }}&watts={{ p.watts }}&slug={{ p.slug }}">Request a quote for this system</a>
+  </div>
+
+  <style>
+    .spec-sheet-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      padding-bottom: 0.9rem;
+      margin-bottom: 1.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    @media print {
+      .no-print, header, footer, .floating-cta { display: none !important; }
+      .spec-sheet-bar { border-bottom: 2px solid var(--text); }
+    }
+
+    .product-hero-illustration {
+      background: linear-gradient(160deg, #05130c, #0a1a10 70%);
+      border: 1px solid rgba(143, 212, 0, 0.3);
+      border-radius: 16px;
+      padding: 1.2rem;
+      margin-bottom: 1.6rem;
+      display: flex;
+      justify-content: center;
+    }
+    .illus-svg { width: 100%; max-width: 420px; height: auto; filter: drop-shadow(0 0 14px rgba(143, 212, 0, 0.25)); }
+
+    .illustration-toggle-row { display: flex; justify-content: flex-end; margin-bottom: 0.6rem; }
+    .illus-toggle-btn { padding: 0.4rem 0.9rem; font-size: 0.78rem; }
+    .illus-toggle-btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+
+    .product-exploded-illustration .illus-svg { max-width: 340px; }
+    .illus-badge { fill: rgba(5,10,6,0.85); stroke: #a3e600; stroke-width: 1.4; }
+    .illus-badge-num { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 10px; font-weight: 700; fill: #a3e600; text-anchor: middle; dominant-baseline: central; }
+
+    .exploded-legend {
+      list-style: none;
+      counter-reset: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 1.4rem;
+      margin: -0.6rem 0 1.6rem;
+      padding: 0;
+      font-size: 0.86rem;
+      color: var(--text-dim);
+    }
+    .exploded-legend li { display: flex; align-items: center; gap: 0.5rem; }
+    .exploded-legend-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent-bg);
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 0.76rem;
+      flex-shrink: 0;
+    }
+
+    .exploded-layer {
+      opacity: 0;
+      transform: translateY(6px);
+      animation: explodedLayerIn 0.45s var(--ease) forwards;
+    }
+    @keyframes explodedLayerIn { to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) {
+      .exploded-layer { animation: none; opacity: 1; transform: none; }
+    }
+    .illus-die { animation: illusDiePulse 2.8s ease-in-out infinite; }
+    @keyframes illusDiePulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+    .illus-fan { animation: illusFanSpin 3s linear infinite; }
+    .illus-fan-rev { animation-direction: reverse; animation-duration: 3.6s; }
+    @keyframes illusFanSpin { to { transform: rotate(360deg); } }
+    .illus-led { animation: illusLedBlink 1.8s ease-in-out infinite; }
+    @keyframes illusLedBlink { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .illus-trace { animation: illusTraceFlow 1.4s linear infinite; }
+    @keyframes illusTraceFlow { to { stroke-dashoffset: -22; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .illus-die, .illus-fan, .illus-led, .illus-trace { animation: none; opacity: 0.9; }
+    }
+
+    .product-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 2.2rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .product-detail-grid .product-photo { aspect-ratio: 4 / 3; border-radius: 16px; }
+    @media (max-width: 760px) {
+      .product-detail-grid { grid-template-columns: 1fr; }
+    }
+
+    .detail-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.6rem; }
+    @media (max-width: 700px) { .detail-two-col { grid-template-columns: 1fr; } }
+
+    .check-list { list-style: none; padding: 0; margin: 0; }
+    .check-list li { position: relative; padding-left: 1.6rem; margin-bottom: 0.65rem; font-size: 0.9rem; color: var(--text-dim); line-height: 1.5; }
+    .check-list.good li::before { content: "+"; position: absolute; left: 0; color: var(--accent); font-weight: 800; }
+    .check-list.bad li::before { content: "\2212"; position: absolute; left: 0.15rem; color: var(--text-dim); font-weight: 800; }
+
+    .icon-spec-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+    @media (max-width: 700px) { .icon-spec-grid { grid-template-columns: 1fr; } }
+    .icon-spec-card {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+    }
+    .icon-spec-card:hover { border-color: var(--accent); box-shadow: var(--shadow-2); }
+    .icon-spec-label { font-size: 0.76rem; color: var(--text-dim); font-weight: 600; }
+    .icon-spec-value { font-size: 0.95rem; font-weight: 700; }
+
+    .compat-panel { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.4rem; }
+    .compat-row {
+      position: relative;
+      display: grid;
+      grid-template-columns: 32px 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.8rem 1.1rem;
+      overflow: hidden;
+    }
+    .compat-row::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, transparent 42%, var(--accent-bg) 50%, transparent 58%);
+      background-size: 250% 100%;
+      background-position: 150% 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .compat-row.scanning::before { animation: compatScan 0.7s ease-out; }
+    @keyframes compatScan {
+      0% { opacity: 1; background-position: 150% 0; }
+      100% { opacity: 0; background-position: -50% 0; }
+    }
+    .compat-icon {
+      width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    .compat-row.scanned .compat-icon {
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity 0.3s var(--ease) 0.5s, transform 0.35s var(--ease) 0.5s;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .compat-row.scanning::before { animation: none; }
+      .compat-icon { opacity: 1; transform: none; transition: none; }
+    }
+    .compat-yes .compat-icon { background: var(--accent-bg); color: var(--accent); }
+    .compat-maybe .compat-icon { background: var(--warn-bg); color: var(--warn); }
+    .compat-no .compat-icon { background: var(--danger-bg); color: var(--danger); }
+    .compat-req { display: block; color: var(--text-dim); font-size: 0.78rem; margin-top: 0.15rem; }
+    .compat-bar-track { background: var(--bg-alt); border-radius: 999px; height: 6px; overflow: hidden; margin-top: 0.4rem; max-width: 240px; }
+    .compat-bar-fill { height: 100%; border-radius: 999px; transition: width 0.8s var(--ease); }
+    .compat-yes .compat-bar-fill { background: linear-gradient(90deg, var(--accent-bright), var(--accent)); }
+    .compat-maybe .compat-bar-fill { background: linear-gradient(90deg, var(--warn), #f0b64c); }
+    .compat-no .compat-bar-fill { background: linear-gradient(90deg, var(--danger), #f0465b); }
+    @media (prefers-reduced-motion: reduce) { .compat-bar-fill { transition: none; } }
+    .compat-note { color: var(--text-dim); font-size: 0.8rem; text-align: right; max-width: 260px; }
+    @media (max-width: 700px) {
+      .compat-row { grid-template-columns: 32px 1fr; }
+      .compat-note { grid-column: 1 / -1; text-align: left; max-width: none; margin-top: 0.3rem; }
+    }
+
+    .power-cost-meter { margin-top: 1rem; }
+    .power-cost-meter-label { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--text-dim); margin-bottom: 0.4rem; }
+    .power-cost-meter-label strong { color: var(--text); }
+    .power-cost-track { background: var(--bg-alt); border-radius: 999px; height: 10px; overflow: hidden; }
+    .power-cost-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent-bright), var(--accent)); transition: width 0.9s var(--ease), box-shadow 0.4s var(--ease); }
+    .power-cost-fill.power-cost-hot { background: linear-gradient(90deg, var(--warn), var(--danger)); animation: powerCostHotPulse 2.2s ease-in-out infinite; }
+    @keyframes powerCostHotPulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .power-cost-fill { transition: none; }
+      .power-cost-fill.power-cost-hot { animation: none; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      var toggleBtn = document.getElementById("illus-toggle");
+      var assembled = document.getElementById("illus-assembled");
+      var exploded = document.getElementById("illus-exploded");
+      var legend = document.getElementById("illus-exploded-legend");
+      if (!toggleBtn || !assembled || !exploded) return;
+      toggleBtn.addEventListener("click", function () {
+        var showingExploded = toggleBtn.getAttribute("aria-pressed") === "true";
+        if (showingExploded) {
+          exploded.hidden = true;
+          if (legend) legend.hidden = true;
+          assembled.hidden = false;
+          toggleBtn.setAttribute("aria-pressed", "false");
+          toggleBtn.textContent = "Show exploded view";
+        } else {
+          exploded.querySelectorAll(".exploded-layer").forEach(function (el) {
+            el.style.animation = "none";
+            void el.offsetWidth;
+            el.style.animation = "";
+          });
+          assembled.hidden = true;
+          exploded.hidden = false;
+          if (legend) legend.hidden = false;
+          toggleBtn.setAttribute("aria-pressed", "true");
+          toggleBtn.textContent = "Show assembled view";
+        }
+      });
+    })();
+
+    (function () {
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var compatRows = document.querySelectorAll(".compat-row");
+      if (compatRows.length) {
+        if (reduceMotion) {
+          compatRows.forEach(function (row) { row.classList.add("scanned"); });
+        } else {
+          var runScan = function (row, delay) {
+            setTimeout(function () {
+              row.classList.add("scanning");
+              setTimeout(function () { row.classList.add("scanned"); }, 550);
+            }, delay);
+          };
+          if ("IntersectionObserver" in window) {
+            var compatObserver = new IntersectionObserver(function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  var idx = Array.prototype.indexOf.call(compatRows, entry.target);
+                  runScan(entry.target, Math.max(0, idx) * 150);
+                  compatObserver.unobserve(entry.target);
+                }
+              });
+            }, { threshold: 0.3 });
+            compatRows.forEach(function (row) { compatObserver.observe(row); });
+          } else {
+            compatRows.forEach(function (row, idx) { runScan(row, idx * 150); });
+          }
+          // Safety net: never leave a row permanently unscanned if the observer never fires.
+          setTimeout(function () {
+            compatRows.forEach(function (row) { row.classList.add("scanning", "scanned"); });
+          }, 2000);
+        }
+      }
+    })();
+
+    (function () {
+      var fills = document.querySelectorAll(".power-cost-fill, .compat-bar-fill");
+      if (!fills.length) return;
+      function activate(el) { el.style.width = (el.dataset.pct || 0) + "%"; }
+      if ("IntersectionObserver" in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) { if (entry.isIntersecting) { activate(entry.target); observer.unobserve(entry.target); } });
+        }, { threshold: 0.3 });
+        fills.forEach(function (el) { observer.observe(el); });
+      } else {
+        fills.forEach(activate);
+      }
+      setTimeout(function () { fills.forEach(activate); }, 1200);
+    })();
+  </script>
+{% endblock %}

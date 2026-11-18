@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import "icons.html" as icons %}
+{% block title %}Guided build — {{ STORE_NAME }}{% endblock %}
+{% block content %}
+  <div class="breadcrumbs">
+    <a href="{{ url_for('home') }}">Catalog</a> <span>/</span> <span class="current">Guided build</span>
+  </div>
+
+  {{ icons.wizard_steps(1) }}
+
+  <h1>Which describes you?</h1>
+  <p class="subtitle">Pick a path and we'll walk you to one recommended build with a total price.</p>
+
+  <div class="grid">
+    <a href="{{ url_for('guide_pick_model', path='startup') }}" class="card hoverable" style="text-decoration:none; display:block;">
+      <span class="pill-icon icon-spin-slow">{{ icons.gpu_chip() }}</span>
+      <span class="pill" style="margin-top:0.9rem; display:inline-block;">Cheapest honest option</span>
+      <h2 style="margin-top:0.7rem;">I'm a startup</h2>
+      <p style="color:var(--text-dim); font-size:0.9rem;">
+        Sized to run one model as cheaply as possible — no more hardware than the memory math
+        actually requires.
+      </p>
+    </a>
+
+    <a href="{{ url_for('guide_pick_model', path='scale') }}" class="card hoverable" style="text-decoration:none; display:block;">
+      <span class="pill-icon icon-rack-rotate">{{ icons.server_rack() }}</span>
+      <span class="pill" style="margin-top:0.9rem; display:inline-block;">Room to grow</span>
+      <h2 style="margin-top:0.7rem;">I'm scaling up</h2>
+      <p style="color:var(--text-dim); font-size:0.9rem;">
+        Sized with double the memory headroom, for more traffic, bigger context windows, and
+        room to grow without buying again next quarter.
+      </p>
+    </a>
+  </div>
+{% endblock %}

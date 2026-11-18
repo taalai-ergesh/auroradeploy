@@ -1,0 +1,364 @@
+{% extends "base.html" %}
+{% import "icons.html" as icons %}
+{% block title %}Model advisor — {{ STORE_NAME }}{% endblock %}
+{% block content %}
+  <div class="breadcrumbs">
+    <a href="{{ url_for('home') }}">Catalog</a> <span>/</span> <span class="current">Model advisor</span>
+  </div>
+
+  <h1>Model advisor</h1>
+  <p class="subtitle">
+    Three open-source models from arena.ai/leaderboard/agent (Open Source filter). For each one,
+    the memory math is shown — not hidden — followed by the cheapest real hardware that actually
+    clears that bar. We never recommend hardware that doesn't have enough memory to hold the model.
+  </p>
+
+  <span class="pill" style="background:var(--accent-bg); color:var(--accent);">Interactive</span>
+  <h2 style="margin-top:0.7rem;">Can my model run?</h2>
+  <p class="subtitle" style="margin-bottom:1.2rem;">
+    Type any parameter count and every product in the catalog is checked at once — real memory
+    math, real prices, real power draw, no fixed list of models required.
+  </p>
+
+  <div class="card">
+    <div style="margin-bottom:1rem;">
+      <label for="calc-preset">Pick a well-known model — no need to remember its parameter count</label>
+      <select id="calc-preset" style="margin-bottom:0;">
+        <option value="">Choose a model&hellip;</option>
+      </select>
+    </div>
+    <p class="subtitle" style="margin:-0.4rem 0 1rem; font-size:0.82rem;">Or skip the list and set both fields yourself:</p>
+    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:1rem; align-items:end;">
+      <div style="margin-bottom:0;">
+        <label for="calc-name">Model name (optional)</label>
+        <input type="text" id="calc-name" placeholder="e.g. Llama 3.1 70B" style="margin-bottom:0;">
+      </div>
+      <div style="margin-bottom:0;">
+        <label for="calc-params">Parameters, in billions</label>
+        <input type="number" id="calc-params" min="0" step="0.1" placeholder="e.g. 70" style="margin-bottom:0;">
+      </div>
+    </div>
+    <div id="calc-math" style="margin-top:1rem;"></div>
+    <div id="calc-result" class="sim-grid" style="margin-top:1rem;"></div>
+    <div id="calc-cta"></div>
+  </div>
+
+  <h2 style="margin-top:2.4rem;">Or start from one of these 3 leaderboard models</h2>
+  <p class="subtitle" style="margin-bottom:1.2rem;">Pre-analyzed with the same real memory math, if you'd rather not type a number.</p>
+
+  {% for row in rows %}
+    {% set m = row.model %}
+    {% set build = row.build %}
+    <div class="card" style="margin-bottom:1.6rem;">
+      <div class="card-top">
+        <div style="display:flex; align-items:flex-start; gap:0.9rem;">
+          <span class="pill-icon icon-float brain-thinking" style="flex-shrink:0;">{{ icons.brain() }}</span>
+          <div>
+            <span class="pill">{{ m.license }}</span>
+            <h2 style="margin-top:0.7rem;">{{ m.name }}</h2>
+            <p style="color:var(--text-dim); font-size:0.85rem; margin-top:-0.2rem;">
+              {% if m.active_params_b %}
+                {{ m.total_params_b }}B total parameters ({{ m.active_params_b }}B active at a time — a
+                {{ term('mixture of experts') }} model, so only part of it fires per word, but all of it
+                still has to sit in memory).
+              {% else %}
+                {{ m.total_params_b }}B parameters.
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="math-box">
+        <div class="label">The memory math, shown:</div>
+        <div class="formula">
+          {{ m.total_params_b }}B params &times; 1 GB = {{ "{:,.0f}".format(m.total_params_b) }} GB
+          &nbsp;+&nbsp; {{ term('20% working room', '20% working room') }}
+          &nbsp;=&nbsp; <strong>{{ "{:,.1f}".format(row.required_gb) }} GB required</strong>
+        </div>
+        <div class="simple-explain">
+          <span class="simple-explain-label">In simple terms</span>
+          Big AI models are built from billions of tiny number-pieces called parameters — think of
+          them like LEGO bricks. The bigger the model, the more bricks it's made of, and the
+          computer needs enough space to hold every single brick at once before it can build
+          anything with them.
+        </div>
+      </div>
+
+      {% if build %}
+        <div class="card-top" style="align-items:center;">
+          <div style="display:flex; align-items:center; gap:0.8rem;">
+            <span class="thumb"><img src="{{ url_for('static', filename='images/products/' + build.product.slug + '.jpg') }}" alt="{{ build.product.name }}"></span>
+            <div>
+              <h2 style="margin:0;">{{ row.build_label }}</h2>
+              {% if build.product.slug == 'h100x8' %}
+                <div style="color:var(--text-dim); font-size:0.78rem;">Built on the {{ term('SXM') }} GPU form factor.</div>
+              {% elif build.product.slug == 'h200x8' %}
+                <div style="color:var(--text-dim); font-size:0.78rem;">Built on NVIDIA's {{ term('HGX') }} reference platform.</div>
+              {% endif %}
+            </div>
+          </div>
+          <span class="pill-icon">{{ icons.category(build.product.category) }}</span>
+        </div>
+
+        <div class="spec-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="spec-box">
+            <div class="spec-label">Combined memory</div>
+            <div class="spec-value">{{ "{:,.0f}".format(build.total_memory_gb) }} GB</div>
+          </div>
+          <div class="spec-box">
+            <div class="spec-label">Combined price</div>
+            <div class="spec-value">${{ "{:,.0f}".format(build.total_price) }}</div>
+          </div>
+          <div class="spec-box">
+            <div class="spec-label">Combined power</div>
+            <div class="spec-value">{{ "{:,.0f}".format(build.total_watts) }} W</div>
+          </div>
+        </div>
+
+        <div class="power-box">
+          {{ icons.bolt() }}
+          <span>
+            <strong>Power, in real terms:</strong> about {{ "%.1f"|format(build.power.home_equivalents) }}x
+            an average home's continuous draw, and about {{ "{:,.0f}".format(build.power.daily_kwh) }} kWh
+            a day if run flat-out (~{{ "%.1f"|format(build.power.ev_batteries_per_day) }}x an electric
+            car battery, every day).
+          </span>
+        </div>
+
+        {% if build.is_cluster %}
+          <div class="cluster-box">
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <span class="pill-icon" style="width:28px;height:28px;">{{ icons.cluster_icon() }}</span>
+              <strong>This is a cluster — {{ build.count }} machines acting as one.</strong>
+            </div>
+            <p>
+              A "cluster" just means multiple computers wired together and coordinated so they behave
+              like a single, bigger machine. Here, {{ build.count }}x {{ build.product.name }} units
+              are combined to reach {{ "{:,.0f}".format(build.total_memory_gb) }} GB of memory.
+            </p>
+            <p>
+              <strong style="color:var(--text);">Real deal vs. just plugging in cards:</strong> the
+              GPUs inside each server are already wired together with {{ term('NVLink') }} for
+              near-instant, high-bandwidth memory sharing. Connecting multiple servers into one cluster
+              additionally needs {{ term('InfiniBand') }} networking between them — dedicated
+              high-speed cabling and switches built for this job. That's very different from buying
+              several desktop cards and plugging them into one PC over ordinary PCIe: technically
+              possible, but far slower for a single huge model, and not something a datacenter would do
+              at this scale. This estimate also doesn't include the extra cost of that networking gear.
+            </p>
+            <div class="simple-explain">
+              <span class="simple-explain-label">In simple terms</span>
+              A cluster is like a few kids each holding one page of a giant book, standing close
+              together and reading it out loud as if it were one book. That only works if they're
+              standing right next to each other with a plan for who reads next — it's not the same as
+              a few kids each holding their OWN separate small book far apart from each other.
+            </div>
+          </div>
+        {% endif %}
+
+        <div style="margin-top:1.2rem;">
+          <a class="btn btn-launch" href="{{ url_for('quote') }}?build={{ (row.build_label + ' — running ' + m.name) | urlencode }}&price={{ build.total_price }}&watts={{ build.total_watts }}&slug={{ build.product.slug }}">Request a quote for this build</a>
+        </div>
+      {% else %}
+        <p style="color:var(--text-dim);">Nothing in the current catalog clears this model's memory requirement.</p>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  <script id="catalog-data" type="application/json">{{ catalog_json | tojson }}</script>
+  <script id="known-models-data" type="application/json">{{ known_models_json | tojson }}</script>
+  <script>
+    var CATALOG = JSON.parse(document.getElementById("catalog-data").textContent);
+    var KNOWN_MODELS = JSON.parse(document.getElementById("known-models-data").textContent);
+    var WORKING_ROOM = {{ working_room_multiplier }};
+    var HOME_W = {{ home_watts }};
+    var EV_KWH = {{ ev_battery_kwh }};
+
+    function calcPowerContext(watts) {
+      var dailyKwh = watts * 24 / 1000;
+      return { watts: watts, homeEquivalents: watts / HOME_W, dailyKwh: dailyKwh, evBatteriesPerDay: dailyKwh / EV_KWH };
+    }
+
+    function calcCheckProduct(p, requiredGb) {
+      var canRun, count, note;
+      if (p.memory_gb >= requiredGb) {
+        canRun = true; count = 1;
+        note = "Runs on a single unit, with room to spare.";
+      } else if (p.clusterable) {
+        count = Math.ceil(requiredGb / p.memory_gb);
+        if (count >= 2) {
+          canRun = null;
+          note = "Needs " + count + "x units clustered together (not a single unit).";
+        } else {
+          canRun = true; count = 1;
+          note = "Runs on a single unit, with room to spare.";
+        }
+      } else {
+        canRun = false; count = 1;
+        note = "Does not have enough memory, and this product does not cluster.";
+      }
+      var totalMemoryGb = p.memory_gb * count;
+      var totalPrice = p.price * count;
+      var totalWatts = p.watts * count;
+      return {
+        product: p, canRun: canRun, count: count, note: note,
+        totalMemoryGb: totalMemoryGb, totalPrice: totalPrice, totalWatts: totalWatts,
+        havePct: Math.min(100, (totalMemoryGb / requiredGb) * 100),
+        power: calcPowerContext(totalWatts)
+      };
+    }
+
+    function calcCheckAll(requiredGb) {
+      var results = CATALOG.map(function (p) { return calcCheckProduct(p, requiredGb); });
+      var runnable = results.filter(function (r) { return r.canRun === true || r.canRun === null; });
+      var recommended = null;
+      if (runnable.length) {
+        recommended = runnable.slice().sort(function (a, b) { return a.totalPrice - b.totalPrice; })[0];
+      }
+      return { results: results, recommended: recommended };
+    }
+
+    function fmt(n) { return n.toLocaleString(undefined, { maximumFractionDigits: 0 }); }
+
+    var simDebounce = null;
+
+    function renderCalculator() {
+      clearTimeout(simDebounce);
+      simDebounce = setTimeout(renderCalculatorNow, 250);
+    }
+
+    var simRenderGen = 0;
+
+    function renderCalculatorNow() {
+      var gen = ++simRenderGen;
+      var paramsInput = document.getElementById("calc-params");
+      var nameInput = document.getElementById("calc-name");
+      var mathBox = document.getElementById("calc-math");
+      var result = document.getElementById("calc-result");
+      var cta = document.getElementById("calc-cta");
+      var rawValue = paramsInput.value.trim();
+      var params = parseFloat(rawValue);
+
+      if (!rawValue) {
+        mathBox.innerHTML = "";
+        result.innerHTML = "";
+        cta.innerHTML = "";
+        return;
+      }
+      if (isNaN(params) || params <= 0) {
+        mathBox.innerHTML = '<p class="field-error" style="margin:0;">Enter a positive number of parameters, in billions (for example, 70).</p>';
+        result.innerHTML = "";
+        cta.innerHTML = "";
+        return;
+      }
+      if (params > 100000) {
+        mathBox.innerHTML = '<p class="field-error" style="margin:0;">That figure looks out of range for a released model — double-check the parameter count.</p>';
+        result.innerHTML = "";
+        cta.innerHTML = "";
+        return;
+      }
+      cta.innerHTML = "";
+
+      var name = (nameInput.value || "your model").trim();
+      var requiredGb = params * WORKING_ROOM;
+      var check = calcCheckAll(requiredGb);
+
+      mathBox.innerHTML = '<div class="math-box">' +
+        '<div class="label">The memory math, shown:</div>' +
+        '<div class="formula">' + params + 'B params &times; 1 GB = ' + fmt(params) + ' GB' +
+        ' &nbsp;+&nbsp; 20% working room &nbsp;=&nbsp; <strong>' + requiredGb.toFixed(1) + ' GB required for ' + escapeHtml(name) + '</strong></div></div>';
+
+      result.innerHTML = check.results.map(function (r, idx) {
+        var statusClass = r.canRun === true ? "sim-yes" : (r.canRun === null ? "sim-maybe" : "sim-no");
+        var icon = r.canRun === true ? "&#10003;" : (r.canRun === null ? "&#8776;" : "&#10007;");
+        var isRecommended = check.recommended && check.recommended.product.slug === r.product.slug;
+        var label = (r.count === 1 ? "" : r.count + "x ") + r.product.name;
+        return '<div class="sim-row ' + statusClass + '" style="animation-delay:' + (idx * 0.12) + 's;" data-slug="' + r.product.slug + '">' +
+          '<div class="sim-row-top">' +
+          '<span class="thumb sim-thumb"><img src="/static/images/products/' + r.product.slug + '.jpg" alt=""></span>' +
+          '<div class="sim-row-name"><strong>' + escapeHtml(label) + '</strong>' +
+          (isRecommended ? ' <span class="sim-badge">Cheapest that fits</span>' : '') +
+          '<span class="sim-row-sub">' + escapeHtml(r.product.category) + '</span></div>' +
+          '<span class="sim-icon">' + icon + '</span>' +
+          '</div>' +
+          '<div class="sim-bar-track"><div class="sim-bar-fill" data-pct="' + r.havePct + '" style="width:0%;"></div></div>' +
+          '<div class="sim-row-stats">' +
+          '<span>' + fmt(r.totalMemoryGb) + ' GB total</span>' +
+          '<span>$' + fmt(r.totalPrice) + '</span>' +
+          '<span>' + fmt(r.totalWatts) + ' W</span>' +
+          '</div>' +
+          '<div class="sim-row-note">' + escapeHtml(r.note) + '</div>' +
+          '</div>';
+      }).join("");
+
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var rows = result.querySelectorAll(".sim-row");
+      rows.forEach(function (row, idx) {
+        var fill = row.querySelector(".sim-bar-fill");
+        if (reduceMotion) {
+          row.classList.add("scanned");
+          fill.style.width = (fill.dataset.pct || 0) + "%";
+        } else {
+          setTimeout(function () {
+            if (gen !== simRenderGen) return;
+            row.classList.add("scanning");
+            setTimeout(function () {
+              if (gen !== simRenderGen) return;
+              row.classList.add("scanned");
+              fill.style.width = (fill.dataset.pct || 0) + "%";
+            }, 450);
+          }, idx * 140);
+        }
+      });
+
+      if (check.recommended) {
+        var rec = check.recommended;
+        var recLabel = (rec.count === 1 ? "1x " : rec.count + "x ") + rec.product.name;
+        var ctaDelay = rows.length * 140 + 500;
+        setTimeout(function () {
+          if (gen !== simRenderGen) return;
+          cta.innerHTML = '<div style="margin-top:1.2rem;"><a class="btn btn-launch" href="/quote?build=' +
+            encodeURIComponent(recLabel + " — running " + name) + '&price=' + rec.totalPrice +
+            '&watts=' + rec.totalWatts + '&slug=' + rec.product.slug + '">Request a quote for ' + escapeHtml(recLabel) + '</a></div>';
+        }, reduceMotion ? 0 : ctaDelay);
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, function (ch) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
+      });
+    }
+
+    var presetSelect = document.getElementById("calc-preset");
+    presetSelect.innerHTML = '<option value="">Choose a model&hellip;</option>' + KNOWN_MODELS.map(function (m, idx) {
+      var sub = m.active_params_b ? m.total_params_b + "B total, " + m.active_params_b + "B active" : m.total_params_b + "B parameters";
+      return '<option value="' + idx + '">' + escapeHtml(m.name) + ' — ' + sub + '</option>';
+    }).join("");
+
+    presetSelect.addEventListener("change", function () {
+      if (presetSelect.value === "") return;
+      var m = KNOWN_MODELS[+presetSelect.value];
+      document.getElementById("calc-name").value = m.name;
+      document.getElementById("calc-params").value = m.total_params_b;
+      renderCalculatorNow();
+    });
+
+    document.getElementById("calc-params").addEventListener("input", renderCalculator);
+    document.getElementById("calc-name").addEventListener("input", renderCalculator);
+  </script>
+
+  <style>
+    /* A slow "thinking" glow on the model advisor's brain icon — teaches that the advisor is
+       actively working out the memory math below, not just decorative. */
+    .brain-thinking { box-shadow: 0 0 0 0 var(--accent-bg); animation: iconFloat 3.6s ease-in-out infinite, brainPulse 2.4s ease-in-out infinite; }
+    @keyframes brainPulse {
+      0%, 100% { box-shadow: 0 0 0 0 var(--accent-bg); }
+      50% { box-shadow: 0 0 0 6px var(--accent-bg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .brain-thinking { animation: none; box-shadow: 0 0 0 3px var(--accent-bg); }
+    }
+  </style>
+{% endblock %}

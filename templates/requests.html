@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Requests — {{ STORE_NAME }}{% endblock %}
+{% block content %}
+  <div class="breadcrumbs">
+    <a href="{{ url_for('home') }}">Catalog</a> <span>/</span> <span class="current">Requests</span>
+  </div>
+
+  <h1>All quote requests</h1>
+  <p class="subtitle">
+    Every request ever submitted, newest first. No accounts, no login — status is tracked here
+    openly, the same as the rest of this catalog.
+  </p>
+
+  {% if items %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Build requested</th>
+            <th>Price</th>
+            <th>Submitted</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in items %}
+            <tr>
+              <td>#{{ "%05d"|format(r.id) }}</td>
+              <td>{{ r.name }}</td>
+              <td>{{ r.contact }}</td>
+              <td>{{ r.build_description }}</td>
+              <td>{{ "${:,.0f}".format(r.total_price) if r.total_price else "—" }}</td>
+              <td>{{ r.submitted_at.strftime("%Y-%m-%d %H:%M") }}</td>
+              <td>
+                <form method="post" action="{{ url_for('update_request_status', request_id=r.id) }}" class="status-form">
+                  <span class="status-badge status-{{ r.status|lower }}">{{ r.status }}</span>
+                  <select name="status" class="status-select" onchange="this.form.submit()" aria-label="Update status for request {{ r.id }}">
+                    {% for s in statuses %}
+                      <option value="{{ s }}" {{ "selected" if s == r.status else "" }}>{{ s }}</option>
+                    {% endfor %}
+                  </select>
+                  <noscript><button type="submit" class="btn-secondary" style="padding:0.3rem 0.7rem; font-size:0.76rem;">Update</button></noscript>
+                </form>
+              </td>
+              <td><a href="{{ url_for('print_quote', request_id=r.id) }}" style="font-size:0.78rem; color:var(--text-dim); text-decoration:none;">Print</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card" style="text-align:center; padding:2.6rem 1.6rem;">
+      <h2 style="margin-top:0;">No requests yet</h2>
+      <p class="subtitle" style="margin:0.5rem auto 1.2rem; max-width:380px;">
+        Once someone submits a quote request from the catalog, it will show up here.
+      </p>
+      <a href="{{ url_for('home') }}" class="btn">Browse the catalog</a>
+    </div>
+  {% endif %}
+
+  <style>
+    .status-form { display: flex; align-items: center; gap: 0.5rem; }
+    .status-select { font-size: 0.78rem; padding: 0.25rem 0.4rem; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); }
+    .status-badge { font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px; white-space: nowrap; }
+    .status-new { background: var(--accent-bg); color: var(--accent); }
+    .status-reviewed { background: var(--warn-bg); color: var(--warn); }
+    .status-contacted { background: var(--bg-alt); color: var(--text-dim); }
+  </style>
+{% endblock %}

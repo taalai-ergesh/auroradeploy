@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Request a quote — {{ STORE_NAME }}{% endblock %}
+{% block content %}
+  <div class="breadcrumbs">
+    <a href="{{ url_for('home') }}">Catalog</a> <span>/</span> <span class="current">Request a quote</span>
+  </div>
+
+  <h1>Request a quote</h1>
+  <p class="subtitle">
+    No payment and no account required. This submits a record with your contact details and the
+    hardware you're interested in — we follow up directly. It is not a purchase or a payment.
+  </p>
+
+  {% if errors %}
+    <div class="error-box">Please fix the following before submitting:
+      <ul style="margin:0.4rem 0 0; padding-left:1.2rem;">
+        {% for field, msg in errors.items() %}<li>{{ msg }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('quote') }}" class="card" style="max-width:480px;" id="quote-form" novalidate>
+    <label for="name">Your name</label>
+    <input type="text" id="name" name="name" value="{{ name or '' }}" required aria-invalid="{{ 'true' if errors and errors.name else 'false' }}">
+    {% if errors and errors.name %}<div class="field-error">{{ errors.name }}</div>{% endif %}
+
+    <label for="contact">Email or phone</label>
+    <input type="text" id="contact" name="contact" value="{{ request.form.get('contact', '') }}" required minlength="7" aria-invalid="{{ 'true' if errors and errors.contact else 'false' }}">
+    {% if errors and errors.contact %}<div class="field-error">{{ errors.contact }}</div>{% endif %}
+
+    <label for="build_description">I want this build</label>
+    <textarea id="build_description" name="build_description" rows="3">{{ build_description }}</textarea>
+
+    <input type="hidden" name="total_price" value="{{ total_price }}">
+    <input type="hidden" name="watts" value="{{ watts }}">
+    <input type="hidden" name="slug" value="{{ slug }}">
+
+    <button type="submit" class="btn" id="quote-submit">Submit request</button>
+    <p style="color:var(--text-dim); font-size:0.78rem; margin-top:0.8rem;">
+      This is not a purchase or payment — no card is charged and no order is placed.
+    </p>
+  </form>
+
+  <script>
+    document.getElementById("quote-form").addEventListener("submit", function () {
+      var btn = document.getElementById("quote-submit");
+      btn.disabled = true;
+      btn.classList.add("btn-loading");
+      btn.textContent = "Submitting…";
+    });
+  </script>
+
+  <style>
+    .btn-loading { opacity: 0.75; cursor: wait; }
+  </style>
+{% endblock %}

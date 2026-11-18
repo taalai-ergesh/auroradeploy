@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}FAQ — {{ STORE_NAME }}{% endblock %}
+{% block content %}
+  <div class="breadcrumbs">
+    <a href="{{ url_for('home') }}">Catalog</a> <span>/</span> <span class="current">FAQ</span>
+  </div>
+
+  <h1>Frequently asked questions</h1>
+  <p class="subtitle">
+    Plain-language answers, no jargon left unexplained. If something below doesn't cover it,
+    every number on the catalog page has its own tooltip explainer too.
+  </p>
+
+  <div class="faq-list reveal-group">
+    <details class="faq-item" open>
+      <summary>Can I actually buy something here?</summary>
+      <div class="faq-body">
+        <p>
+          Every product listed is real hardware at a real, sourced price — this isn't a mockup
+          catalog. What you can't do here is pay online: there's no checkout, no accounts, and
+          no payment processing. Click <strong>Request a quote</strong> on any product or build,
+          and it's saved with a request number you can look up later on the
+          <a href="{{ url_for('requests_list') }}">Requests</a> page.
+        </p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>How is the "memory required" number calculated?</summary>
+      <div class="faq-body">
+        <p>
+          A model's parameter count in billions, multiplied by 1&nbsp;GB per billion parameters,
+          plus 20% extra headroom for things like the KV cache and activation buffers that a
+          model needs while it's actually generating output. So a 70B model needs roughly
+          70&nbsp;GB &times; 1.2 = 84&nbsp;GB of GPU memory. We never recommend hardware that
+          doesn't clear that number.
+        </p>
+        <div class="simple-explain">
+          <span class="simple-explain-label">In simple terms</span>
+          Think of parameters like LEGO bricks — the model is built from billions of them, and
+          each one needs its own tiny bit of shelf space. We count the bricks, add a little extra
+          room for elbow space, and that tells us exactly how big a shelf (GPU memory) you need.
+        </div>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Why GPU memory and not CPU or RAM?</summary>
+      <div class="faq-body">
+        <p>
+          A big AI model's weights have to load into GPU memory before the GPU's own cores can
+          run it — that's the hard requirement. Regular CPU and system RAM mostly just keep the
+          machine's operating system running and shuttle data around; more of either won't let
+          an undersized GPU hold a bigger model or make it run faster. That's why every spec on
+          this site leads with GPU memory and watts, not CPU or RAM.
+        </p>
+        <div class="simple-explain">
+          <span class="simple-explain-label">In simple terms</span>
+          It's like a moving truck: your furniture (the AI model) either fits inside or it
+          doesn't. A stronger truck engine (CPU) or a bigger glovebox (RAM) doesn't help if the
+          cargo area (GPU memory) itself is too small — you just need a bigger cargo area.
+        </div>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Where do the recommended models come from?</summary>
+      <div class="faq-body">
+        <p>
+          The three models on the <a href="{{ url_for('models') }}">Model advisor</a> page are
+          pulled from arena.ai's leaderboard for agentic tasks, filtered to open-source models —
+          not picked because they're popular or because we sell hardware sized for them. If you
+          have a different model in mind, the calculator at the bottom of that page runs the same
+          real math for any parameter count you type in.
+        </p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Is a "cluster" here a real cluster, or just several cards plugged in?</summary>
+      <div class="faq-body">
+        <p>
+          A real one. When a model needs more memory than any single product offers, we combine
+          multiple units of the <em>same</em> clusterable server or rack — the kind of hardware
+          that ships with NVLink already wiring its GPUs together, and that real datacenters
+          network together with InfiniBand for multi-server setups. That's a different world from
+          plugging several desktop cards into one PC over ordinary PCIe, which is slower and not
+          something a datacenter would actually do at this scale. Cluster pricing here also
+          doesn't include the extra InfiniBand networking gear a real multi-server cluster needs
+          on top of the machines themselves — we say so every time a cluster build comes up.
+        </p>
+        <div class="simple-explain">
+          <span class="simple-explain-label">In simple terms</span>
+          A real cluster is like a few kids standing right next to each other, each holding one
+          page of a giant book, reading it aloud together as if it were one book. Plugging in
+          several unrelated desktop cards is more like kids in different rooms shouting pages to
+          each other — technically possible, but nowhere near as fast or organized.
+        </div>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>What do the power numbers ("1.2x a home," "0.6 EV batteries") actually mean?</summary>
+      <div class="faq-body">
+        <p>
+          Watts measure electricity draw, not compute power. To make that concrete, every watt
+          figure is also shown against two reference points: {{ HOME_WATTS }}&nbsp;W, a rough
+          estimate of an average home's continuous draw, and {{ EV_BATTERY_KWH }}&nbsp;kWh, a
+          rough estimate of an electric car's usable battery capacity. Run a piece of hardware
+          flat-out for 24 hours and we convert that to kWh, then show how many home-equivalents
+          or EV-battery-equivalents that represents.
+        </p>
+        <div class="simple-explain">
+          <span class="simple-explain-label">In simple terms</span>
+          Watts are like how hungry a machine is for electricity. Saying "1.2x a home" just means
+          it eats about as much electricity as your whole house running non-stop — a much easier
+          number to picture than a raw watt count most people don't have a feel for.
+        </div>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Are the prices exact?</summary>
+      <div class="faq-body">
+        <p>
+          They're sourced from real listings — NVIDIA's own product pages and major retailers
+          (B&amp;H, Micro Center, NVIDIA's marketplace) — as of July 2026, and we say so on every
+          price tooltip. One exception, disclosed here honestly: NVIDIA doesn't publish rack-level
+          pricing for the GB300 NVL72 publicly, so that figure is a widely reported estimate
+          rather than a published list price. Everything else reflects an actual current listing.
+        </p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary>What happens after I request a quote?</summary>
+      <div class="faq-body">
+        <p>
+          Your request is saved with a unique request number, which you can look up any time on
+          the <a href="{{ url_for('requests_list') }}">Requests</a> page. Nothing is charged and
+          no account is created — it's simply a record that you're interested in a specific build
+          at a specific price, the same way you'd request a quote from any B2B hardware vendor
+          before purchasing.
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <style>
+    .faq-list { max-width: 760px; margin-top: 1.6rem; }
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      margin-bottom: 0.8rem;
+      overflow: hidden;
+      box-shadow: var(--shadow-1);
+      transition: box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+    }
+    .faq-item:hover { box-shadow: var(--shadow-2); border-color: var(--accent); }
+    .faq-item summary {
+      padding: 1.1rem 1.3rem;
+      font-weight: 700;
+      font-size: 0.96rem;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: background var(--dur-fast) var(--ease);
+    }
+    .faq-item summary:hover { background: var(--bg-alt); }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after {
+      content: "";
+      flex-shrink: 0;
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid var(--text-dim);
+      border-bottom: 2px solid var(--text-dim);
+      transform: rotate(45deg);
+      transition: transform var(--dur) var(--ease);
+    }
+    .faq-item[open] summary::after { transform: rotate(-135deg); }
+    .faq-item[open] summary { border-bottom: 1px solid var(--border); }
+    .faq-body { padding: 0 1.3rem 1.2rem; color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; }
+    .faq-body p { margin: 1rem 0 0; }
+    .faq-body a { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .faq-item, .faq-item summary, .faq-item summary::after { transition: none; }
+    }
+  </style>
+{% endblock %}

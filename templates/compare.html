@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+{% import "icons.html" as icons %}
+{% block title %}Compare hardware — {{ STORE_NAME }}{% endblock %}
+{% block content %}
+  <div class="breadcrumbs">
+    <a href="{{ url_for('home') }}">Catalog</a> <span>/</span> <span class="current">Compare</span>
+  </div>
+
+  <h1>Compare hardware</h1>
+  <p class="subtitle">
+    Side-by-side specs for the products you picked from the catalog. Every number here is the
+    same real, verified figure shown on each product's own card — nothing recalculated or
+    estimated for this view.
+  </p>
+
+  {% if unavailable_count %}
+    <div class="error-box">
+      {{ unavailable_count }} selected product{{ "s" if unavailable_count != 1 else "" }} could not be found and
+      {{ "were" if unavailable_count != 1 else "was" }} left out of this comparison.
+    </div>
+  {% endif %}
+
+  {% if products|length < 2 %}
+    <div class="card" style="text-align:center; padding:3rem 1.6rem;">
+      <span class="pill-icon" style="margin:0 auto 1rem;">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 3v18M3 9h6M3 15h6M15 3v18M15 9h6M15 15h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+      </span>
+      <h2>Pick at least two products to compare</h2>
+      <p class="subtitle" style="margin:0.6rem auto 1.4rem; max-width:420px;">
+        Head back to the catalog and click the <strong style="color:var(--text);">compare icon</strong>
+        on any two or three product cards, then use the tray that appears at the bottom of the
+        screen to jump here.
+      </p>
+      <a class="btn" href="{{ url_for('home') }}#catalog-grid">Browse the catalog</a>
+    </div>
+  {% else %}
+    <div class="table-wrap compare-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th class="compare-row-label">&nbsp;</th>
+            {% for p in products %}
+              <th>
+                <div class="compare-col-head">
+                  <span class="thumb" style="width:56px; height:56px;">
+                    <img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}">
+                  </span>
+                  <div>{{ p.name }}</div>
+                  {% if badges_by_slug.get(p.slug) %}
+                    <div class="compare-badges">
+                      {% for badge in badges_by_slug[p.slug] %}<span class="compare-badge">{{ badge }}</span>{% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="compare-row-label">Category</td>
+            {% for p in products %}<td>{{ p.category }}</td>{% endfor %}
+          </tr>
+          <tr>
+            <td class="compare-row-label">{{ term('price-sourcing', 'Price') }}</td>
+            {% for p in products %}
+              <td class="compare-value">
+                ${{ "{:,.0f}".format(p.price) }}
+                <div class="compare-bar-track"><div class="compare-bar-fill compare-bar-price" data-pct="{{ bars_by_slug.get(p.slug, {}).get('price', 0) }}" style="width:0%;"></div></div>
+              </td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td class="compare-row-label">GPU memory</td>
+            {% for p in products %}
+              <td class="compare-value">
+                {% if p.memory_gb >= 1000 %}{{ "%.1f"|format(p.memory_gb/1000) }} TB{% else %}{{ p.memory_gb }} GB{% endif %}
+                <div class="compare-sub">{{ term(p.memory_type) }}</div>
+                <div class="compare-bar-track"><div class="compare-bar-fill" data-pct="{{ bars_by_slug.get(p.slug, {}).get('memory_gb', 0) }}" style="width:0%;"></div></div>
+              </td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td class="compare-row-label">Power draw</td>
+            {% for p in products %}
+              {% set pc = power_context(p.watts) %}
+              <td class="compare-value">
+                {% if p.watts >= 1000 %}{{ "%.1f"|format(p.watts/1000) }} kW{% else %}{{ p.watts }} W{% endif %}
+                <div class="compare-sub">&asymp;{{ "%.1f"|format(pc.home_equivalents) }}x a home's draw</div>
+                <div class="compare-bar-track"><div class="compare-bar-fill compare-bar-warn" data-pct="{{ bars_by_slug.get(p.slug, {}).get('watts', 0) }}" style="width:0%;"></div></div>
+              </td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td class="compare-row-label">Tensor / AI compute</td>
+            {% for p in products %}<td class="compare-value">{{ p.tensor_performance }}</td>{% endfor %}
+          </tr>
+          <tr>
+            <td class="compare-row-label">Best for</td>
+            {% for p in products %}<td>{{ p.best_for }}</td>{% endfor %}
+          </tr>
+          <tr>
+            <td class="compare-row-label">Availability</td>
+            {% for p in products %}
+              <td>
+                <span class="availability-dot {{ 'in-stock' if p.in_stock else 'built-to-order' }}">
+                  <span class="dot"></span> {{ "In stock" if p.in_stock else "Built to order" }}
+                </span>
+              </td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td class="compare-row-label">Lead time</td>
+            {% for p in products %}<td style="font-size:0.85rem; color:var(--text-dim);">{{ p.delivery_window_note }}</td>{% endfor %}
+          </tr>
+          <tr>
+            <td class="compare-row-label">Warranty</td>
+            {% for p in products %}<td style="font-size:0.85rem; color:var(--text-dim);">{{ p.warranty }}</td>{% endfor %}
+          </tr>
+          {% for label, values in extra_rows %}
+            <tr>
+              <td class="compare-row-label">{{ label }}</td>
+              {% for value in values %}<td>{{ value }}</td>{% endfor %}
+            </tr>
+          {% endfor %}
+          <tr>
+            <td class="compare-row-label">&nbsp;</td>
+            {% for p in products %}
+              <td>
+                <a class="btn-secondary" style="font-size:0.82rem; padding:0.55rem 1rem;" href="{{ url_for('quote') }}?build={{ ('1x ' + p.name) | urlencode }}&price={{ p.price }}&watts={{ p.watts }}&slug={{ p.slug }}">Request a quote</a>
+              </td>
+            {% endfor %}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  <style>
+    .compare-wrap { margin-top: 1.6rem; overflow-x: auto; }
+    .compare-table { min-width: 560px; }
+    .compare-table .compare-row-label {
+      font-weight: 700;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      white-space: nowrap;
+      background: var(--bg-alt);
+      position: sticky;
+      left: 0;
+      z-index: 4;
+    }
+    .compare-table thead .compare-row-label { background: var(--bg-alt); z-index: 6; }
+    .compare-col-head { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; text-align: center; font-weight: 700; }
+    .compare-value { font-weight: 700; }
+    .compare-sub { font-weight: 400; color: var(--text-dim); font-size: 0.76rem; margin-top: 0.15rem; }
+    .compare-badges { display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: center; }
+    .compare-badge {
+      display: inline-block;
+      font-size: 0.66rem;
+      font-weight: 800;
+      color: var(--accent);
+      background: var(--accent-bg);
+      border-radius: 999px;
+      padding: 0.16rem 0.55rem;
+      animation: compareBadgePulse 2.2s ease-in-out infinite;
+    }
+    .compare-badge:nth-child(2) { color: var(--warn); background: var(--warn-bg); animation-delay: 0.4s; }
+    .compare-badge:nth-child(3) { color: #5b8fd4; background: rgba(91, 143, 212, 0.15); animation-delay: 0.8s; }
+    @keyframes compareBadgePulse {
+      0%, 100% { box-shadow: 0 0 0 0 currentColor; }
+      50% { box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 20%, transparent); }
+    }
+
+    .compare-bar-track { background: var(--bg-alt); border-radius: 999px; height: 6px; overflow: hidden; margin-top: 0.4rem; }
+    .compare-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent-bright), var(--accent)); transition: width 0.8s var(--ease); }
+    .compare-bar-fill.compare-bar-warn { background: linear-gradient(90deg, var(--warn), #f0b64c); }
+    .compare-bar-fill.compare-bar-price { background: linear-gradient(90deg, #5b8fd4, #3a6bc4); }
+
+    .compare-table td, .compare-table th { text-align: center; }
+    .compare-table td:first-child, .compare-table th:first-child { text-align: left; }
+
+    .compare-table tbody tr {
+      opacity: 0;
+      transform: translateY(6px);
+      animation: compareRowIn 0.45s var(--ease) forwards;
+      transition: background var(--dur-fast) var(--ease);
+    }
+    .compare-table tbody tr:nth-child(1) { animation-delay: 0.02s; }
+    .compare-table tbody tr:nth-child(2) { animation-delay: 0.06s; }
+    .compare-table tbody tr:nth-child(3) { animation-delay: 0.1s; }
+    .compare-table tbody tr:nth-child(4) { animation-delay: 0.14s; }
+    .compare-table tbody tr:nth-child(5) { animation-delay: 0.18s; }
+    .compare-table tbody tr:nth-child(n+6) { animation-delay: 0.22s; }
+    @keyframes compareRowIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .availability-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-dim);
+    }
+    .availability-dot .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); flex-shrink: 0; }
+    .availability-dot.in-stock { color: var(--accent); }
+    .availability-dot.in-stock .dot { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
+    .availability-dot.built-to-order .dot { background: var(--warn); }
+    .availability-dot.built-to-order { color: var(--warn); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .compare-table tbody tr { opacity: 1; transform: none; animation: none; }
+      .compare-badge { animation: none; }
+      .compare-bar-fill { transition: none; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      var fills = document.querySelectorAll(".compare-bar-fill");
+      if (!fills.length) return;
+      function activate(el) {
+        var pct = el.dataset.pct;
+        if (pct) el.style.width = pct + "%";
+      }
+      if ("IntersectionObserver" in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) { activate(entry.target); observer.unobserve(entry.target); }
+          });
+        }, { threshold: 0.2 });
+        fills.forEach(function (el) { observer.observe(el); });
+      } else {
+        fills.forEach(activate);
+      }
+      setTimeout(function () { fills.forEach(activate); }, 1200);
+    })();
+  </script>
+{% endblock %}

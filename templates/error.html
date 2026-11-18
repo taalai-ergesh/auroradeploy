@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} — {{ title }} — {{ STORE_NAME }}{% endblock %}
+{% block content %}
+  <div class="error-page">
+    <div class="error-code">{{ code }}</div>
+    <h1>{{ title }}</h1>
+    <p class="subtitle">{{ message }}</p>
+    <div style="display:flex; gap:0.8rem; flex-wrap:wrap; margin-top:1.4rem;">
+      <a href="{{ url_for('home') }}" class="btn">Back to catalog</a>
+      <a href="{{ url_for('faq') }}" class="btn-secondary">FAQ</a>
+    </div>
+  </div>
+
+  <style>
+    .error-page { max-width: 520px; margin: 3rem auto; text-align: center; }
+    .error-code { font-size: 4rem; font-weight: 800; color: var(--border); line-height: 1; letter-spacing: -0.02em; }
+  </style>
+{% endblock %}

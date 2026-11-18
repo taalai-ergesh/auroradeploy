@@ -1,0 +1,722 @@
+{% extends "base.html" %}
+{% block title %}Technical guide — {{ STORE_NAME }}{% endblock %}
+{% block content %}
+  <div class="breadcrumbs">
+    <a href="{{ url_for('home') }}">Catalog</a> <span>/</span> <span class="current">AI Hardware Lab</span>
+  </div>
+
+  <span class="pill">Reference</span>
+  <h1 style="margin-top:0.7rem;">AI Hardware Lab</h1>
+  <p class="subtitle">
+    The mechanics behind every number on this site — what determines whether a piece of
+    hardware can run a given model, and why. Diagrams, not just paragraphs.
+  </p>
+
+  <div class="guide-toc" id="guide-toc">
+    <a href="#gpu-memory" data-toc-target="gpu-memory">GPU memory</a>
+    <a href="#parameters" data-toc-target="parameters">Parameters</a>
+    <a href="#quantization" data-toc-target="quantization">Quantization</a>
+    <a href="#watts" data-toc-target="watts">Watts and power</a>
+    <a href="#rack-servers" data-toc-target="rack-servers">Rack servers</a>
+    <a href="#training-inference" data-toc-target="training-inference">Inference vs. training</a>
+    <a href="#multi-gpu" data-toc-target="multi-gpu">Why some models need multiple GPUs</a>
+  </div>
+
+  <section id="gpu-memory" class="guide-section">
+    <h2>GPU memory</h2>
+    <p>
+      A GPU has its own dedicated memory, separate from your computer's system RAM. Before a
+      GPU can run any part of a model, that model's weights have to be loaded into this memory.
+      If the model doesn't fit, the GPU cannot run it — there is no fallback to system RAM for
+      the parts that don't fit; the process fails or has to be restructured (e.g. split across
+      more GPUs).
+    </p>
+
+    <div class="diagram">
+      <div class="diagram-live-badge"><span class="live-dot"></span>Live — this fills up as you change the numbers below</div>
+      <svg viewBox="0 0 480 140" class="diagram-svg" id="mem-diagram-svg" role="img" aria-label="Diagram: model weights plus 20 percent working room must fit inside GPU memory capacity, updated live by the calculator below">
+        <rect id="mem-capacity-rect" x="10" y="20" width="300" height="90" rx="6" fill="none" stroke="var(--text-dim)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="160" y="14" text-anchor="middle" class="diagram-label" id="mem-capacity-label">GPU memory capacity</text>
+        <rect id="mem-weights-rect" x="20" y="30" width="230" height="70" rx="4" fill="var(--accent-bg)" stroke="var(--accent)" stroke-width="1.6"/>
+        <text id="mem-weights-label" x="135" y="70" text-anchor="middle" class="diagram-label-strong">Model weights</text>
+        <rect id="mem-room-rect" x="250" y="30" width="50" height="70" rx="4" fill="var(--warn-bg)" stroke="var(--warn)" stroke-width="1.6"/>
+        <text id="mem-room-label-1" x="275" y="65" text-anchor="middle" class="diagram-label-small">+20%</text>
+        <text id="mem-room-label-2" x="275" y="78" text-anchor="middle" class="diagram-label-small">working</text>
+        <text id="mem-room-label-3" x="275" y="91" text-anchor="middle" class="diagram-label-small">room</text>
+        <rect id="mem-overflow-rect" x="300" y="30" width="0" height="70" rx="3" fill="var(--danger-bg)" stroke="var(--danger)" stroke-width="1.6" stroke-dasharray="3 3" opacity="0"/>
+        <path d="M320 65 h30" stroke="var(--text-dim)" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <text x="400" y="60" text-anchor="middle" class="diagram-label" id="mem-fit-arrow-label">Fits →</text>
+        <text x="400" y="76" text-anchor="middle" class="diagram-label-strong" id="mem-fit-result-label">runs</text>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+            <path d="M0 0 L8 4 L0 8 Z" fill="var(--text-dim)"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="try-it-hint" id="mem-try-hint" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="try-it-arrow">
+        <path d="M12 4v14M6 13l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Try changing the numbers below and watch the diagram above react
+    </div>
+
+    <div class="mem-calc" id="mem-calc">
+      <div class="mem-calc-title"><span class="pill-icon-inline">&#9881;</span> Try it yourself — the diagram above updates live</div>
+      <div class="mem-calc-row">
+        <label for="mem-calc-params">{{ term('Parameters (billions)', 'Parameters (billions)') }}</label>
+        <div class="mem-calc-input-pair">
+          <input type="range" id="mem-calc-params-range" min="1" max="2000" value="70" step="1">
+          <input type="number" id="mem-calc-params" min="0.1" max="100000" value="70" step="0.1">
+        </div>
+      </div>
+      <div class="mem-calc-row">
+        <span>{{ term('Precision', 'Precision') }}</span>
+        <div class="mem-calc-precision" id="mem-calc-precision" role="group" aria-label="Precision">
+          <button type="button" class="mem-precision-btn active" data-bytes-scale="1">16-bit</button>
+          <button type="button" class="mem-precision-btn" data-bytes-scale="0.5">8-bit</button>
+          <button type="button" class="mem-precision-btn" data-bytes-scale="0.25">4-bit</button>
+        </div>
+      </div>
+      <div class="mem-calc-row">
+        <label for="mem-calc-gpu">Check against this GPU's memory</label>
+        <select id="mem-calc-gpu"></select>
+      </div>
+      <div class="mem-calc-result" id="mem-calc-result" aria-live="polite"></div>
+    </div>
+
+    <p>
+      GPU memory comes in two families used across this catalog: <strong>GDDR</strong>, used on
+      desktop and workstation cards (cheaper per gigabyte, still fast, less total bandwidth), and
+      <strong>HBM</strong> ("High Bandwidth Memory"), stacked directly on the chip in datacenter
+      GPUs like the H100 and H200 (higher bandwidth, higher cost).
+    </p>
+
+    <div class="simple-explain">
+      <span class="simple-explain-label">In simple terms</span>
+      A GPU is like a chef, and its memory is like the chef's kitchen counter. Before the chef can
+      start cooking, every ingredient — the whole AI model — has to already be laid out on the
+      counter. If the counter's too small, some ingredients just won't fit, and the chef can't cook
+      that recipe at all, no matter how skilled they are.
+    </div>
+  </section>
+
+  <section id="parameters" class="guide-section">
+    <h2>Parameters</h2>
+    <p>
+      A model's "parameters" are the individual numeric values it learned during training —
+      roughly, its knowledge encoded as numbers. A 70-billion-parameter model has 70 billion of
+      these values. Each one has to be stored somewhere, and at full (unquantized) precision each
+      parameter takes about 2 bytes, which is why parameter count translates almost directly into
+      a memory requirement: roughly 1&nbsp;GB of memory per billion parameters at the common
+      16-bit precision most open-weight models ship in.
+    </p>
+    <p>
+      Some models — DeepSeek-V3.2 and Kimi K2.6 in our model advisor, for example — use a
+      "mixture of experts" design, where only a fraction of the total parameters activate for any
+      given token. That reduces compute per token, but all the experts still have to be resident
+      in memory in case they're needed, so memory requirements are still based on the
+      <em>total</em> parameter count, not the active count.
+    </p>
+
+    <div class="simple-explain">
+      <span class="simple-explain-label">In simple terms</span>
+      A model's parameters are like the number of tiny switches inside its "brain" — the more
+      switches it has, the more it can learn, but each switch also needs its own little bit of
+      storage space. A 70-billion-parameter model just means there are 70 billion of these
+      switches that all need somewhere to live.
+    </div>
+  </section>
+
+  <section id="quantization" class="guide-section">
+    <h2>Quantization</h2>
+    <p>
+      Quantization reduces the precision used to store each parameter — for example, from 16-bit
+      down to 8-bit or 4-bit — which shrinks the memory footprint roughly in proportion (8-bit is
+      roughly half the memory of 16-bit; 4-bit roughly a quarter). This is a real, widely used
+      technique, and it's why you'll see the same model described with very different memory
+      requirements in different places.
+    </p>
+    <p>
+      We calculate memory math on this site at 16-bit precision (1&nbsp;GB per billion
+      parameters) because it's the safest, most conservative baseline and the format most
+      open-weight releases ship in by default. If you plan to run a quantized version of a model,
+      its real memory requirement will be lower than what we show — often significantly.
+      Quantization can also reduce output quality to some degree; how much depends on the model
+      and quantization method.
+    </p>
+
+    <div class="simple-explain">
+      <span class="simple-explain-label">In simple terms</span>
+      Quantization is like writing a phone number with fewer digits by rounding it — you save
+      space, but lose a little precision. Doing this to a model shrinks how much memory it needs,
+      the same way a rounded number takes less room to write down than the exact one.
+    </div>
+  </section>
+
+  <section id="watts" class="guide-section">
+    <h2>Watts and power</h2>
+    <p>
+      Watts measure the rate of electricity draw, not compute capability. A higher-watt GPU
+      doesn't hold more memory or automatically run models better — it typically means more raw
+      compute (faster), a larger electricity bill, and more heat that has to be removed from the
+      room. Power matters for two practical reasons: your electricity cost, and whether your
+      facility's power and cooling infrastructure can actually support the hardware.
+    </p>
+    <p>
+      A single RTX 5090 draws about as much power as a couple of hair dryers running
+      continuously. An 8-GPU server draws roughly as much as several houses. A full GB300 NVL72
+      rack draws roughly 100x an average home's continuous load — which is why full racks are
+      only deployed in facilities built for that load, not offices or homes.
+    </p>
+
+    <div class="simple-explain">
+      <span class="simple-explain-label">In simple terms</span>
+      Watts tell you how much electricity something drinks, kind of like how many glasses of juice
+      someone drinks. A phone charger takes a small sip. A giant AI computer rack gulps down as much
+      juice as a hundred houses combined — that's why these machines need special rooms with extra
+      power and extra cooling, the same way a huge animal needs a bigger cage and a lot more food
+      than a hamster does.
+    </div>
+
+    {% set desktop_gpu = catalog_json | selectattr("slug", "equalto", "rtx5090") | first %}
+    {% set server_gpu = catalog_json | selectattr("slug", "equalto", "h100x8") | first %}
+    {% set rack_gpu = catalog_json | selectattr("slug", "equalto", "gb300nvl72") | first %}
+    <div class="diagram">
+      <svg viewBox="0 0 480 150" class="diagram-svg" role="img" aria-label="Diagram comparing relative power draw of a desktop card, an 8-GPU server, and a full rack against a standard household circuit. Hover or tap each bar for the exact real wattage.">
+        <line x1="40" y1="120" x2="460" y2="120" stroke="var(--border)" stroke-width="1.5"/>
+        <line x1="40" y1="20" x2="40" y2="120" stroke="var(--border)" stroke-width="1.5"/>
+        <line x1="40" y1="110" x2="460" y2="110" stroke="var(--warn)" stroke-width="1.2" stroke-dasharray="3 3"/>
+        <text x="450" y="104" text-anchor="end" class="diagram-label-small" fill="var(--warn)">standard 120V circuit ({{ standard_circuit_watts }} W safe continuous)</text>
+        <g class="watts-bar" tabindex="0" data-watts="{{ desktop_gpu.watts }}" data-name="{{ desktop_gpu.name }}">
+          <rect x="70" y="106" width="46" height="14" fill="var(--accent)" opacity="0.85"/>
+          <text x="93" y="136" text-anchor="middle" class="diagram-label-small">Desktop card</text>
+          <title>{{ desktop_gpu.name }}: {{ desktop_gpu.watts }} W — about {{ "%.1f"|format(desktop_gpu.watts / home_watts) }}x an average home's continuous draw</title>
+        </g>
+        <g class="watts-bar" tabindex="0" data-watts="{{ server_gpu.watts }}" data-name="{{ server_gpu.name }}">
+          <rect x="200" y="70" width="46" height="50" fill="var(--warn)" opacity="0.85"/>
+          <text x="223" y="136" text-anchor="middle" class="diagram-label-small">8-GPU server</text>
+          <title>{{ server_gpu.name }}: {{ server_gpu.watts }} W — about {{ "%.1f"|format(server_gpu.watts / home_watts) }}x an average home's continuous draw</title>
+        </g>
+        <g class="watts-bar" tabindex="0" data-watts="{{ rack_gpu.watts }}" data-name="{{ rack_gpu.name }}">
+          <rect x="330" y="24" width="46" height="96" fill="var(--danger)" opacity="0.85"/>
+          <text x="353" y="136" text-anchor="middle" class="diagram-label-small">Full rack</text>
+          <title>{{ rack_gpu.name }}: {{ "{:,.0f}".format(rack_gpu.watts) }} W — about {{ "%.0f"|format(rack_gpu.watts / home_watts) }}x an average home's continuous draw</title>
+        </g>
+      </svg>
+      <p class="diagram-caption">Bar height is not to true linear scale — a real rack draws roughly 200&times; a desktop card, compressed here so all three stay visible. Hover, tap, or tab to a bar for the exact real wattage.</p>
+      <div class="watts-readout" id="watts-readout">Hover or tap a bar above to see its real power draw.</div>
+    </div>
+  </section>
+
+  <section id="rack-servers" class="guide-section">
+    <h2>Rack servers</h2>
+    <p>
+      Datacenter GPU servers are built to mount in a standard 19-inch rack, measured in "rack
+      units" (U) — 1U is about 1.75 inches of vertical space. An 8-GPU HGX-based server is
+      typically 4U–8U depending on the integrator and cooling design. A full rack is usually
+      42U–48U total, so a single 8U server takes up roughly a sixth of a rack; a fully populated
+      rack like the GB300 NVL72 is designed and sold as one 48U unit, not assembled piecemeal
+      from individual servers.
+    </p>
+    <p>
+      Rack-mounted systems assume rack-scale infrastructure already exists: power distribution
+      units rated for the load, hot/cold aisle or liquid cooling, and network cabling — not just
+      an electrical outlet.
+    </p>
+
+    <div class="simple-explain">
+      <span class="simple-explain-label">In simple terms</span>
+      Think of a datacenter rack like a chest of drawers — each "U" is one drawer-sized slot. A big
+      server might take up several drawers at once, and a full rack is the whole chest, built to
+      hold as many computer "drawers" as will neatly fit, stacked one on top of another.
+    </div>
+
+    <div class="rack-calc" id="rack-calc">
+      <div class="mem-calc-title"><span class="pill-icon-inline">&#9881;</span> How many servers fit in a rack?</div>
+      <div class="mem-calc-row">
+        <label for="rack-calc-total">Rack height (U)</label>
+        <input type="number" id="rack-calc-total" min="1" max="60" value="48" step="1">
+      </div>
+      <div class="mem-calc-row">
+        <label for="rack-calc-server">Server height (U)</label>
+        <input type="number" id="rack-calc-server" min="1" max="60" value="8" step="1">
+      </div>
+      <div class="rack-calc-visual" id="rack-calc-visual" aria-hidden="true"></div>
+      <div class="mem-calc-result" id="rack-calc-result" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section id="training-inference" class="guide-section">
+    <h2>Inference vs. training</h2>
+    <p>
+      <strong>Inference</strong> is running a model to produce output — the model's weights are
+      fixed, and the GPU just computes a forward pass. This is comparatively cheap: it needs
+      enough memory to hold the model plus a working buffer (what we call the 20% working room),
+      and a single GPU or a small cluster is often enough.
+    </p>
+    <p>
+      <strong>Training</strong> (including fine-tuning) updates the model's weights, which means
+      the GPU also has to hold gradients and optimizer state alongside the weights themselves —
+      commonly 3-4x the memory of the weights alone, sometimes more. This is why training
+      hardware recommendations lean toward multi-GPU servers with NVLink rather than single cards,
+      even for models that would fit in a single card's memory for inference alone.
+    </p>
+
+    <div class="simple-explain">
+      <span class="simple-explain-label">In simple terms</span>
+      Inference is like reading a book that's already written — you just need room to hold it
+      open. Training is like WRITING the book yourself — you need a much bigger desk for all your
+      notes, drafts, and crossed-out pages, not just space for the final, finished book.
+    </div>
+  </section>
+
+  <section id="multi-gpu" class="guide-section">
+    <h2>Why some models need multiple GPUs</h2>
+    <p>
+      When a model's memory requirement exceeds any single GPU's capacity, it has to be split
+      across multiple GPUs — a technique generally called model parallelism. For that to work
+      efficiently, the GPUs need a fast, direct connection to share data with minimal delay.
+      NVIDIA's datacenter GPUs use <strong>NVLink</strong> for this within a server; connecting
+      multiple whole servers into a larger cluster additionally requires
+      <strong>InfiniBand</strong> networking between them.
+    </p>
+
+    <div class="simple-explain">
+      <span class="simple-explain-label">In simple terms</span>
+      NVLink is like kids standing right next to each other, so they can pass notes instantly.
+      InfiniBand is like kids in different rooms passing notes through a mail slot — it still
+      works, but it's much slower than just handing a note to the person standing beside you.
+    </div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 480 190" class="diagram-svg" role="img" aria-label="Diagram of two servers, each with 4 GPUs densely connected by NVLink, with the two servers connected to each other by a single InfiniBand link. Hover a server or the InfiniBand link to highlight it.">
+        <rect x="20" y="20" width="180" height="140" rx="8" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="110" y="14" text-anchor="middle" class="diagram-label">Server A</text>
+        <rect x="280" y="20" width="180" height="140" rx="8" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="370" y="14" text-anchor="middle" class="diagram-label">Server B</text>
+
+        <g class="gpu-mesh-group" tabindex="0">
+          <title>NVLink mesh inside Server A: every GPU talks to every other GPU directly, at very high bandwidth and low latency.</title>
+          <g class="diagram-nvlink">
+            <line x1="55" y1="55" x2="165" y2="55" /><line x1="55" y1="55" x2="55" y2="125" /><line x1="55" y1="55" x2="165" y2="125" />
+            <line x1="165" y1="55" x2="55" y2="125" /><line x1="165" y1="55" x2="165" y2="125" /><line x1="55" y1="125" x2="165" y2="125" />
+          </g>
+          <g fill="var(--accent)" class="gpu-mesh-nodes">
+            <circle cx="55" cy="55" r="9"/><circle cx="165" cy="55" r="9"/><circle cx="55" cy="125" r="9"/><circle cx="165" cy="125" r="9"/>
+          </g>
+          <g class="packet-motion" aria-hidden="true">
+            <circle r="2.6" fill="var(--accent-bright)"><animateMotion dur="1.1s" repeatCount="indefinite" path="M55,55 L165,125"/></circle>
+            <circle r="2.6" fill="var(--accent-bright)"><animateMotion dur="1.3s" repeatCount="indefinite" path="M165,55 L55,125"/></circle>
+            <circle r="2.6" fill="var(--accent-bright)"><animateMotion dur="0.9s" repeatCount="indefinite" path="M55,55 L165,55"/></circle>
+          </g>
+        </g>
+        <g class="gpu-mesh-group" tabindex="0">
+          <title>NVLink mesh inside Server B: every GPU talks to every other GPU directly, at very high bandwidth and low latency.</title>
+          <g class="diagram-nvlink">
+            <line x1="315" y1="55" x2="425" y2="55" /><line x1="315" y1="55" x2="315" y2="125" /><line x1="315" y1="55" x2="425" y2="125" />
+            <line x1="425" y1="55" x2="315" y2="125" /><line x1="425" y1="55" x2="425" y2="125" /><line x1="315" y1="125" x2="425" y2="125" />
+          </g>
+          <g fill="var(--accent)" class="gpu-mesh-nodes">
+            <circle cx="315" cy="55" r="9"/><circle cx="425" cy="55" r="9"/><circle cx="315" cy="125" r="9"/><circle cx="425" cy="125" r="9"/>
+          </g>
+          <g class="packet-motion" aria-hidden="true">
+            <circle r="2.6" fill="var(--accent-bright)"><animateMotion dur="1s" repeatCount="indefinite" path="M315,55 L425,125"/></circle>
+            <circle r="2.6" fill="var(--accent-bright)"><animateMotion dur="1.2s" repeatCount="indefinite" path="M425,55 L315,125"/></circle>
+            <circle r="2.6" fill="var(--accent-bright)"><animateMotion dur="1s" repeatCount="indefinite" path="M315,125 L425,125"/></circle>
+          </g>
+        </g>
+        <g class="ib-link" tabindex="0">
+          <title>InfiniBand: the networking layer connecting separate servers into one cluster. Much lower bandwidth than NVLink inside a server — notice only one packet at a time crosses here, versus several moving at once inside each server's mesh — which is why NVLink-connected GPUs act like one giant GPU but InfiniBand-connected servers don't.</title>
+          <line x1="200" y1="90" x2="280" y2="90" stroke="var(--warn)" stroke-width="2.5" stroke-dasharray="5 4"/>
+          <text x="240" y="80" text-anchor="middle" class="diagram-label-small" fill="var(--warn)">InfiniBand</text>
+          <g class="packet-motion" aria-hidden="true">
+            <circle r="3.2" fill="var(--warn)">
+              <animateMotion dur="2.4s" repeatCount="indefinite" keyPoints="0;1;1;0;0" keyTimes="0;0.45;0.55;1;1" calcMode="linear" path="M200,90 L280,90"/>
+            </circle>
+          </g>
+        </g>
+        <text x="110" y="180" text-anchor="middle" class="diagram-label-small">NVLink mesh (dense, low-latency)</text>
+      </svg>
+      <p class="diagram-caption">Hover, tap, or tab to a server's mesh or the InfiniBand link to see what it means. The moving dots show relative traffic density, not literal packets.</p>
+    </div>
+
+    <p>
+      This is also why we only build "clusters" out of hardware designed for it (see the
+      <code>clusterable</code> flag on each product) — plugging several desktop cards into one PC
+      over ordinary PCIe technically works, but is far slower for a single large model and isn't
+      how real multi-GPU deployments are built.
+    </p>
+  </section>
+
+  <p style="margin-top:2rem;">
+    <a href="{{ url_for('models') }}" class="btn">Try the model advisor</a>
+  </p>
+
+  <script id="guide-catalog-data" type="application/json">{{ catalog_json | tojson }}</script>
+  <script>
+    (function () {
+      var CATALOG = JSON.parse(document.getElementById("guide-catalog-data").textContent);
+      var WORKING_ROOM = {{ working_room_multiplier }};
+
+      // ---- Memory calculator: drives the GPU-memory diagram live ----
+      var gpuSelect = document.getElementById("mem-calc-gpu");
+      gpuSelect.innerHTML = CATALOG.map(function (p) {
+        return '<option value="' + p.slug + '" data-gb="' + p.memory_gb + '">' + p.name + ' (' +
+          (p.memory_gb >= 1000 ? (p.memory_gb / 1000).toFixed(1) + ' TB' : p.memory_gb + ' GB') + ')</option>';
+      }).join("");
+
+      var paramsRange = document.getElementById("mem-calc-params-range");
+      var paramsInput = document.getElementById("mem-calc-params");
+      var precisionBtns = document.querySelectorAll(".mem-precision-btn");
+      var bytesScale = 1;
+
+      function syncParams(value) {
+        paramsRange.value = Math.min(2000, value);
+        paramsInput.value = value;
+      }
+      var tryHint = document.getElementById("mem-try-hint");
+      function dismissTryHint() { if (tryHint) tryHint.classList.add("dismissed"); }
+
+      paramsRange.addEventListener("input", function () { dismissTryHint(); syncParams(+paramsRange.value); renderMemDiagram(); });
+      paramsInput.addEventListener("input", function () { dismissTryHint(); if (+paramsInput.value > 0) { syncParams(+paramsInput.value); renderMemDiagram(); } });
+      precisionBtns.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          dismissTryHint();
+          precisionBtns.forEach(function (b) { b.classList.remove("active"); });
+          btn.classList.add("active");
+          bytesScale = +btn.dataset.bytesScale;
+          renderMemDiagram();
+        });
+      });
+      gpuSelect.addEventListener("change", function () { dismissTryHint(); renderMemDiagram(); });
+      if (tryHint) { setTimeout(dismissTryHint, 12000); }
+
+      function renderMemDiagram() {
+        var params = +paramsInput.value || 0;
+        var weightsGb = params * bytesScale;
+        var roomGb = weightsGb * (WORKING_ROOM - 1);
+        var totalGb = weightsGb * WORKING_ROOM;
+        var opt = gpuSelect.options[gpuSelect.selectedIndex];
+        var gpuGb = opt ? +opt.dataset.gb : 0;
+        var gpuName = opt ? opt.textContent : "";
+
+        var boxX = 20, boxW = 280;
+        var pxPerGb = gpuGb > 0 ? boxW / gpuGb : 0;
+        var weightsPx = Math.min(boxW, weightsGb * pxPerGb);
+        var roomPx = Math.min(boxW - weightsPx, roomGb * pxPerGb);
+        var overflowGb = Math.max(0, totalGb - gpuGb);
+        var fits = totalGb <= gpuGb;
+
+        document.getElementById("mem-weights-rect").setAttribute("width", Math.max(2, weightsPx));
+        document.getElementById("mem-room-rect").setAttribute("x", boxX + weightsPx);
+        document.getElementById("mem-room-rect").setAttribute("width", Math.max(2, roomPx));
+
+        var labelsShown = roomPx > 26;
+        ["mem-room-label-1", "mem-room-label-2", "mem-room-label-3"].forEach(function (id, i) {
+          var el = document.getElementById(id);
+          el.setAttribute("x", boxX + weightsPx + roomPx / 2);
+          el.style.opacity = labelsShown ? "1" : "0";
+        });
+        document.getElementById("mem-weights-label").setAttribute("x", boxX + weightsPx / 2);
+        document.getElementById("mem-weights-label").style.opacity = weightsPx > 50 ? "1" : "0";
+
+        var capacityRect = document.getElementById("mem-capacity-rect");
+        var overflowRect = document.getElementById("mem-overflow-rect");
+        if (fits) {
+          capacityRect.classList.remove("mem-overflow");
+          overflowRect.setAttribute("opacity", "0");
+        } else {
+          capacityRect.classList.add("mem-overflow");
+          overflowRect.setAttribute("x", boxX + boxW);
+          overflowRect.setAttribute("width", Math.min(150, overflowGb * pxPerGb));
+          overflowRect.setAttribute("opacity", "1");
+        }
+
+        document.getElementById("mem-fit-result-label").textContent = fits ? "runs" : "doesn't fit";
+        document.getElementById("mem-fit-result-label").setAttribute("fill", fits ? "var(--accent)" : "var(--danger)");
+        document.getElementById("mem-fit-arrow-label").textContent = fits ? "Fits →" : "Over by →";
+
+        var precisionLabel = bytesScale === 1 ? "16-bit" : (bytesScale === 0.5 ? "8-bit" : "4-bit");
+        var result = document.getElementById("mem-calc-result");
+        result.className = "mem-calc-result " + (fits ? "fits" : "no-fit");
+        result.textContent = params.toLocaleString() + "B params at " + precisionLabel + " + 20% working room = " +
+          totalGb.toFixed(1) + " GB required. " + gpuName + " has " +
+          (gpuGb >= 1000 ? (gpuGb / 1000).toFixed(1) + " TB" : gpuGb + " GB") + " — " +
+          (fits ? "fits, with room to spare." : "short by " + overflowGb.toFixed(1) + " GB.");
+      }
+      renderMemDiagram();
+
+      // ---- Watts diagram: real numbers on hover/focus ----
+      var wattsReadout = document.getElementById("watts-readout");
+      document.querySelectorAll(".watts-bar").forEach(function (bar) {
+        function show() {
+          var watts = +bar.dataset.watts;
+          var homeEq = (watts / {{ home_watts }}).toFixed(1);
+          wattsReadout.textContent = bar.dataset.name + ": " + watts.toLocaleString() + " W — about " + homeEq + "x an average home's continuous draw.";
+        }
+        bar.addEventListener("mouseenter", show);
+        bar.addEventListener("focus", show);
+        bar.addEventListener("click", show);
+      });
+
+      // ---- Rack-fit calculator ----
+      var rackTotal = document.getElementById("rack-calc-total");
+      var rackServer = document.getElementById("rack-calc-server");
+      var rackVisual = document.getElementById("rack-calc-visual");
+      var rackResult = document.getElementById("rack-calc-result");
+
+      function renderRackCalc() {
+        var total = Math.max(1, +rackTotal.value || 1);
+        var server = Math.max(1, +rackServer.value || 1);
+        var count = Math.floor(total / server);
+        var used = count * server;
+        var leftover = total - used;
+
+        var slots = "";
+        for (var i = 0; i < count; i++) {
+          slots += '<div class="rack-calc-slot" style="height:' + Math.max(4, server * 3) + 'px;"></div>';
+        }
+        if (leftover > 0) {
+          slots += '<div class="rack-calc-slot rack-calc-leftover" style="height:' + Math.max(4, leftover * 3) + 'px;"></div>';
+        }
+        rackVisual.innerHTML = slots;
+
+        rackResult.className = "mem-calc-result fits";
+        rackResult.textContent = count + " server" + (count === 1 ? "" : "s") + " of " + server + "U fit in a " + total + "U rack" +
+          (leftover > 0 ? ", with " + leftover + "U left over." : ", using the full height exactly.");
+      }
+      rackTotal.addEventListener("input", renderRackCalc);
+      rackServer.addEventListener("input", renderRackCalc);
+      renderRackCalc();
+
+      // ---- Sticky TOC scroll-spy ----
+      var tocLinks = document.querySelectorAll("#guide-toc a");
+      var sections = document.querySelectorAll(".guide-section");
+      if ("IntersectionObserver" in window && sections.length) {
+        var spy = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            var link = document.querySelector('#guide-toc a[data-toc-target="' + entry.target.id + '"]');
+            if (!link) return;
+            if (entry.isIntersecting) {
+              tocLinks.forEach(function (l) { l.classList.remove("active"); });
+              link.classList.add("active");
+            }
+          });
+        }, { rootMargin: "-40% 0px -50% 0px", threshold: 0 });
+        sections.forEach(function (s) { spy.observe(s); });
+      }
+    })();
+  </script>
+
+  <style>
+    .guide-toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 1.6rem 0 2.2rem;
+      padding-bottom: 1.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .guide-toc a {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-decoration: none;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+    }
+    .guide-toc a:hover { color: var(--accent); border-color: var(--accent); }
+    .guide-toc a.active { color: var(--accent-ink); border-color: var(--accent); background: var(--accent); font-weight: 700; }
+
+    @supports (position: sticky) {
+      .guide-toc {
+        position: sticky;
+        top: 0.6rem;
+        z-index: 5;
+        background: var(--bg);
+        padding: 0.9rem 0.2rem 1.6rem;
+        margin-top: 0.6rem;
+      }
+    }
+
+    .guide-section { max-width: 720px; margin-bottom: 2.2rem; scroll-margin-top: 90px; }
+    .guide-section h2 { margin-bottom: 0.6rem; }
+    .guide-section p { color: var(--text-dim); font-size: 0.92rem; line-height: 1.65; margin: 0.7rem 0; }
+    .guide-section code { background: var(--bg-alt); padding: 0.15rem 0.4rem; border-radius: 5px; font-size: 0.85em; }
+
+    .diagram {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin: 1.2rem 0;
+    }
+    .diagram-svg { width: 100%; height: auto; display: block; }
+    .diagram-label { font-size: 11px; fill: var(--text-dim); font-family: -apple-system, sans-serif; }
+    .diagram-label-strong { font-size: 12px; font-weight: 700; fill: var(--text); font-family: -apple-system, sans-serif; }
+    .diagram-label-small { font-size: 9.5px; fill: var(--text-dim); font-family: -apple-system, sans-serif; }
+    .diagram-caption { color: var(--text-dim); font-size: 0.76rem; margin: 0.8rem 0 0; font-style: italic; }
+    .diagram-nvlink line { stroke: var(--accent); stroke-width: 1.4; opacity: 0.55; }
+
+    #mem-weights-rect, #mem-room-rect, #mem-overflow-rect, #mem-capacity-rect {
+      transition: width 0.4s var(--ease), x 0.4s var(--ease), opacity 0.3s var(--ease), stroke 0.3s var(--ease);
+    }
+    #mem-capacity-rect.mem-overflow { stroke: var(--danger); }
+
+    .mem-calc, .rack-calc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem 1.3rem;
+      margin: 0.4rem 0 1.4rem;
+    }
+    .mem-calc-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+    .pill-icon-inline { display: inline-block; }
+    .mem-calc-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
+    .mem-calc-row label, .mem-calc-row > span { font-size: 0.82rem; color: var(--text-dim); font-weight: 600; flex-shrink: 0; }
+    .mem-calc-input-pair { display: flex; align-items: center; gap: 0.6rem; flex: 1; min-width: 200px; }
+    .mem-calc-input-pair input[type="range"] { flex: 1; accent-color: var(--accent); }
+    .mem-calc-input-pair input[type="number"], .rack-calc input[type="number"] {
+      width: 80px;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.85rem;
+    }
+    .mem-calc-precision { display: flex; gap: 0.4rem; }
+    .mem-precision-btn {
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-dim);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+    }
+    .mem-precision-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .mem-precision-btn.active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+    #mem-calc-gpu {
+      padding: 0.4rem 0.6rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.84rem;
+      max-width: 260px;
+    }
+    .mem-calc-result {
+      font-size: 0.86rem;
+      font-weight: 700;
+      padding: 0.7rem 0.9rem;
+      border-radius: 8px;
+      margin-top: 0.4rem;
+    }
+    .mem-calc-result.fits { background: var(--accent-bg); color: var(--accent); }
+    .mem-calc-result.no-fit { background: var(--danger-bg); color: var(--danger); }
+
+    .rack-calc-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px;
+      margin: 0.6rem 0;
+      max-width: 220px;
+    }
+    .rack-calc-slot { background: var(--accent-bg); border: 1px solid var(--accent); border-radius: 2px; height: 8px; }
+    .rack-calc-slot.rack-calc-leftover { background: var(--bg-alt); border-color: var(--border); }
+
+    .watts-bar { cursor: pointer; outline: none; }
+    .watts-bar rect { transition: opacity var(--dur-fast) var(--ease), filter var(--dur-fast) var(--ease); }
+    .watts-bar:hover rect, .watts-bar:focus-visible rect { opacity: 1; filter: brightness(1.25) drop-shadow(0 0 6px var(--accent-bg)); }
+    .watts-readout {
+      margin-top: 0.8rem;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.8rem;
+      min-height: 1.4rem;
+    }
+
+    .gpu-mesh-group, .ib-link { cursor: pointer; outline: none; }
+    .gpu-mesh-group .diagram-nvlink line { transition: stroke-width var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease); }
+    .gpu-mesh-group:hover .diagram-nvlink line, .gpu-mesh-group:focus-visible .diagram-nvlink line {
+      stroke-width: 2.4;
+      opacity: 1;
+    }
+    .gpu-mesh-group .gpu-mesh-nodes circle { transition: r var(--dur-fast) var(--ease), filter var(--dur-fast) var(--ease); }
+    .gpu-mesh-group:hover .gpu-mesh-nodes circle, .gpu-mesh-group:focus-visible .gpu-mesh-nodes circle {
+      filter: drop-shadow(0 0 4px var(--accent));
+    }
+    .ib-link line { transition: stroke-width var(--dur-fast) var(--ease); }
+    .ib-link:hover line, .ib-link:focus-visible line { stroke-width: 4; }
+
+    .diagram-live-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--accent);
+      margin-bottom: 0.8rem;
+    }
+    .live-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-right: 0.4rem;
+      box-shadow: 0 0 0 0 var(--accent-bg);
+      animation: guideLiveDotPulse 2s ease-out infinite;
+    }
+    @keyframes guideLiveDotPulse {
+      0% { box-shadow: 0 0 0 0 var(--accent-bg); }
+      70% { box-shadow: 0 0 0 6px transparent; }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+
+    .try-it-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      margin: 0.9rem auto 1.3rem;
+      padding: 0.6rem 1.1rem;
+      max-width: fit-content;
+      background: var(--warn-bg);
+      border: 1px solid var(--warn);
+      border-radius: 999px;
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: var(--warn);
+      transition: opacity 0.4s var(--ease), max-height 0.4s var(--ease);
+    }
+    .try-it-hint.dismissed { opacity: 0; max-height: 0; margin: 0; padding: 0; overflow: hidden; pointer-events: none; border-width: 0; }
+    .try-it-arrow { width: 26px; height: 26px; flex-shrink: 0; stroke-width: 2.5; animation: tryItBounce 1.1s ease-in-out infinite; }
+    @keyframes tryItBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(9px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #mem-weights-rect, #mem-room-rect, #mem-overflow-rect, #mem-capacity-rect { transition: none; }
+      .packet-motion { display: none; }
+      .live-dot { animation: none; }
+      .try-it-arrow { animation: none; }
+    }
+  </style>
+{% endblock %}
