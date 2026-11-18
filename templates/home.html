@@ -345,13 +345,17 @@
 
   <span class="story-kicker">Chapter 4 &middot; Compare at a glance</span>
   <h2>Compare at a glance</h2>
-  <p class="subtitle" style="margin-bottom:1rem;">Filter by category, sort any column, or click a row to jump to its full specs below.</p>
+  <p class="subtitle" style="margin-bottom:1rem;">Search by name, filter by category, sort any column, or click a row to jump to its full specs below.</p>
 
-  <div class="filter-chips" id="filter-chips">
-    <button type="button" class="chip active" data-filter="all">All</button>
-    {% for cat in products|map(attribute='category')|unique %}
-      <button type="button" class="chip" data-filter="{{ cat }}">{{ cat }}</button>
-    {% endfor %}
+  <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center; margin-bottom:1rem;">
+    <input type="search" id="catalog-search" placeholder="Search hardware…"
+      style="flex:1; min-width:180px; max-width:280px; padding:0.45rem 0.8rem; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-size:0.9rem;">
+    <div class="filter-chips" id="filter-chips" style="margin-bottom:0;">
+      <button type="button" class="chip active" data-filter="all">All</button>
+      {% for cat in products|map(attribute='category')|unique %}
+        <button type="button" class="chip" data-filter="{{ cat }}">{{ cat }}</button>
+      {% endfor %}
+    </div>
   </div>
 
   <div class="table-wrap" style="margin-bottom:2.6rem;">
@@ -371,7 +375,7 @@
               data-name="{{ p.name }}" data-memory="{{ p.memory_gb }}" data-watts="{{ p.watts }}" data-price="{{ p.price }}">
             <td>
               <div style="display:flex; align-items:center; gap:0.7rem;">
-                <span class="thumb"><img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}"></span>
+                <span class="thumb"><img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}" loading="lazy" width="40" height="40"></span>
                 <div>
                   <div style="font-weight:700;">{{ p.name }}</div>
                   <div style="color:var(--text-dim); font-size:0.78rem;">{{ p.category }}</div>
@@ -428,7 +432,7 @@
       {% set meters = meters_by_slug[p.slug] %}
       <div class="card hoverable card-glow" id="product-{{ p.slug }}" data-category="{{ p.category }}">
         <div class="product-photo">
-          <img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}">
+          <img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}" loading="lazy">
           <span class="product-icon-badge">{{ icons.category(p.category) }}</span>
           <button type="button" class="quickview-btn" data-slug="{{ p.slug }}" style="position:absolute; bottom:0.7rem; right:0.7rem;">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" stroke="currentColor" stroke-width="1.8"></path><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"></circle></svg>
@@ -524,7 +528,7 @@
       {% set pc = power_context(p.watts) %}
       <div id="qv-source-{{ p.slug }}">
         <div class="product-photo" style="margin-bottom:1.3rem;">
-          <img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}">
+          <img src="{{ url_for('static', filename='images/products/' + p.slug + '.jpg') }}" alt="{{ p.name }}" loading="lazy">
         </div>
         <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.6rem;">
           <span class="pill">{{ p.category }}</span>
@@ -1815,25 +1819,47 @@
       });
     })();
 
-    document.querySelectorAll("#filter-chips .chip").forEach(function (chip) {
-      chip.addEventListener("click", function () {
-        document.querySelectorAll("#filter-chips .chip").forEach(function (c) { c.classList.remove("active"); });
-        chip.classList.add("active");
-        var filter = chip.dataset.filter;
+    (function () {
+      var activeFilter = "all";
 
+      function applyFilters() {
+        var query = (document.getElementById("catalog-search").value || "").trim().toLowerCase();
         document.querySelectorAll("table tbody tr[data-category]").forEach(function (row) {
-          row.style.display = (filter === "all" || row.dataset.category === filter) ? "" : "none";
+          var catOk = activeFilter === "all" || row.dataset.category === activeFilter;
+          var textOk = !query ||
+            (row.dataset.name || "").toLowerCase().indexOf(query) !== -1 ||
+            (row.dataset.category || "").toLowerCase().indexOf(query) !== -1;
+          row.style.display = catOk && textOk ? "" : "none";
         });
         var visibleCount = 0;
         document.querySelectorAll(".grid .card[data-category]").forEach(function (card) {
-          var show = filter === "all" || card.dataset.category === filter;
+          var catOk = activeFilter === "all" || card.dataset.category === activeFilter;
+          var textOk = !query ||
+            (card.dataset.name || "").toLowerCase().indexOf(query) !== -1 ||
+            (card.dataset.category || "").toLowerCase().indexOf(query) !== -1;
+          var show = catOk && textOk;
           card.style.display = show ? "" : "none";
           if (show) visibleCount++;
         });
         var emptyState = document.getElementById("catalog-empty-state");
         if (emptyState) emptyState.hidden = visibleCount !== 0;
+      }
+
+      document.querySelectorAll("#filter-chips .chip").forEach(function (chip) {
+        chip.addEventListener("click", function () {
+          document.querySelectorAll("#filter-chips .chip").forEach(function (c) { c.classList.remove("active"); });
+          chip.classList.add("active");
+          activeFilter = chip.dataset.filter;
+          applyFilters();
+        });
       });
-    });
+
+      var searchInput = document.getElementById("catalog-search");
+      if (searchInput) {
+        searchInput.addEventListener("input", applyFilters);
+        searchInput.addEventListener("search", applyFilters);
+      }
+    })();
 
     (function () {
       var canvas = document.getElementById("hero-particles");

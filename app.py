@@ -1,12 +1,20 @@
 import base64
+import logging
 import math
 import os
 from datetime import datetime
 from functools import wraps
 
 import psycopg2
-from flask import Flask, Response, abort, redirect, render_template, request, url_for
+from flask import Flask, Response, abort, jsonify, redirect, render_template, request, url_for
 from markupsafe import Markup
+
+try:
+    import boto3
+    from botocore.exceptions import ClientError
+    _SES_AVAILABLE = True
+except ImportError:
+    _SES_AVAILABLE = False
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 STORE_NAME = "Taalai's AI Hardware Co."
@@ -321,6 +329,35 @@ def _admin_required(f):
         )
     return decorated
 
+
+def _send_quote_email(name, contact, build_description, request_id, product_name):
+    admin_email = os.environ.get("ADMIN_EMAIL")
+    if not admin_email or not _SES_AVAILABLE:
+        return
+    try:
+        region = os.environ.get("AWS_SES_REGION", "us-east-1")
+        ses = boto3.client("ses", region_name=region)
+        product_line = f"Product: {product_name}\n" if product_name else ""
+        body = (
+            f"New quote request #{request_id}\n\n"
+            f"Name: {name}\n"
+            f"Contact: {contact}\n"
+            f"{product_line}"
+            f"Build: {build_description}\n\n"
+            f"View all requests: https://aistore.auroradeploy.com/requests"
+        )
+        ses.send_email(
+            Source=admin_email,
+            Destination={"ToAddresses": [admin_email]},
+            Message={
+                "Subject": {"Data": f"[AI Store] Quote #{request_id} from {name}"},
+                "Body": {"Text": {"Data": body}},
+            },
+        )
+    except Exception:
+        logging.exception("SES email failed for request %s", request_id)
+
+
 GLOSSARY = {
     "GDDR7": "A fast memory type used on desktop and workstation graphics cards. Cheaper per gigabyte than the HBM used in datacenter GPUs, but with less total bandwidth.",
     "HBM3": "\"High Bandwidth Memory\" — memory stacked directly on the GPU chip itself for very fast, very close access. Used in datacenter GPUs like the H100, not desktop cards.",
@@ -501,6 +538,19 @@ def not_found(e):
 def server_error(e):
     return render_template("error.html", code=500, title="Something went wrong",
                             message="An unexpected error occurred on our end. Nothing was charged or submitted."), 500
+
+
+@app.route("/api/products")
+def api_products():
+    return jsonify(build_catalog_json())
+
+
+@app.route("/api/products/<slug>")
+def api_product(slug):
+    product = PRODUCTS_BY_SLUG.get(slug)
+    if not product:
+        return jsonify({"error": "Product not found"}), 404
+    return jsonify({k: v for k, v in product.items() if not callable(v)})
 
 
 @app.route("/")
@@ -791,6 +841,7 @@ def quote():
         conn.commit()
 
     product = PRODUCTS_BY_SLUG.get(slug)
+    _send_quote_email(name, contact, build_description, new_id, product["name"] if product else None)
     power = power_context(total_watts) if total_watts else None
     delivery_note = product["delivery_window_note"] if product else (
         "In-stock components typically ship within 3–10 business days; built-to-order systems "
