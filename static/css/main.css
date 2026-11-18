@@ -752,13 +752,13 @@
     .thumb img { width: 100%; height: 100%; object-fit: cover; }
 
     .product-photo img, .thumb img {
-      opacity: 0;
+      opacity: 1;
       transition: opacity 0.35s ease;
       position: relative;
       z-index: 1;
     }
-    .product-photo img.img-loaded, .thumb img.img-loaded {
-      opacity: 1;
+    .product-photo img.img-broken, .thumb img.img-broken {
+      opacity: 0;
     }
     .product-photo::before, .thumb::before {
       content: "";
@@ -777,7 +777,7 @@
       100% { background-position: -200% 0; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .product-photo img.img-loaded, .thumb img.img-loaded { opacity: 1; transition: none; }
+      .product-photo img, .thumb img { opacity: 1; transition: none; }
       .product-photo::before, .thumb::before { display: none; }
     }
 

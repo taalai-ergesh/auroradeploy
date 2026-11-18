@@ -292,6 +292,8 @@
           '</div>';
       }).join("");
 
+      if (typeof wireImageSkeletons === "function") wireImageSkeletons(result);
+
       var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       var rows = result.querySelectorAll(".sim-row");
       rows.forEach(function (row, idx) {
