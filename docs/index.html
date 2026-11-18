@@ -430,20 +430,19 @@
   function chicagoMidnight(d) {
     // Returns UTC ms of midnight in Chicago on the same calendar day as d
     const tc = chicagoDateOf(d);
-    // Create ISO date string in Chicago and parse
-    const iso = `${tc.year}-${String(tc.month+1).padStart(2,'0')}-${String(tc.day).padStart(2,'0')}T00:00:00`;
-    // Convert from Chicago to UTC
-    const local = new Date(iso);
-    const offset = new Intl.DateTimeFormat('en-US', {
+    // Get the Chicago UTC offset for this date (handles DST correctly)
+    const offsetStr = new Intl.DateTimeFormat('en-US', {
       timeZone: TZ, timeZoneName: 'shortOffset'
-    }).formatToParts(local).find(p => p.type === 'timeZoneName').value;
-    // Parse offset like GMT-6 or GMT-5
-    const match = offset.match(/GMT([+-])(\d+)(?::(\d+))?/);
-    if (!match) return local.getTime();
-    const sign = match[1] === '+' ? 1 : -1;
-    const hrs  = parseInt(match[2]);
-    const mins = parseInt(match[3] || '0');
-    return local.getTime() - sign * (hrs * 60 + mins) * 60000;
+    }).formatToParts(d).find(p => p.type === 'timeZoneName').value;
+    // offsetStr is like "GMT-6" or "GMT-5"
+    const match = offsetStr.match(/GMT([+-])(\d+)(?::(\d+))?/);
+    if (!match) return NaN;
+    const sign = match[1];
+    const hrs  = String(match[2]).padStart(2, '0');
+    const mins = String(match[3] || '0').padStart(2, '0');
+    // Build ISO string with explicit offset so new Date() parses it correctly
+    const iso = `${tc.year}-${String(tc.month+1).padStart(2,'0')}-${String(tc.day).padStart(2,'0')}T00:00:00${sign}${hrs}:${mins}`;
+    return new Date(iso).getTime();
   }
 
   function formatCountdown(ms) {
