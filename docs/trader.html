@@ -4,359 +4,377 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap">
 
 <style>
-  :root {
-    --bg:          #F0FDF7;
-    --surface:     #FFFFFF;
-    --surface-2:   #E0FAF0;
-    --border:      #A7F3D0;
-    --fg:          #064E3B;
-    --fg-muted:    #34786A;
-    --accent:      #059669;
-    --accent-dim:  rgba(5,150,105,.13);
-    --accent-glow: rgba(5,150,105,.22);
-    --open:        #059669;
-    --open-glow:   rgba(5,150,105,.18);
-    --closed:      #DC2626;
-    --closed-glow: rgba(220,38,38,.14);
-    --time:        #047857;
-    --tick-up:     #059669;
-    --tick-dn:     #DC2626;
-    color-scheme:  light;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg:          #020D08;
-      --surface:     #061410;
-      --surface-2:   #091E18;
-      --border:      #0D2E22;
-      --fg:          #B4F5D8;
-      --fg-muted:    #2D6B52;
-      --accent:      #10B981;
-      --accent-dim:  rgba(16,185,129,.13);
-      --accent-glow: rgba(16,185,129,.24);
-      --open:        #10B981;
-      --open-glow:   rgba(16,185,129,.22);
-      --closed:      #F87171;
-      --closed-glow: rgba(248,113,113,.18);
-      --time:        #34D399;
-      --tick-up:     #10B981;
-      --tick-dn:     #F87171;
-      color-scheme:  dark;
-    }
-  }
-  :root[data-theme="dark"] {
+:root {
+  --bg:          #F0FDF7;
+  --surface:     #FFFFFF;
+  --surface-2:   #E0FAF0;
+  --border:      #A7F3D0;
+  --fg:          #064E3B;
+  --fg-muted:    #3A7060;
+  --accent:      #059669;
+  --accent-dim:  rgba(5,150,105,.13);
+  --accent-glow: rgba(5,150,105,.26);
+  --open:        #059669;
+  --open-glow:   rgba(5,150,105,.20);
+  --closed:      #DC2626;
+  --closed-glow: rgba(220,38,38,.14);
+  --time:        #047857;
+  --up:          #059669;
+  --dn:          #DC2626;
+  --up-dim:      rgba(5,150,105,.12);
+  --dn-dim:      rgba(220,38,38,.10);
+  color-scheme:  light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
     --bg:          #020D08;
-    --surface:     #061410;
-    --surface-2:   #091E18;
-    --border:      #0D2E22;
-    --fg:          #B4F5D8;
-    --fg-muted:    #2D6B52;
+    --surface:     #071510;
+    --surface-2:   #0C1F16;
+    --border:      #143322;
+    --fg:          #C8F5E0;
+    --fg-muted:    #4A8A6A;
     --accent:      #10B981;
-    --accent-dim:  rgba(16,185,129,.13);
-    --accent-glow: rgba(16,185,129,.24);
+    --accent-dim:  rgba(16,185,129,.15);
+    --accent-glow: rgba(16,185,129,.30);
     --open:        #10B981;
-    --open-glow:   rgba(16,185,129,.22);
+    --open-glow:   rgba(16,185,129,.24);
     --closed:      #F87171;
     --closed-glow: rgba(248,113,113,.18);
     --time:        #34D399;
-    --tick-up:     #10B981;
-    --tick-dn:     #F87171;
+    --up:          #10B981;
+    --dn:          #F87171;
+    --up-dim:      rgba(16,185,129,.14);
+    --dn-dim:      rgba(248,113,113,.12);
     color-scheme:  dark;
   }
+}
+:root[data-theme="dark"] {
+  --bg:          #020D08;
+  --surface:     #071510;
+  --surface-2:   #0C1F16;
+  --border:      #143322;
+  --fg:          #C8F5E0;
+  --fg-muted:    #4A8A6A;
+  --accent:      #10B981;
+  --accent-dim:  rgba(16,185,129,.15);
+  --accent-glow: rgba(16,185,129,.30);
+  --open:        #10B981;
+  --open-glow:   rgba(16,185,129,.24);
+  --closed:      #F87171;
+  --closed-glow: rgba(248,113,113,.18);
+  --time:        #34D399;
+  --up:          #10B981;
+  --dn:          #F87171;
+  --up-dim:      rgba(16,185,129,.14);
+  --dn-dim:      rgba(248,113,113,.12);
+  color-scheme:  dark;
+}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@property --rot { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
 
-  body {
-    background: var(--bg);
-    color: var(--fg);
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding-block: 48px;
-    padding-left:  max(16px, env(safe-area-inset-left,  0px));
-    padding-right: max(16px, env(safe-area-inset-right, 0px));
-    position: relative;
-    overflow-x: hidden;
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* Animated candlestick chart canvas */
-  #canvas {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    opacity: .45;
-  }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding-block: 48px;
+  padding-left:  max(16px, env(safe-area-inset-left,  0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  position: relative; overflow-x: hidden;
+}
 
-  .wrap {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 480px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
+/* CRT scanlines */
+body::after {
+  content: ''; position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.022) 2px, rgba(0,0,0,.022) 3px);
+  pointer-events: none; z-index: 100;
+}
 
-  /* ── Ticker tape ── */
-  .ticker-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    height: 36px;
-    display: flex;
-    align-items: center;
-  }
-  .ticker-label {
-    flex-shrink: 0;
-    font-family: 'Space Mono', monospace;
-    font-size: .6rem;
-    letter-spacing: .12em;
-    color: var(--accent);
-    text-transform: uppercase;
-    padding: 0 12px;
-    border-right: 1px solid var(--border);
-    height: 100%;
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-  }
-  .ticker-scroll-outer {
-    flex: 1;
-    overflow: hidden;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    /* Fade edges */
-    -webkit-mask-image: linear-gradient(90deg, transparent, black 12px, black calc(100% - 12px), transparent);
-    mask-image: linear-gradient(90deg, transparent, black 12px, black calc(100% - 12px), transparent);
-  }
-  .ticker-scroll {
-    display: flex;
-    gap: 32px;
-    white-space: nowrap;
-    will-change: transform;
-    animation: tickerMove 28s linear infinite;
-    padding-left: 24px;
-  }
-  @keyframes tickerMove {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-  }
-  .tick-item {
-    font-family: 'Space Mono', monospace;
-    font-size: .7rem;
-    display: flex;
-    gap: 6px;
-    align-items: baseline;
-  }
-  .tick-sym   { color: var(--fg); font-weight: 700; }
-  .tick-price { color: var(--fg-muted); }
-  .tick-chg.up   { color: var(--tick-up); }
-  .tick-chg.down { color: var(--tick-dn); }
+/* Boot terminal */
+.boot-terminal {
+  position: fixed; inset: 0; z-index: 200; background: #000;
+  display: flex; align-items: flex-start; justify-content: center;
+  font-family: 'Space Mono', monospace; font-size: .72rem; color: #10B981;
+  flex-direction: column; gap: 3px; padding: 40px;
+  animation: bootFade 2.6s ease-out forwards;
+}
+@keyframes bootFade { 0%,55%{opacity:1;} 100%{opacity:0;pointer-events:none;} }
+.boot-line { opacity: 0; white-space: nowrap; animation: blIn .1s ease-out forwards; }
+@keyframes blIn { to { opacity: 1; } }
+.boot-cursor { display:inline-block; width:7px; height:1.1em; background:#10B981; vertical-align:text-bottom; animation:cur .7s step-end infinite; }
+@keyframes cur { 0%,100%{opacity:1;} 50%{opacity:0;} }
 
-  /* ── Header ── */
-  .header {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; padding: 0 2px;
-  }
-  .brand { display: flex; align-items: center; gap: 10px; }
-  .brand-icon {
-    width: 34px; height: 34px;
-    border-radius: 8px;
-    background: var(--accent-dim);
-    border: 1px solid var(--accent);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1rem;
-    box-shadow: 0 0 10px var(--accent-glow);
-  }
-  .brand-name { font-weight: 700; font-size: 1.05rem; letter-spacing: -.01em; }
-  .system-label {
-    font-family: 'Space Mono', monospace;
-    font-size: .6rem; letter-spacing: .12em;
-    color: var(--fg-muted); text-transform: uppercase;
-  }
+/* Scanning beam */
+.scan-beam {
+  position: fixed; left: 0; right: 0; top: 0; height: 2px;
+  z-index: 99; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--accent) 25%, rgba(200,255,230,.9) 50%, var(--accent) 75%, transparent);
+  box-shadow: 0 0 24px 10px var(--accent-glow), 0 0 60px 20px var(--accent-dim);
+  animation: beamSweep 14s ease-in-out infinite;
+}
+@keyframes beamSweep {
+  0%        { transform:translateY(0);     opacity:0; }
+  3%        { opacity:1; }
+  88%       { transform:translateY(100vh); opacity:.6; }
+  93%,100%  { transform:translateY(100vh); opacity:0; }
+}
 
-  /* ── Status card ── */
-  .status-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 32px 24px;
-    display: flex; flex-direction: column; align-items: center;
-    gap: 18px; text-align: center;
-    position: relative; overflow: hidden;
-    transition: box-shadow .5s, border-color .5s;
-  }
-  /* Animated gradient sweep when open */
-  .status-card.is-open::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: conic-gradient(
-      from var(--angle, 0deg) at 50% 50%,
-      transparent 0deg,
-      var(--accent-dim) 60deg,
-      transparent 120deg
-    );
-    animation: rotateBg 6s linear infinite;
-    pointer-events: none;
-  }
-  @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
-  @keyframes rotateBg { to { --angle: 360deg; } }
+#canvas    { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+#particles { position: fixed; inset: 0; z-index: 51; pointer-events: none; }
 
-  .status-card.is-open {
-    border-color: var(--open);
-    box-shadow: 0 0 48px var(--open-glow), 0 0 100px var(--accent-dim);
-  }
-  .status-card.is-closed {
-    border-color: rgba(220,38,38,.3);
-    box-shadow: 0 0 32px var(--closed-glow);
-  }
+.wrap {
+  position: relative; z-index: 2;
+  width: 100%; max-width: 480px;
+  display: flex; flex-direction: column; gap: 14px;
+}
 
-  /* Content sits above the gradient */
-  .status-card > * { position: relative; z-index: 1; }
+/* ── Ticker tape ── */
+.ticker-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden; height: 36px;
+  display: flex; align-items: center;
+  -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+}
+.ticker-label {
+  flex-shrink: 0; font-family: 'Space Mono', monospace; font-size: .58rem;
+  letter-spacing: .12em; color: var(--accent); text-transform: uppercase;
+  padding: 0 12px; border-right: 1px solid var(--border);
+  height: 100%; display: flex; align-items: center; white-space: nowrap;
+}
+.ticker-scroll-outer {
+  flex: 1; overflow: hidden; height: 100%; display: flex; align-items: center;
+  -webkit-mask-image: linear-gradient(90deg,transparent,black 12px,black calc(100% - 12px),transparent);
+  mask-image: linear-gradient(90deg,transparent,black 12px,black calc(100% - 12px),transparent);
+}
+.ticker-scroll { display:flex; gap:32px; white-space:nowrap; animation:tickerMove 28s linear infinite; padding-left:24px; }
+@keyframes tickerMove { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+.tick-item { font-family:'Space Mono',monospace; font-size:.7rem; display:flex; gap:6px; align-items:baseline; }
+.tick-sym   { color:var(--fg); font-weight:700; }
+.tick-price { color:var(--fg-muted); }
+.tick-chg.up   { color:var(--up); }
+.tick-chg.down { color:var(--dn); }
 
-  /* Pulsing status dot */
-  .status-dot-wrap {
-    display: flex; align-items: center; justify-content: center;
-    width: 64px; height: 64px; border-radius: 50%; position: relative;
-  }
-  .ring {
-    position: absolute; inset: 0; border-radius: 50%;
-    border: 1.5px solid var(--open); opacity: 0;
-  }
-  .is-open .ring:nth-child(1) { animation: ringOut 2.4s ease-out infinite 0s; }
-  .is-open .ring:nth-child(2) { animation: ringOut 2.4s ease-out infinite .8s; }
-  .is-open .ring:nth-child(3) { animation: ringOut 2.4s ease-out infinite 1.6s; }
-  @keyframes ringOut {
-    0%   { transform: scale(1);   opacity: .7; }
-    100% { transform: scale(2.4); opacity: 0;  }
-  }
-  .is-closed .ring { display: none; }
-  .status-dot {
-    width: 24px; height: 24px; border-radius: 50%; position: relative; z-index: 1;
-  }
-  .is-open  .status-dot { background: var(--open);   box-shadow: 0 0 14px var(--open), 0 0 28px var(--open-glow); }
-  .is-closed .status-dot { background: var(--closed); box-shadow: 0 0 10px var(--closed); }
+/* ── Header ── */
+.header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 2px; }
+.brand  { display:flex; align-items:center; gap:10px; }
+.brand-icon-wrap { position:relative; width:38px; height:38px; flex-shrink:0; }
+.brand-icon {
+  width:34px; height:34px; border-radius:8px;
+  background:var(--accent-dim); border:1px solid var(--accent);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1rem; box-shadow:0 0 14px var(--accent-glow);
+  position:absolute; top:2px; left:2px;
+}
+.brand-ring {
+  position:absolute; inset:0; border-radius:50%;
+  border:1.5px solid transparent;
+  border-top-color:var(--accent); border-right-color:var(--accent-dim);
+  animation:spinRing 3s linear infinite;
+}
+@keyframes spinRing { to{transform:rotate(360deg);} }
+.brand-name { font-weight:700; font-size:1.05rem; }
+.pnl-block { display:flex; flex-direction:column; align-items:flex-end; gap:1px; }
+.pnl-label { font-family:'Space Mono',monospace; font-size:.5rem; letter-spacing:.12em; color:var(--fg-muted); text-transform:uppercase; }
+.pnl-val { font-family:'Space Mono',monospace; font-size:.78rem; font-weight:700; letter-spacing:.04em; }
+.pnl-val.up { color:var(--up); text-shadow:0 0 10px var(--accent-glow); }
+.pnl-val.dn { color:var(--dn); }
 
-  /* Pill */
-  .market-pill {
-    font-family: 'Space Mono', monospace;
-    font-size: .65rem; letter-spacing: .14em;
-    text-transform: uppercase; padding: 4px 14px;
-    border-radius: 999px; font-weight: 700;
-  }
-  .is-open  .market-pill { color: var(--open);   background: var(--open-glow);   border: 1px solid var(--open);   }
-  .is-closed .market-pill { color: var(--closed); background: var(--closed-glow); border: 1px solid var(--closed); }
+/* ── Card wrapper (rotating border) ── */
+.card-wrapper { position: relative; }
+.card-wrapper::before {
+  content: ''; position: absolute; inset: -2px; border-radius: 22px; z-index: 0;
+  background: conic-gradient(from var(--rot), var(--accent), #22d3a0, var(--accent), #0ea5e9, var(--accent));
+  opacity: 0; transition: opacity .6s;
+  animation: rotBorder 5s linear infinite;
+}
+.card-wrapper.glow-on::before { opacity: .7; }
+@keyframes rotBorder { to { --rot: 360deg; } }
 
-  .status-heading {
-    font-weight: 700; font-size: 1.75rem;
-    letter-spacing: -.03em; line-height: 1.15; text-wrap: balance;
-  }
-  .status-sub {
-    color: var(--fg-muted); font-size: .88rem;
-    line-height: 1.55; max-width: 34ch; text-wrap: balance;
-  }
+/* ── Status card ── */
+.status-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 28px 24px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 16px; text-align: center; position: relative; overflow: hidden; z-index: 1;
+  transition: transform .1s ease-out, box-shadow .5s, border-color .5s;
+  will-change: transform;
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+}
+.holo-shimmer {
+  position:absolute; inset:0; border-radius:inherit;
+  pointer-events:none; z-index:2; opacity:0;
+  mix-blend-mode:screen; transition:opacity .15s, background .04s;
+}
+.status-card:hover .holo-shimmer { opacity:1; }
+.corner {
+  position:absolute; width:18px; height:18px;
+  border-color:var(--accent); border-style:solid; opacity:.4; z-index:3;
+  transition:opacity .4s, width .3s, height .3s;
+}
+.corner.tl{top:10px;left:10px;border-width:2px 0 0 2px;border-radius:3px 0 0 0;}
+.corner.tr{top:10px;right:10px;border-width:2px 2px 0 0;border-radius:0 3px 0 0;}
+.corner.bl{bottom:10px;left:10px;border-width:0 0 2px 2px;border-radius:0 0 0 3px;}
+.corner.br{bottom:10px;right:10px;border-width:0 2px 2px 0;border-radius:0 0 3px 0;}
+.is-open .corner { opacity:1; width:24px; height:24px; }
+.card-shimmer {
+  position:absolute; top:0; bottom:0; left:-80%; width:60%;
+  pointer-events:none; z-index:1;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);
+  animation:cardShimmer 7s ease-in-out infinite;
+}
+@keyframes cardShimmer{0%,100%{left:-80%;}50%{left:130%;}}
+.status-card.is-open {
+  border-color:var(--accent);
+  animation:openPulse 4s ease-in-out infinite;
+}
+@keyframes openPulse{0%,100%{box-shadow:0 0 0 1px var(--accent-dim),0 0 30px var(--accent-dim);}50%{box-shadow:0 0 0 1px var(--accent-glow),0 0 80px var(--accent-glow);}}
+.status-card.is-closed{border-color:rgba(220,38,38,.3);box-shadow:0 0 32px var(--closed-glow);}
+.status-card>*:not(.corner):not(.holo-shimmer):not(.card-shimmer){position:relative;z-index:1;}
 
-  /* Clock */
-  .clock-block { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .live-clock {
-    font-family: 'Space Mono', monospace;
-    font-size: 2.2rem; font-weight: 700;
-    color: var(--time); letter-spacing: .06em;
-    font-variant-numeric: tabular-nums;
-    text-shadow: 0 0 20px var(--accent-glow);
-  }
-  .clock-tz {
-    font-family: 'Space Mono', monospace;
-    font-size: .6rem; letter-spacing: .14em;
-    color: var(--fg-muted); text-transform: uppercase;
-  }
+/* ── Radar + dot ── */
+.radar-wrap{display:flex;align-items:center;justify-content:center;width:76px;height:76px;position:relative;}
+.radar-sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,var(--accent) 0deg,var(--accent-dim) 40deg,transparent 70deg);animation:radarSpin 2s linear infinite;opacity:0;transition:opacity .5s;}
+.is-open .radar-sweep{opacity:.5;}
+@keyframes radarSpin{to{transform:rotate(360deg);}}
+.radar-grid{position:absolute;inset:2px;border-radius:50%;border:1px solid var(--accent-dim);opacity:.4;}
+.ring{position:absolute;inset:0;border-radius:50%;border:1.5px solid var(--open);opacity:0;}
+.is-open .ring:nth-child(3){animation:ringOut 2.4s ease-out infinite 0s;}
+.is-open .ring:nth-child(4){animation:ringOut 2.4s ease-out infinite .8s;}
+.is-open .ring:nth-child(5){animation:ringOut 2.4s ease-out infinite 1.6s;}
+@keyframes ringOut{0%{transform:scale(.7);opacity:.9;}100%{transform:scale(2.8);opacity:0;}}
+.is-closed .ring{display:none;}
+.status-dot{width:22px;height:22px;border-radius:50%;position:relative;z-index:1;}
+.is-open  .status-dot{background:var(--open);box-shadow:0 0 16px var(--open),0 0 36px var(--open-glow);}
+.is-closed .status-dot{background:var(--closed);box-shadow:0 0 10px var(--closed);}
 
-  /* Countdown */
-  .countdown-block {
-    background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 14px 24px;
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    min-width: 180px;
-  }
-  .countdown-label {
-    font-family: 'Space Mono', monospace;
-    font-size: .6rem; letter-spacing: .14em;
-    text-transform: uppercase; color: var(--fg-muted);
-  }
-  .countdown-value {
-    font-family: 'Space Mono', monospace;
-    font-size: 1.65rem; font-weight: 700;
-    color: var(--accent); font-variant-numeric: tabular-nums;
-    letter-spacing: .06em;
-    text-shadow: 0 0 16px var(--accent-glow);
-  }
+.market-pill{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;padding:4px 14px;border-radius:999px;font-weight:700;}
+.is-open  .market-pill{color:var(--open);background:var(--open-glow);border:1px solid var(--open);}
+.is-closed .market-pill{color:var(--closed);background:var(--closed-glow);border:1px solid var(--closed);}
 
-  /* CTA */
-  .cta-btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: var(--accent); color: #fff;
-    text-decoration: none; font-weight: 700; font-size: .9rem;
-    padding: 13px 28px; border-radius: 10px; letter-spacing: .01em;
-    box-shadow: 0 0 24px var(--accent-glow);
-    transition: opacity .15s, transform .15s, box-shadow .15s;
-  }
-  .cta-btn:hover { opacity: .9; transform: translateY(-2px); box-shadow: 0 4px 32px var(--accent-glow); }
-  .cta-arrow { display: inline-block; transition: transform .2s; }
-  .cta-btn:hover .cta-arrow { transform: translateX(3px); }
+/* Clock */
+.clock-block{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.scramble-clock{display:flex;align-items:center;font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--time);letter-spacing:.04em;font-variant-numeric:tabular-nums;text-shadow:0 0 24px var(--accent-glow),0 0 60px var(--accent-dim);}
+.clk-digit{display:inline-block;min-width:1ch;}
+.clk-sep{opacity:.4;animation:sepBlink 1s step-end infinite;}
+@keyframes sepBlink{0%,100%{opacity:.4;}50%{opacity:.1;}}
+.clock-tz{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.14em;color:var(--fg-muted);text-transform:uppercase;}
 
-  /* Sparkline */
-  .mini-chart { width: 100%; height: 48px; overflow: visible; }
+/* Gradient heading when open */
+.status-heading{font-weight:700;font-size:1.65rem;letter-spacing:-.03em;line-height:1.15;text-wrap:balance;position:relative;}
+.is-open .status-heading{background:linear-gradient(135deg,var(--accent) 0%,#6ee7b7 50%,#0ea5e9 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 12px var(--accent-glow));}
+.status-heading::before,.status-heading::after{content:attr(data-text);position:absolute;top:0;left:0;right:0;opacity:0;}
+.status-heading::before{color:#60ffe0;clip-path:polygon(0 15%,100% 15%,100% 50%,0 50%);}
+.status-heading::after{color:#f060ff;clip-path:polygon(0 60%,100% 60%,100% 90%,0 90%);}
+.glitching .status-heading::before{animation:gA .18s ease-out;}
+.glitching .status-heading::after{animation:gB .18s ease-out;}
+@keyframes gA{0%,100%{opacity:0;transform:none;}40%{opacity:.8;transform:translate(-3px,0);}}
+@keyframes gB{0%,100%{opacity:0;transform:none;}60%{opacity:.7;transform:translate(3px,0);}}
 
-  /* ── Hours card ── */
-  .hours-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; padding: 18px 20px;
-  }
-  .hours-title {
-    font-family: 'Space Mono', monospace;
-    font-size: .6rem; letter-spacing: .14em;
-    text-transform: uppercase; color: var(--fg-muted); margin-bottom: 14px;
-  }
-  .hours-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-  .day-col { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-  .day-label {
-    font-family: 'Space Mono', monospace;
-    font-size: .57rem; letter-spacing: .06em;
-    text-transform: uppercase; color: var(--fg-muted);
-  }
-  .day-bar { width: 100%; height: 44px; border-radius: 5px; background: var(--surface-2); }
-  .day-col.active .day-bar { background: var(--accent-dim); border: 1px solid rgba(16,185,129,.22); }
-  .day-col.today .day-label { color: var(--accent); font-weight: 700; }
-  .day-col.today .day-bar   { border-color: var(--accent); box-shadow: 0 0 8px var(--accent-dim); }
-  .day-hours {
-    font-family: 'Space Mono', monospace;
-    font-size: .57rem; color: var(--fg-muted); text-align: center; line-height: 1.4;
-  }
-  .day-col.active .day-hours { color: var(--accent); }
-  .day-col.off .day-hours    { opacity: .4; }
+.status-sub{color:var(--fg-muted);font-size:.88rem;line-height:1.6;max-width:34ch;text-wrap:balance;}
 
-  /* ── Footer ── */
-  .footer { text-align: center; color: var(--fg-muted); font-size: .78rem; line-height: 1.65; }
-  .footer a { color: var(--accent); text-decoration: none; }
-  .footer a:hover { text-decoration: underline; }
+.countdown-block{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 24px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:180px;}
+.countdown-label{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-muted);}
+.countdown-value{font-family:'Space Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:.06em;text-shadow:0 0 18px var(--accent-glow);}
 
-  @media (prefers-reduced-motion: reduce) {
-    .ticker-scroll, .ring, .status-card::before,
-    .cta-btn, .live-clock, .countdown-value { animation: none !important; transition: none !important; }
-  }
+.cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:700;font-size:.9rem;padding:12px 26px;border-radius:10px;letter-spacing:.01em;box-shadow:0 0 28px var(--accent-glow);position:relative;overflow:hidden;transition:opacity .15s,transform .15s,box-shadow .15s;color:#002816;}
+.cta-btn::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:ctaShine 3s ease-in-out infinite;}
+@keyframes ctaShine{0%,100%{left:-100%;}50%{left:140%;}}
+.cta-btn:hover{opacity:.9;transform:translateY(-2px);box-shadow:0 6px 44px var(--accent-glow);}
+.cta-arrow{transition:transform .2s;}
+.cta-btn:hover .cta-arrow{transform:translateX(3px);}
+
+.mini-chart{width:100%;height:48px;}
+
+/* ── Order book ── */
+.ob-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+.ob-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.ob-title{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:8px;}
+.ob-title::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.ob-sym{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--fg-muted);}
+.ob-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0 10px;}
+.ob-col{display:flex;flex-direction:column;gap:3px;}
+.ob-col-hdr{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.ob-col-hdr.bid{color:var(--up);}
+.ob-col-hdr.ask{color:var(--dn);text-align:right;}
+.ob-row{display:flex;align-items:center;position:relative;height:20px;overflow:hidden;border-radius:3px;}
+.ob-bar{position:absolute;top:0;bottom:0;border-radius:3px;transition:width .3s ease;}
+.ob-row.bid-row .ob-bar{right:0;background:var(--up-dim);}
+.ob-row.ask-row .ob-bar{left:0;background:var(--dn-dim);}
+.ob-price{font-family:'Space Mono',monospace;font-size:.64rem;font-weight:700;position:relative;z-index:1;padding:0 5px;transition:color .2s;}
+.ob-row.bid-row .ob-price{color:var(--up);}
+.ob-row.ask-row .ob-price{color:var(--dn);margin-left:auto;}
+.ob-size{font-family:'Space Mono',monospace;font-size:.55rem;color:var(--fg-muted);position:relative;z-index:1;padding:0 5px;}
+.ob-row.ask-row .ob-size{margin-right:auto;}
+.ob-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.ob-mid-price{font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;color:var(--fg);text-shadow:0 0 8px var(--accent-glow);}
+.ob-spread-label{font-family:'Space Mono',monospace;font-size:.5rem;color:var(--fg-muted);}
+.flash-up{animation:flashUp .4s ease-out;}
+.flash-dn{animation:flashDn .4s ease-out;}
+@keyframes flashUp{0%{color:#fff;text-shadow:0 0 10px var(--up);}100%{}}
+@keyframes flashDn{0%{color:#fff;text-shadow:0 0 10px var(--dn);}100%{}}
+
+/* ── Trade feed ── */
+.feed-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+.feed-title{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.feed-title::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--up);box-shadow:0 0 8px var(--accent-glow);animation:blink 1.2s ease-in-out infinite;}
+.feed-list{display:flex;flex-direction:column;gap:4px;overflow:hidden;max-height:120px;}
+.feed-item{display:grid;grid-template-columns:52px 68px 56px 1fr 44px;align-items:center;gap:4px;font-family:'Space Mono',monospace;font-size:.6rem;padding:3px 4px;border-radius:4px;animation:feedIn .3s ease-out;}
+@keyframes feedIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:none;}}
+.feed-item.up-fill{background:var(--up-dim);}
+.feed-item.dn-fill{background:var(--dn-dim);}
+.fi-sym{font-weight:700;color:var(--fg);}
+.fi-price.up{color:var(--up);}
+.fi-price.dn{color:var(--dn);}
+.fi-qty{color:var(--fg-muted);}
+.fi-status{font-size:.5rem;letter-spacing:.06em;color:var(--accent);text-transform:uppercase;}
+.fi-lat{color:var(--fg-muted);font-size:.5rem;text-align:right;}
+
+/* ── Market sessions ── */
+.sessions-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+.sessions-title{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-muted);margin-bottom:12px;}
+.session-row{display:grid;grid-template-columns:12px 1fr 1fr auto;align-items:center;gap:8px;margin-bottom:8px;}
+.session-row:last-child{margin-bottom:0;}
+.session-dot{width:8px;height:8px;border-radius:50%;background:var(--border);}
+.session-dot.active{background:var(--up);box-shadow:0 0 8px var(--accent-glow);animation:blink 1.5s ease-in-out infinite;}
+.session-label{font-weight:600;font-size:.78rem;}
+.session-time{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--fg-muted);}
+.session-status{font-family:'Space Mono',monospace;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
+.session-status.on{color:var(--up);}
+.session-status.off{color:var(--fg-muted);}
+
+/* ── Hours ── */
+.hours-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+.hours-title{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-muted);margin-bottom:14px;}
+.hours-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.day-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.day-label{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-muted);}
+.day-bar{width:100%;height:44px;border-radius:5px;background:var(--surface-2);}
+.day-col.active .day-bar{background:var(--accent-dim);border:1px solid rgba(16,185,129,.22);}
+.day-col.today .day-label{color:var(--accent);font-weight:700;}
+.day-col.today .day-bar{border-color:var(--accent);box-shadow:0 0 10px var(--accent-dim);}
+.day-hours{font-family:'Space Mono',monospace;font-size:.55rem;color:var(--fg-muted);text-align:center;line-height:1.4;}
+.day-col.active .day-hours{color:var(--accent);}
+.day-col.off .day-hours{opacity:.4;}
+
+.footer{text-align:center;color:var(--fg-muted);font-size:.78rem;line-height:1.65;}
+.footer a{color:var(--accent);text-decoration:none;}
+.footer a:hover{text-decoration:underline;}
+
+@media (prefers-reduced-motion:reduce){
+  .scan-beam,.ticker-scroll,.ring,.radar-sweep,.brand-ring,.card-shimmer,
+  .status-card,.cta-btn::before,.clk-sep,.boot-terminal{animation:none!important;}
+}
 </style>
 
+<div class="boot-terminal" id="bootTerminal"><div id="bootLines"></div></div>
+<div class="scan-beam" aria-hidden="true"></div>
 <canvas id="canvas"></canvas>
+<canvas id="particles"></canvas>
 
 <div class="wrap">
-
   <div class="ticker-wrap">
     <div class="ticker-label">Sim&nbsp;Quotes</div>
     <div class="ticker-scroll-outer">
@@ -366,40 +384,103 @@
 
   <div class="header">
     <div class="brand">
-      <div class="brand-icon">📈</div>
+      <div class="brand-icon-wrap">
+        <div class="brand-icon">📈</div>
+        <div class="brand-ring"></div>
+      </div>
       <div class="brand-name">Paper Trader</div>
     </div>
-    <div class="system-label">Market Status</div>
+    <div class="pnl-block">
+      <div class="pnl-label">Portfolio</div>
+      <div class="pnl-val up" id="pnlVal">$12,847.32</div>
+    </div>
   </div>
 
-  <div class="status-card" id="statusCard">
-    <div class="status-dot-wrap">
-      <div class="ring"></div>
-      <div class="ring"></div>
-      <div class="ring"></div>
-      <div class="status-dot"></div>
+  <div class="card-wrapper" id="cardWrapper">
+    <div class="status-card" id="statusCard">
+      <div class="corner tl"></div><div class="corner tr"></div>
+      <div class="corner bl"></div><div class="corner br"></div>
+      <div class="holo-shimmer" id="holoShimmer"></div>
+      <div class="card-shimmer"></div>
+
+      <div class="radar-wrap">
+        <div class="radar-sweep"></div>
+        <div class="radar-grid"></div>
+        <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+        <div class="status-dot"></div>
+      </div>
+
+      <div class="market-pill" id="marketPill"></div>
+
+      <div class="clock-block">
+        <div class="scramble-clock" id="scrambleClock"></div>
+        <div class="clock-tz">Chicago / CST</div>
+      </div>
+
+      <div class="status-heading" id="statusHeading" data-text=""></div>
+      <div class="status-sub" id="statusSub"></div>
+
+      <svg class="mini-chart" id="miniChart" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"></svg>
+
+      <div class="countdown-block" id="countdownBlock" hidden>
+        <div class="countdown-label">Market Opens In</div>
+        <div class="countdown-value" id="countdownValue">--:--:--</div>
+      </div>
+
+      <a class="cta-btn" id="ctaBtn" href="https://trader.auroradeploy.com" target="_blank" rel="noopener" hidden>
+        Open Trading Console <span class="cta-arrow">→</span>
+      </a>
     </div>
+  </div>
 
-    <div class="market-pill" id="marketPill"></div>
-
-    <div class="clock-block">
-      <div class="live-clock" id="liveClock">--:--:--</div>
-      <div class="clock-tz">Chicago / CST</div>
+  <!-- Live order book -->
+  <div class="ob-card">
+    <div class="ob-header-row">
+      <div class="ob-title">Order Book</div>
+      <div class="ob-sym" id="obSym">NVDA · 134.52</div>
     </div>
-
-    <div class="status-heading" id="statusHeading"></div>
-    <div class="status-sub" id="statusSub"></div>
-
-    <svg class="mini-chart" id="miniChart" viewBox="0 0 400 48" preserveAspectRatio="none" aria-hidden="true"></svg>
-
-    <div class="countdown-block" id="countdownBlock" hidden>
-      <div class="countdown-label">Market Opens In</div>
-      <div class="countdown-value" id="countdownValue">--:--:--</div>
+    <div class="ob-grid">
+      <div class="ob-col" id="bidsCol">
+        <div class="ob-col-hdr bid">Bid</div>
+      </div>
+      <div class="ob-mid">
+        <div class="ob-mid-price" id="obMid">134.52</div>
+        <div class="ob-spread-label">SPREAD</div>
+        <div class="ob-spread-label" id="obSpread">0.04</div>
+      </div>
+      <div class="ob-col" id="asksCol">
+        <div class="ob-col-hdr ask">Ask</div>
+      </div>
     </div>
+  </div>
 
-    <a class="cta-btn" id="ctaBtn" href="https://trader.auroradeploy.com" target="_blank" rel="noopener" hidden>
-      Open Trading Console <span class="cta-arrow">→</span>
-    </a>
+  <!-- Trade execution feed -->
+  <div class="feed-card">
+    <div class="feed-title">Live Executions</div>
+    <div class="feed-list" id="feedList"></div>
+  </div>
+
+  <!-- Market sessions -->
+  <div class="sessions-card">
+    <div class="sessions-title">Market Sessions (ET)</div>
+    <div class="session-row">
+      <div class="session-dot" id="dot-pre"></div>
+      <div class="session-label">Pre-Market</div>
+      <div class="session-time">4:00 – 9:30 AM</div>
+      <div class="session-status" id="ss-pre">--</div>
+    </div>
+    <div class="session-row">
+      <div class="session-dot" id="dot-reg"></div>
+      <div class="session-label">Regular Hours</div>
+      <div class="session-time">9:30 AM – 4:00 PM</div>
+      <div class="session-status" id="ss-reg">--</div>
+    </div>
+    <div class="session-row">
+      <div class="session-dot" id="dot-aft"></div>
+      <div class="session-label">After-Hours</div>
+      <div class="session-time">4:00 – 8:00 PM</div>
+      <div class="session-status" id="ss-aft">--</div>
+    </div>
   </div>
 
   <div class="hours-card">
@@ -414,265 +495,290 @@
     <a href="https://aistore.auroradeploy.com" target="_blank" rel="noopener">AI Hardware Store</a>
     &middot; GPU hardware for AI builds
   </div>
-
 </div>
 
 <script>
-  /* ── Static candlestick background — live candle ticks, shifts 1× per minute ── */
-  (function () {
-    const cvs = document.getElementById('canvas');
-    const ctx = cvs.getContext('2d');
-    let W, H, candles = [], live = null;
-    const CW = 14, GAP = 5, STEP = CW + GAP;
+/* Boot terminal */
+(function(){
+  const lines=['> PAPER TRADER SYSTEM v2.4.1','> Market data feed........... OK','> Order routing engine....... OK','> Risk management............ OK','> Loading trading console...'];
+  const c=document.getElementById('bootLines');
+  lines.forEach((t,i)=>{ const el=document.createElement('div'); el.className='boot-line'; el.textContent=t; el.style.animationDelay=(i*.3)+'s'; c.appendChild(el); });
+  const cur=document.createElement('span'); cur.className='boot-cursor'; c.appendChild(cur);
+  setTimeout(()=>{ const bt=document.getElementById('bootTerminal'); bt.style.pointerEvents='none'; setTimeout(()=>bt.style.display='none',400); },2200);
+})();
 
-    function col() {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? { up: '16,185,129', dn: '248,113,113' }
-        : { up: '5,150,105',  dn: '220,38,38'  };
-    }
+/* Enhanced candlestick canvas: EMA + volume bars */
+(function(){
+  const cvs=document.getElementById('canvas'), ctx=cvs.getContext('2d');
+  let W,H,candles=[],live=null;
+  const CW=14,GAP=5,STEP=CW+GAP;
+  const VOL_H=0.18; // bottom 18% = volume
 
-    function resize() {
-      W = cvs.width  = window.innerWidth;
-      H = cvs.height = window.innerHeight;
-      init();
-      render();
-    }
+  function col(){ return window.matchMedia('(prefers-color-scheme:dark)').matches?{up:'16,185,129',dn:'248,113,113'}:{up:'5,150,105',dn:'220,38,38'}; }
 
-    // Build enough historical candles to fill the screen (never loops — pure random walk)
-    function init() {
-      const count = Math.ceil(W / STEP) + 1;
-      let p = H * 0.45 + (Math.random() * 0.1 - 0.05) * H;
-      candles = Array.from({ length: count }, () => {
-        const o = p;
-        const c = Math.max(H * 0.12, Math.min(H * 0.88,
-                    p + (Math.random() - 0.47) * H * 0.07));
-        const hi  = Math.min(o, c) - Math.random() * H * 0.025;
-        const lo  = Math.max(o, c) + Math.random() * H * 0.025;
-        p = c;
-        return { o, c, hi, lo };
-      });
-      // Start the live candle at the last close price
-      live = makeLive(p);
-    }
+  function resize(){ W=cvs.width=window.innerWidth; H=cvs.height=window.innerHeight; init(); render(); }
 
-    function makeLive(openP) {
-      return { o: openP, c: openP, hi: openP, lo: openP };
-    }
-
-    // Called every 2 s — small random tick on the live candle only
-    function tickLive() {
-      const delta = (Math.random() - 0.5) * H * 0.012;
-      live.c = Math.max(H * 0.12, Math.min(H * 0.88, live.c + delta));
-      live.hi = Math.min(live.hi, live.c - Math.random() * H * 0.004);
-      live.lo = Math.max(live.lo, live.c + Math.random() * H * 0.004);
-      render();
-    }
-
-    // Called every 60 s — close the live candle and push a fresh one
-    function closeCandle() {
-      candles.push({ ...live });
-      candles.shift(); // drop oldest so width stays constant
-      live = makeLive(live.c);
-      render();
-    }
-
-    function render() {
-      ctx.clearRect(0, 0, W, H);
-      const c = col();
-      const all = [...candles, live];
-      all.forEach((cd, i) => {
-        const x = i * STEP;
-        const up  = cd.c <= cd.o; // lower Y = higher price = green
-        const clr = up ? c.up : c.dn;
-        const top = Math.min(cd.o, cd.c);
-        const bot = Math.max(cd.o, cd.c);
-        const bh  = Math.max(2, bot - top);
-        // Wick
-        ctx.beginPath();
-        ctx.moveTo(x + CW / 2, cd.hi);
-        ctx.lineTo(x + CW / 2, cd.lo);
-        ctx.strokeStyle = `rgba(${clr},.28)`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        // Body
-        ctx.fillStyle = `rgba(${clr},.18)`;
-        ctx.fillRect(x, top, CW, bh);
-        ctx.strokeStyle = `rgba(${clr},.42)`;
-        ctx.lineWidth = 1;
-        ctx.strokeRect(x, top, CW, bh);
-      });
-    }
-
-    resize();
-    setInterval(tickLive,  2000);   // live candle ticks every 2 s (subtle)
-    setInterval(closeCandle, 60000); // new candle every 60 s
-    window.addEventListener('resize', resize);
-  })();
-
-  /* ── Ticker tape ── */
-  const TICKERS = [
-    { sym: 'NVDA', price: '134.52', chg: '+2.14%', up: true },
-    { sym: 'AAPL', price: '228.87', chg: '-0.43%', up: false },
-    { sym: 'MSFT', price: '415.20', chg: '+0.91%', up: true },
-    { sym: 'TSLA', price: '247.08', chg: '+3.56%', up: true },
-    { sym: 'AMZN', price: '210.44', chg: '-1.02%', up: false },
-    { sym: 'GOOG', price: '191.66', chg: '+0.37%', up: true },
-    { sym: 'META', price: '589.12', chg: '-0.78%', up: false },
-    { sym: 'AMD',  price: '155.33', chg: '+1.88%', up: true },
-  ];
-
-  document.getElementById('tickerScroll').innerHTML =
-    [...TICKERS, ...TICKERS].map(t =>
-      `<span class="tick-item">
-        <span class="tick-sym">${t.sym}</span>
-        <span class="tick-price">${t.price}</span>
-        <span class="tick-chg ${t.up ? 'up' : 'down'}">${t.chg}</span>
-       </span>`
-    ).join('');
-
-  /* ── Sparkline ── */
-  function buildSparkline(open) {
-    const svg = document.getElementById('miniChart');
-    const pts = 28;
-    let s = [...new Date().toDateString()].reduce((a, c) => a + c.charCodeAt(0), 0);
-    const rand = () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
-    const vals = Array.from({ length: pts }, rand);
-    const mn = Math.min(...vals), mx = Math.max(...vals);
-    const ys = vals.map(v => 38 - ((v - mn) / (mx - mn)) * 28);
-    const xs = vals.map((_, i) => (i / (pts - 1)) * 400);
-    const path = xs.map((x, i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
-    const color = open ? 'var(--open)' : 'var(--fg-muted)';
-    svg.innerHTML = `
-      <defs>
-        <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${color}" stop-opacity=".35"/>
-          <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-        </linearGradient>
-      </defs>
-      <path d="${path} L400,48 L0,48 Z" fill="url(#sg)"/>
-      <path d="${path}" fill="none" stroke="${color}" stroke-width="1.6"
-            stroke-linecap="round" stroke-linejoin="round"/>
-    `;
-  }
-
-  /* ── Time logic ── */
-  const OPEN_HOUR = 7, CLOSE_HOUR = 18, TZ = 'America/Chicago';
-  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-
-  function chicagoDate() {
-    const p = {};
-    new Intl.DateTimeFormat('en-US', {
-      timeZone:TZ, hour12:false,
-      year:'numeric',month:'2-digit',day:'2-digit',
-      hour:'2-digit',minute:'2-digit',second:'2-digit',weekday:'short'
-    }).formatToParts(new Date()).forEach(({type,value}) => p[type]=value);
-    return {
-      year:parseInt(p.year), month:parseInt(p.month)-1, day:parseInt(p.day),
-      hour:parseInt(p.hour)===24?0:parseInt(p.hour),
-      minute:parseInt(p.minute), second:parseInt(p.second),
-      dowIndex:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(p.weekday)
-    };
-  }
-
-  function chicagoDateOf(d) {
-    const p = {};
-    new Intl.DateTimeFormat('en-US', {
-      timeZone:TZ, hour12:false,
-      year:'numeric',month:'2-digit',day:'2-digit',
-      hour:'2-digit',minute:'2-digit',second:'2-digit',weekday:'short'
-    }).formatToParts(d).forEach(({type,value}) => p[type]=value);
-    return {
-      year:parseInt(p.year), month:parseInt(p.month)-1, day:parseInt(p.day),
-      hour:parseInt(p.hour)===24?0:parseInt(p.hour),
-      minute:parseInt(p.minute), second:parseInt(p.second),
-      dowIndex:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(p.weekday)
-    };
-  }
-
-  function chicagoMidnight(d) {
-    const tc = chicagoDateOf(d);
-    const offsetStr = new Intl.DateTimeFormat('en-US',{timeZone:TZ,timeZoneName:'shortOffset'})
-      .formatToParts(d).find(p=>p.type==='timeZoneName').value;
-    const m = offsetStr.match(/GMT([+-])(\d+)(?::(\d+))?/);
-    if (!m) return NaN;
-    const iso = `${tc.year}-${String(tc.month+1).padStart(2,'0')}-${String(tc.day).padStart(2,'0')}T00:00:00${m[1]}${String(m[2]).padStart(2,'0')}:${String(m[3]||'0').padStart(2,'0')}`;
-    return new Date(iso).getTime();
-  }
-
-  function isBizDay(d) { return d >= 1 && d <= 5; }
-  function isOpen(c)   { return isBizDay(c.dowIndex) && c.hour >= OPEN_HOUR && c.hour < CLOSE_HOUR; }
-
-  function msUntilOpen() {
-    const now = new Date();
-    for (let d = 0; d <= 6; d++) {
-      const trial = new Date(now.getTime() + d * 86400000);
-      const tc = chicagoDateOf(trial);
-      if (!isBizDay(tc.dowIndex)) continue;
-      const openMs = chicagoMidnight(trial) + OPEN_HOUR * 3600000;
-      if (openMs > now.getTime()) return openMs - now.getTime();
-    }
-    return null;
-  }
-
-  function fmt(ms) {
-    const s = Math.floor(ms / 1000);
-    return [Math.floor(s/3600), Math.floor((s%3600)/60), s%60]
-      .map(n => String(n).padStart(2,'0')).join(':');
-  }
-
-  /* ── Hours grid ── */
-  (function () {
-    const todayDow = chicagoDate().dowIndex;
-    const grid = document.getElementById('hoursGrid');
-    DAYS.forEach((day, i) => {
-      const active = i >= 1 && i <= 5, today = i === todayDow;
-      const col = document.createElement('div');
-      col.className = 'day-col' + (active ? ' active' : ' off') + (today ? ' today' : '');
-      col.innerHTML = `<div class="day-label">${day}</div><div class="day-bar"></div><div class="day-hours">${active ? '7a–6p' : '—'}</div>`;
-      grid.appendChild(col);
+  function init(){
+    const count=Math.ceil(W/STEP)+1; let p=H*.45+(Math.random()*.1-.05)*H;
+    candles=Array.from({length:count},()=>{
+      const o=p,c=Math.max(H*.14,Math.min(H*.82,p+(Math.random()-.47)*H*.07));
+      const hi=Math.min(o,c)-Math.random()*H*.025, lo=Math.max(o,c)+Math.random()*H*.025;
+      p=c; return{o,c,hi,lo,vol:Math.random()};
     });
-  })();
-
-  /* ── Tick ── */
-  let sparkBuilt = false;
-
-  function tick() {
-    const c = chicagoDate();
-    const h12 = c.hour % 12 || 12;
-    const ampm = c.hour < 12 ? 'AM' : 'PM';
-    document.getElementById('liveClock').textContent =
-      `${String(h12).padStart(2,'0')}:${String(c.minute).padStart(2,'0')}:${String(c.second).padStart(2,'0')} ${ampm}`;
-
-    const open = isOpen(c);
-    if (!sparkBuilt) { buildSparkline(open); sparkBuilt = true; }
-
-    const card    = document.getElementById('statusCard');
-    const pill    = document.getElementById('marketPill');
-    const heading = document.getElementById('statusHeading');
-    const sub     = document.getElementById('statusSub');
-    const ctaBtn  = document.getElementById('ctaBtn');
-    const cdBlock = document.getElementById('countdownBlock');
-    const cdValue = document.getElementById('countdownValue');
-
-    if (open) {
-      card.className = 'status-card is-open';
-      pill.textContent = 'Market Open';
-      heading.textContent = 'Trading is live';
-      sub.textContent = 'The paper trading console is running. Place simulated trades and track your portfolio.';
-      ctaBtn.hidden = false;
-      cdBlock.hidden = true;
-    } else {
-      card.className = 'status-card is-closed';
-      pill.textContent = 'Market Closed';
-      heading.textContent = 'Markets are closed';
-      sub.textContent = 'The server runs on a scheduled window to keep costs low — weekdays 7 AM to 6 PM CST.';
-      ctaBtn.hidden = true;
-      cdBlock.hidden = false;
-      const ms = msUntilOpen();
-      cdValue.textContent = ms ? fmt(ms) : '--:--:--';
-    }
+    live={o:p,c:p,hi:p,lo:p,vol:0.3};
   }
 
-  tick();
-  setInterval(tick, 1000);
+  function computeEMA(closes,period=12){
+    const k=2/(period+1); let ema=closes[0];
+    return closes.map((v,i)=>{ if(i===0)return ema; ema=v*k+ema*(1-k); return ema; });
+  }
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    const c=col(), chartH=H*(1-VOL_H), volBase=H;
+    const all=[...candles,live], closes=all.map(x=>x.c);
+    const emas=computeEMA(closes,12);
+    const maxVol=Math.max(...all.map(x=>x.vol||0));
+
+    all.forEach((cd,i)=>{
+      const x=i*STEP, up=cd.c<=cd.o, clr=up?c.up:c.dn;
+      const top=Math.min(cd.o,cd.c), bot=Math.max(cd.o,cd.c), bh=Math.max(2,bot-top);
+      // Wick
+      ctx.beginPath(); ctx.moveTo(x+CW/2,cd.hi); ctx.lineTo(x+CW/2,cd.lo);
+      ctx.strokeStyle=`rgba(${clr},.28)`; ctx.lineWidth=1; ctx.stroke();
+      // Body
+      ctx.fillStyle=`rgba(${clr},.20)`; ctx.fillRect(x,top,CW,bh);
+      ctx.strokeStyle=`rgba(${clr},.48)`; ctx.lineWidth=1; ctx.strokeRect(x,top,CW,bh);
+      // Volume bar
+      const volH=(cd.vol/maxVol)*H*VOL_H*.8;
+      ctx.fillStyle=`rgba(${clr},.22)`; ctx.fillRect(x,volBase-volH,CW,volH);
+    });
+
+    // EMA line
+    ctx.beginPath();
+    emas.forEach((e,i)=>{ const x=i*STEP+CW/2; i===0?ctx.moveTo(x,e):ctx.lineTo(x,e); });
+    ctx.strokeStyle=`rgba(${c.up},.6)`; ctx.lineWidth=1.8; ctx.lineJoin='round'; ctx.stroke();
+  }
+
+  function tickLive(){ const delta=(Math.random()-.5)*H*.012; live.c=Math.max(H*.14,Math.min(H*.82,live.c+delta)); live.hi=Math.min(live.hi,live.c-Math.random()*H*.004); live.lo=Math.max(live.lo,live.c+Math.random()*H*.004); live.vol=Math.min(1,live.vol+Math.random()*.05); render(); }
+  function closeCandle(){ candles.push({...live}); candles.shift(); live={o:live.c,c:live.c,hi:live.c,lo:live.c,vol:0.1}; render(); }
+
+  resize(); setInterval(tickLive,2000); setInterval(closeCandle,60000);
+  window.addEventListener('resize',resize);
+  window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{render();});
+})();
+
+/* Mouse particle trail */
+(function(){
+  const cvs=document.getElementById('particles'),ctx=cvs.getContext('2d');
+  let W,H,sparks=[];
+  function resize(){ W=cvs.width=window.innerWidth; H=cvs.height=window.innerHeight; }
+  function getColor(){ return window.matchMedia('(prefers-color-scheme:dark)').matches?'16,185,129':'5,150,105'; }
+  window.addEventListener('mousemove',e=>{ for(let i=0;i<4;i++) sparks.push({x:e.clientX,y:e.clientY,vx:(Math.random()-.5)*2.5,vy:(Math.random()-.5)*2.5-1,life:1,r:Math.random()*2+.5}); });
+  function draw(){
+    ctx.clearRect(0,0,W,H); const c=getColor();
+    sparks=sparks.filter(s=>s.life>.01);
+    sparks.forEach(s=>{ s.x+=s.vx; s.y+=s.vy; s.vy+=.06; s.life-=.04; ctx.beginPath(); ctx.arc(s.x,s.y,s.r*s.life,0,Math.PI*2); ctx.fillStyle=`rgba(${c},${s.life*.75})`; ctx.fill(); });
+    requestAnimationFrame(draw);
+  }
+  resize(); draw(); window.addEventListener('resize',resize);
+})();
+
+/* 3D tilt + holographic shimmer */
+(function(){
+  const card=document.getElementById('statusCard'),holo=document.getElementById('holoShimmer');
+  let inside=false;
+  card.addEventListener('mouseenter',()=>inside=true);
+  card.addEventListener('mouseleave',()=>{ inside=false; card.style.transform=''; holo.style.opacity='0'; });
+  card.addEventListener('mousemove',e=>{
+    if(!inside)return;
+    const r=card.getBoundingClientRect();
+    const dx=(e.clientX-(r.left+r.width/2))/(r.width/2), dy=(e.clientY-(r.top+r.height/2))/(r.height/2);
+    card.style.transform=`perspective(900px) rotateY(${dx*10}deg) rotateX(${-dy*7}deg) scale(1.01)`;
+    const hue=(dx*60+150).toFixed(0);
+    holo.style.background=`radial-gradient(circle at ${((dx+1)/2*100).toFixed(0)}% ${((dy+1)/2*100).toFixed(0)}%,hsla(${hue},100%,72%,.22),transparent 55%)`;
+    holo.style.opacity='1';
+  });
+})();
+
+/* Ticker tape */
+const TICKERS=[{sym:'NVDA',price:'134.52',chg:'+2.14%',up:true},{sym:'AAPL',price:'228.87',chg:'-0.43%',up:false},{sym:'MSFT',price:'415.20',chg:'+0.91%',up:true},{sym:'TSLA',price:'247.08',chg:'+3.56%',up:true},{sym:'AMZN',price:'210.44',chg:'-1.02%',up:false},{sym:'GOOG',price:'191.66',chg:'+0.37%',up:true},{sym:'META',price:'589.12',chg:'-0.78%',up:false},{sym:'AMD',price:'155.33',chg:'+1.88%',up:true}];
+document.getElementById('tickerScroll').innerHTML=[...TICKERS,...TICKERS].map(t=>`<span class="tick-item"><span class="tick-sym">${t.sym}</span><span class="tick-price">${t.price}</span><span class="tick-chg ${t.up?'up':'down'}">${t.chg}</span></span>`).join('');
+
+/* Sparkline */
+function buildSparkline(open){
+  const svg=document.getElementById('miniChart');
+  let s=[...new Date().toDateString()].reduce((a,c)=>a+c.charCodeAt(0),0);
+  const rand=()=>{s=(s*1664525+1013904223)&0xffffffff;return(s>>>0)/0xffffffff;};
+  const vals=Array.from({length:28},rand),mn=Math.min(...vals),mx=Math.max(...vals);
+  const ys=vals.map(v=>38-((v-mn)/(mx-mn))*28),xs=vals.map((_,i)=>(i/27)*400);
+  const path=xs.map((x,i)=>`${i===0?'M':'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
+  const col=open?'var(--open)':'var(--fg-muted)';
+  svg.innerHTML=`<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${col}" stop-opacity=".4"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><path d="${path} L400,48 L0,48 Z" fill="url(#sg)"/><path d="${path}" fill="none" stroke="${col}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+
+/* P&L drift */
+let pnl=12847.32, pnlPct=2.4;
+function updatePnl(){
+  pnl+=( Math.random()-.48)*8; pnlPct+=(Math.random()-.48)*.04;
+  const el=document.getElementById('pnlVal');
+  const up=pnl>=12000;
+  el.className='pnl-val '+(up?'up':'dn');
+  el.textContent=`$${pnl.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/,',')} ${pnlPct>=0?'+':''}${pnlPct.toFixed(1)}%`;
+}
+setInterval(updatePnl,1800);
+
+/* Live order book */
+let obMid=134.52;
+const OB_SYMS=['NVDA','AAPL','MSFT','TSLA'];
+let obSymIdx=0;
+let bids=[],asks=[];
+
+function initOB(){
+  bids=[]; asks=[];
+  for(let i=0;i<4;i++){
+    bids.push({price:+(obMid-(i+1)*.01).toFixed(2),size:Math.floor(100+Math.random()*1900)});
+    asks.push({price:+(obMid+(i+1)*.01).toFixed(2),size:Math.floor(100+Math.random()*1900)});
+  }
+  renderOB();
+}
+
+function renderOB(){
+  const bc=document.getElementById('bidsCol'), ac=document.getElementById('asksCol');
+  const hb=bc.querySelector('.ob-col-hdr'), ha=ac.querySelector('.ob-col-hdr');
+  const maxS=Math.max(...bids.map(x=>x.size),...asks.map(x=>x.size));
+
+  while(bc.children.length>1) bc.removeChild(bc.lastChild);
+  while(ac.children.length>1) ac.removeChild(ac.lastChild);
+
+  bids.forEach((b,i)=>{
+    const row=document.createElement('div'); row.className='ob-row bid-row'; row.id='bid'+i;
+    const bar=document.createElement('div'); bar.className='ob-bar'; bar.style.width=(b.size/maxS*85)+'%';
+    const price=document.createElement('div'); price.className='ob-price'; price.textContent=b.price.toFixed(2);
+    const size=document.createElement('div'); size.className='ob-size'; size.textContent='×'+b.size;
+    row.appendChild(bar); row.appendChild(price); row.appendChild(size);
+    bc.appendChild(row);
+  });
+  asks.forEach((a,i)=>{
+    const row=document.createElement('div'); row.className='ob-row ask-row'; row.id='ask'+i;
+    const bar=document.createElement('div'); bar.className='ob-bar'; bar.style.width=(a.size/maxS*85)+'%';
+    const price=document.createElement('div'); price.className='ob-price'; price.textContent=a.price.toFixed(2);
+    const size=document.createElement('div'); size.className='ob-size'; size.textContent='×'+a.size;
+    row.appendChild(bar); row.appendChild(size); row.appendChild(price);
+    ac.appendChild(row);
+  });
+
+  const spread=+(asks[0].price-bids[0].price).toFixed(2);
+  document.getElementById('obMid').textContent=obMid.toFixed(2);
+  document.getElementById('obSpread').textContent=spread.toFixed(2);
+  document.getElementById('obSym').textContent=OB_SYMS[obSymIdx]+' · '+obMid.toFixed(2);
+}
+
+function tickOB(){
+  obMid=+(obMid+(Math.random()-.5)*.05).toFixed(2);
+  bids.forEach((b,i)=>{
+    const old=b.size;
+    b.size=Math.max(100,Math.min(2000,b.size+Math.floor((Math.random()-.5)*300)));
+    b.price=+(obMid-(i+1)*.01).toFixed(2);
+    const el=document.getElementById('bid'+i);
+    if(el){ const pe=el.querySelector('.ob-price'); if(pe){ pe.className='ob-price'; pe.classList.add(b.size>old?'flash-up':'flash-dn'); setTimeout(()=>pe.classList.remove('flash-up','flash-dn'),500); } }
+  });
+  asks.forEach((a,i)=>{
+    const old=a.size;
+    a.size=Math.max(100,Math.min(2000,a.size+Math.floor((Math.random()-.5)*300)));
+    a.price=+(obMid+(i+1)*.01).toFixed(2);
+    const el=document.getElementById('ask'+i);
+    if(el){ const pe=el.querySelector('.ob-price'); if(pe){ pe.className='ob-price'; pe.classList.add(a.size>old?'flash-up':'flash-dn'); setTimeout(()=>pe.classList.remove('flash-up','flash-dn'),500); } }
+  });
+  renderOB();
+}
+setTimeout(initOB, 400);
+setInterval(tickOB, 500);
+
+/* Trade execution feed */
+const FEED_SYMS=['NVDA','AAPL','MSFT','TSLA','AMZN','AMD','META','GOOG'];
+function addExecution(){
+  const sym=FEED_SYMS[Math.floor(Math.random()*FEED_SYMS.length)];
+  const up=Math.random()>.45;
+  const price=(100+Math.random()*500).toFixed(2);
+  const qty=Math.floor(50+Math.random()*950);
+  const lat=Math.floor(1+Math.random()*5)+'ms';
+  const list=document.getElementById('feedList');
+  const item=document.createElement('div');
+  item.className='feed-item '+(up?'up-fill':'dn-fill');
+  item.innerHTML=`<span class="fi-sym">${sym}</span><span class="fi-price ${up?'up':'dn'}">${price}</span><span class="fi-qty">×${qty}</span><span class="fi-status">FILLED</span><span class="fi-lat">${lat}</span>`;
+  list.insertBefore(item,list.firstChild);
+  while(list.children.length>5) list.removeChild(list.lastChild);
+}
+setTimeout(()=>{ for(let i=0;i<4;i++) addExecution(); },600);
+setInterval(addExecution, 1200);
+
+/* Scramble clock */
+const SC='0123456789ABCDEF!@#$?'; let clockBuilt=false;
+function scrambleTo(el,target){ if(el.textContent===target)return; let n=0; const id=setInterval(()=>{ if(n++>=4){el.textContent=target;clearInterval(id);}else el.textContent=SC[Math.floor(Math.random()*SC.length)]; },35); }
+function updateClock(h12,min,sec,ampm){
+  const cl=document.getElementById('scrambleClock');
+  if(!clockBuilt){ cl.innerHTML=''; [['h1','clk-digit'],['h2','clk-digit'],['c1','clk-sep'],['m1','clk-digit'],['m2','clk-digit'],['c2','clk-sep'],['s1','clk-digit'],['s2','clk-digit'],['sp','clk-digit'],['a1','clk-digit'],['a2','clk-digit']].forEach(([id,cls])=>{ const sp=document.createElement('span');sp.id='ck_'+id;sp.className=cls;cl.appendChild(sp); }); clockBuilt=true; }
+  const hS=String(h12).padStart(2,'0'),mS=String(min).padStart(2,'0'),sS=String(sec).padStart(2,'0');
+  [['h1',hS[0]],['h2',hS[1]],['c1',':'],['m1',mS[0]],['m2',mS[1]],['c2',':'],['s1',sS[0]],['s2',sS[1]],['sp',' '],['a1',ampm[0]],['a2',ampm[1]]].forEach(([id,ch])=>{ const el=document.getElementById('ck_'+id); if(el&&el.textContent!==ch)scrambleTo(el,ch); });
+}
+
+/* Glitch trigger */
+function triggerGlitch(){ document.getElementById('statusCard').classList.add('glitching'); setTimeout(()=>document.getElementById('statusCard').classList.remove('glitching'),220); setTimeout(triggerGlitch,9000+Math.random()*6000); }
+setTimeout(triggerGlitch,5000);
+
+/* Market sessions (ET = CST + 1h) */
+function updateSessions(cst){
+  const etH=cst.hour+1, etM=cst.minute, etMins=etH*60+etM;
+  const PRE=[4*60,9*60+30], REG=[9*60+30,16*60], AFT=[16*60,20*60];
+  function setSession(dotId,statusId,range){
+    const on=etMins>=range[0]&&etMins<range[1];
+    const dot=document.getElementById(dotId), st=document.getElementById(statusId);
+    dot.className='session-dot'+(on?' active':'');
+    st.className='session-status '+(on?'on':'off');
+    st.textContent=on?'OPEN':'CLOSED';
+  }
+  setSession('dot-pre','ss-pre',PRE);
+  setSession('dot-reg','ss-reg',REG);
+  setSession('dot-aft','ss-aft',AFT);
+}
+
+/* Hours grid */
+(function(){ const p={}; new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago',weekday:'short'}).formatToParts(new Date()).forEach(({type,value})=>p[type]=value); const dow=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(p.weekday); const grid=document.getElementById('hoursGrid'); ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach((day,i)=>{ const active=i>=1&&i<=5,today=i===dow; const col=document.createElement('div'); col.className='day-col'+(active?' active':' off')+(today?' today':''); col.innerHTML=`<div class="day-label">${day}</div><div class="day-bar"></div><div class="day-hours">${active?'7a–6p':'—'}</div>`; grid.appendChild(col); }); })();
+
+/* Business hours */
+const TZ='America/Chicago';
+function chiDate(d=new Date()){ const p={}; new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',weekday:'short'}).formatToParts(d).forEach(({type,value})=>p[type]=value); return{year:+p.year,month:+p.month-1,day:+p.day,hour:+p.hour===24?0:+p.hour,minute:+p.minute,second:+p.second,dow:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(p.weekday)}; }
+function chiMidnight(d){ const c=chiDate(d); const os=new Intl.DateTimeFormat('en-US',{timeZone:TZ,timeZoneName:'shortOffset'}).formatToParts(d).find(p=>p.type==='timeZoneName').value; const m=os.match(/GMT([+-])(\d+)(?::(\d+))?/); if(!m)return NaN; return new Date(`${c.year}-${String(c.month+1).padStart(2,'0')}-${String(c.day).padStart(2,'0')}T00:00:00${m[1]}${String(m[2]).padStart(2,'0')}:${String(m[3]||'0').padStart(2,'0')}`).getTime(); }
+function biz(d){return d>=1&&d<=5;}
+function isOpen(c){return biz(c.dow)&&c.hour>=7&&c.hour<18;}
+function msUntilOpen(){ const now=new Date(); for(let d=0;d<=6;d++){ const tr=new Date(now.getTime()+d*86400000),tc=chiDate(tr); if(!biz(tc.dow))continue; const ms=chiMidnight(tr)+7*3600000; if(ms>now.getTime())return ms-now.getTime(); } return null; }
+function fmt(ms){const s=Math.floor(ms/1000);return[Math.floor(s/3600),Math.floor((s%3600)/60),s%60].map(n=>String(n).padStart(2,'0')).join(':');}
+
+let sparkBuilt=false;
+function tick(){
+  const c=chiDate(), h12=c.hour%12||12, ampm=c.hour<12?'AM':'PM';
+  updateClock(h12,c.minute,c.second,ampm);
+  updateSessions(c);
+  if(!sparkBuilt){buildSparkline(isOpen(c));sparkBuilt=true;}
+  const open=isOpen(c);
+  const card=document.getElementById('statusCard');
+  const wrap=document.getElementById('cardWrapper');
+  const hd=document.getElementById('statusHeading');
+  if(open){
+    card.className='status-card is-open'; wrap.className='card-wrapper glow-on';
+    document.getElementById('marketPill').textContent='Market Open';
+    hd.textContent='Markets are live'; hd.setAttribute('data-text','Markets are live');
+    document.getElementById('statusSub').textContent='Trading is active. Execute paper trades and track your simulated portfolio in real time.';
+    document.getElementById('ctaBtn').hidden=false; document.getElementById('countdownBlock').hidden=true;
+  } else {
+    card.className='status-card is-closed'; wrap.className='card-wrapper';
+    document.getElementById('marketPill').textContent='Market Closed';
+    hd.textContent='Closed for trading'; hd.setAttribute('data-text','Closed for trading');
+    document.getElementById('statusSub').textContent='The trading server runs weekdays 7 AM – 6 PM CST to keep costs low.';
+    document.getElementById('ctaBtn').hidden=true; document.getElementById('countdownBlock').hidden=false;
+    const ms=msUntilOpen(); document.getElementById('countdownValue').textContent=ms?fmt(ms):'--:--:--';
+  }
+}
+tick(); setInterval(tick,1000);
 </script>
