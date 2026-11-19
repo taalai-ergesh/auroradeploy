@@ -107,18 +107,17 @@ body::after {
 @keyframes cur { 0%,100%{opacity:1;} 50%{opacity:0;} }
 
 /* Scanning beam */
-.scan-beam {
-  position: fixed; left: 0; right: 0; top: 0; height: 2px;
-  z-index: 99; pointer-events: none; opacity: 0;
-  background: linear-gradient(90deg, transparent, var(--accent) 25%, rgba(200,255,230,.9) 50%, var(--accent) 75%, transparent);
-  box-shadow: 0 0 24px 10px var(--accent-glow), 0 0 60px 20px var(--accent-dim);
-  animation: beamSweep 14s ease-in-out infinite;
+/* Price-level alert flash lines */
+.price-alert-line {
+  position: fixed; left: 0; right: 0; height: 1px;
+  pointer-events: none; z-index: 99;
+  animation: priceAlertFade 2s ease-out forwards;
 }
-@keyframes beamSweep {
-  0%        { transform:translateY(0);     opacity:0; }
-  3%        { opacity:1; }
-  88%       { transform:translateY(100vh); opacity:.6; }
-  93%,100%  { transform:translateY(100vh); opacity:0; }
+@keyframes priceAlertFade {
+  0%   { opacity: 0; }
+  8%   { opacity: 1; }
+  75%  { opacity: .8; }
+  100% { opacity: 0; }
 }
 
 #canvas    { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
@@ -364,13 +363,13 @@ body::after {
 .footer a:hover{text-decoration:underline;}
 
 @media (prefers-reduced-motion:reduce){
-  .scan-beam,.ticker-scroll,.ring,.radar-sweep,.brand-ring,.card-shimmer,
+  .price-alert-line,.ticker-scroll,.ring,.radar-sweep,.brand-ring,.card-shimmer,
   .status-card,.cta-btn::before,.clk-sep,.boot-terminal{animation:none!important;}
 }
 </style>
 
 <div class="boot-terminal" id="bootTerminal"><div id="bootLines"></div></div>
-<div class="scan-beam" aria-hidden="true"></div>
+<!-- price-alert lines injected by JS -->
 <canvas id="canvas"></canvas>
 <canvas id="particles"></canvas>
 
@@ -498,6 +497,21 @@ body::after {
 </div>
 
 <script>
+/* JS price-level alert flashes — random position/color/interval */
+(function(){
+  function spawnAlert(){
+    const up=Math.random()>.5;
+    const el=document.createElement('div'); el.className='price-alert-line';
+    el.style.top=(8+Math.random()*76)+'vh';
+    el.style.borderTop=`1px ${Math.random()>.4?'dashed':'solid'} rgba(${up?'16,185,129':'248,113,113'},${(.45+Math.random()*.4).toFixed(2)})`;
+    el.style.boxShadow=`0 0 ${(4+Math.random()*8)|0}px rgba(${up?'16,185,129':'248,113,113'},.3)`;
+    document.body.appendChild(el);
+    el.addEventListener('animationend',()=>el.remove());
+    setTimeout(spawnAlert,900+Math.random()*3600);
+  }
+  setTimeout(spawnAlert,1800);
+})();
+
 /* Boot terminal */
 (function(){
   const lines=['> PAPER TRADER SYSTEM v2.4.1','> Market data feed........... OK','> Order routing engine....... OK','> Risk management............ OK','> Loading trading console...'];
@@ -605,16 +619,26 @@ body::after {
 const TICKERS=[{sym:'NVDA',price:'134.52',chg:'+2.14%',up:true},{sym:'AAPL',price:'228.87',chg:'-0.43%',up:false},{sym:'MSFT',price:'415.20',chg:'+0.91%',up:true},{sym:'TSLA',price:'247.08',chg:'+3.56%',up:true},{sym:'AMZN',price:'210.44',chg:'-1.02%',up:false},{sym:'GOOG',price:'191.66',chg:'+0.37%',up:true},{sym:'META',price:'589.12',chg:'-0.78%',up:false},{sym:'AMD',price:'155.33',chg:'+1.88%',up:true}];
 document.getElementById('tickerScroll').innerHTML=[...TICKERS,...TICKERS].map(t=>`<span class="tick-item"><span class="tick-sym">${t.sym}</span><span class="tick-price">${t.price}</span><span class="tick-chg ${t.up?'up':'down'}">${t.chg}</span></span>`).join('');
 
-/* Sparkline */
+/* Mini OHLC candlestick sparkline */
 function buildSparkline(open){
   const svg=document.getElementById('miniChart');
-  let s=[...new Date().toDateString()].reduce((a,c)=>a+c.charCodeAt(0),0);
-  const rand=()=>{s=(s*1664525+1013904223)&0xffffffff;return(s>>>0)/0xffffffff;};
-  const vals=Array.from({length:28},rand),mn=Math.min(...vals),mx=Math.max(...vals);
-  const ys=vals.map(v=>38-((v-mn)/(mx-mn))*28),xs=vals.map((_,i)=>(i/27)*400);
-  const path=xs.map((x,i)=>`${i===0?'M':'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
-  const col=open?'var(--open)':'var(--fg-muted)';
-  svg.innerHTML=`<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${col}" stop-opacity=".4"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs><path d="${path} L400,48 L0,48 Z" fill="url(#sg)"/><path d="${path}" fill="none" stroke="${col}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const colUp=open?'var(--up)':'var(--fg-muted)', colDn=open?'var(--dn)':'var(--fg-muted)';
+  let s=Date.now()^(Math.random()*0xfffff|0);
+  const rand=()=>{s=Math.imul(s^s>>>15,1|s);s^=s+Math.imul(s^s>>>7,61|s);return((s^s>>>14)>>>0)/2**32;};
+  let p=24, bars=[];
+  for(let i=0;i<22;i++){
+    const o=p, c=Math.max(2,Math.min(44,p+(rand()-.47)*10));
+    const hi=Math.max(0,Math.min(o,c)-rand()*2.5), lo=Math.min(48,Math.max(o,c)+rand()*2.5);
+    bars.push({o,c,hi,lo}); p=c;
+  }
+  const bw=400/22;
+  let el='';
+  bars.forEach((b,i)=>{
+    const up=b.c<=b.o, col=up?colUp:colDn, x=i*bw+1, mid=(x+bw/2-1).toFixed(1);
+    el+=`<line x1="${mid}" y1="${b.hi.toFixed(1)}" x2="${mid}" y2="${b.lo.toFixed(1)}" stroke="${col}" stroke-width="1" opacity=".45"/>`;
+    el+=`<rect x="${x.toFixed(1)}" y="${Math.min(b.o,b.c).toFixed(1)}" width="${(bw-2).toFixed(1)}" height="${Math.max(1,Math.abs(b.o-b.c)).toFixed(1)}" fill="${col}" opacity=".78"/>`;
+  });
+  svg.innerHTML=el;
 }
 
 /* P&L drift */
