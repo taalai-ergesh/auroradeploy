@@ -418,14 +418,14 @@
 </div>
 
 <script>
-  /* ── Animated candlestick background ── */
+  /* ── Static candlestick background — live candle ticks, shifts 1× per minute ── */
   (function () {
     const cvs = document.getElementById('canvas');
     const ctx = cvs.getContext('2d');
-    let W, H, candles, offset = 0;
-    const CANDLE_W = 18, GAP = 8, STEP = CANDLE_W + GAP;
+    let W, H, candles = [], live = null;
+    const CW = 14, GAP = 5, STEP = CW + GAP;
 
-    function getColor() {
+    function col() {
       return window.matchMedia('(prefers-color-scheme: dark)').matches
         ? { up: '16,185,129', dn: '248,113,113' }
         : { up: '5,150,105',  dn: '220,38,38'  };
@@ -434,59 +434,78 @@
     function resize() {
       W = cvs.width  = window.innerWidth;
       H = cvs.height = window.innerHeight;
-      buildCandles();
+      init();
+      render();
     }
 
-    function buildCandles() {
-      const count = Math.ceil(W / STEP) + 4;
-      // Simple random walk for price
-      let price = H * 0.5;
-      candles = Array.from({ length: count * 2 }, () => {
-        const open  = price;
-        const move  = (Math.random() - 0.48) * H * 0.07;
-        const close = Math.max(H * 0.1, Math.min(H * 0.9, price + move));
-        const high  = Math.min(H * 0.9, Math.max(open, close) + Math.random() * H * 0.03);
-        const low   = Math.max(H * 0.1, Math.min(open, close) - Math.random() * H * 0.03);
-        price = close;
-        return { open, close, high, low };
+    // Build enough historical candles to fill the screen (never loops — pure random walk)
+    function init() {
+      const count = Math.ceil(W / STEP) + 1;
+      let p = H * 0.45 + (Math.random() * 0.1 - 0.05) * H;
+      candles = Array.from({ length: count }, () => {
+        const o = p;
+        const c = Math.max(H * 0.12, Math.min(H * 0.88,
+                    p + (Math.random() - 0.47) * H * 0.07));
+        const hi  = Math.min(o, c) - Math.random() * H * 0.025;
+        const lo  = Math.max(o, c) + Math.random() * H * 0.025;
+        p = c;
+        return { o, c, hi, lo };
       });
+      // Start the live candle at the last close price
+      live = makeLive(p);
     }
 
-    function draw() {
+    function makeLive(openP) {
+      return { o: openP, c: openP, hi: openP, lo: openP };
+    }
+
+    // Called every 2 s — small random tick on the live candle only
+    function tickLive() {
+      const delta = (Math.random() - 0.5) * H * 0.012;
+      live.c = Math.max(H * 0.12, Math.min(H * 0.88, live.c + delta));
+      live.hi = Math.min(live.hi, live.c - Math.random() * H * 0.004);
+      live.lo = Math.max(live.lo, live.c + Math.random() * H * 0.004);
+      render();
+    }
+
+    // Called every 60 s — close the live candle and push a fresh one
+    function closeCandle() {
+      candles.push({ ...live });
+      candles.shift(); // drop oldest so width stays constant
+      live = makeLive(live.c);
+      render();
+    }
+
+    function render() {
       ctx.clearRect(0, 0, W, H);
-      const c = getColor();
-      offset = (offset + 0.4) % STEP;
-
-      candles.forEach((cd, i) => {
-        const x = i * STEP - offset;
-        if (x < -STEP || x > W + STEP) return;
-        const up = cd.close >= cd.open;
-        const col = up ? c.up : c.dn;
-        const top = Math.min(cd.open, cd.close);
-        const bot = Math.max(cd.open, cd.close);
-        const bodyH = Math.max(2, bot - top);
-
+      const c = col();
+      const all = [...candles, live];
+      all.forEach((cd, i) => {
+        const x = i * STEP;
+        const up  = cd.c <= cd.o; // lower Y = higher price = green
+        const clr = up ? c.up : c.dn;
+        const top = Math.min(cd.o, cd.c);
+        const bot = Math.max(cd.o, cd.c);
+        const bh  = Math.max(2, bot - top);
         // Wick
         ctx.beginPath();
-        ctx.moveTo(x + CANDLE_W / 2, cd.high);
-        ctx.lineTo(x + CANDLE_W / 2, cd.low);
-        ctx.strokeStyle = `rgba(${col},.35)`;
+        ctx.moveTo(x + CW / 2, cd.hi);
+        ctx.lineTo(x + CW / 2, cd.lo);
+        ctx.strokeStyle = `rgba(${clr},.28)`;
         ctx.lineWidth = 1;
         ctx.stroke();
-
         // Body
-        ctx.fillStyle = `rgba(${col},.22)`;
-        ctx.fillRect(x, top, CANDLE_W, bodyH);
-        ctx.strokeStyle = `rgba(${col},.5)`;
+        ctx.fillStyle = `rgba(${clr},.18)`;
+        ctx.fillRect(x, top, CW, bh);
+        ctx.strokeStyle = `rgba(${clr},.42)`;
         ctx.lineWidth = 1;
-        ctx.strokeRect(x, top, CANDLE_W, bodyH);
+        ctx.strokeRect(x, top, CW, bh);
       });
-
-      requestAnimationFrame(draw);
     }
 
     resize();
-    draw();
+    setInterval(tickLive,  2000);   // live candle ticks every 2 s (subtle)
+    setInterval(closeCandle, 60000); // new candle every 60 s
     window.addEventListener('resize', resize);
   })();
 
