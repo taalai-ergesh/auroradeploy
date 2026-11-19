@@ -10,7 +10,7 @@
   --surface-2:   #E0FAF0;
   --border:      #A7F3D0;
   --fg:          #064E3B;
-  --fg-muted:    #3A7060;
+  --fg-muted:    #1A4C3A;
   --accent:      #059669;
   --accent-dim:  rgba(5,150,105,.13);
   --accent-glow: rgba(5,150,105,.26);
@@ -31,8 +31,8 @@
     --surface:     #071510;
     --surface-2:   #0C1F16;
     --border:      #143322;
-    --fg:          #C8F5E0;
-    --fg-muted:    #4A8A6A;
+    --fg:          #E0F9EE;
+    --fg-muted:    #80B898;
     --accent:      #10B981;
     --accent-dim:  rgba(16,185,129,.15);
     --accent-glow: rgba(16,185,129,.30);
@@ -53,8 +53,8 @@
   --surface:     #071510;
   --surface-2:   #0C1F16;
   --border:      #143322;
-  --fg:          #C8F5E0;
-  --fg-muted:    #4A8A6A;
+  --fg:          #E0F9EE;
+  --fg-muted:    #80B898;
   --accent:      #10B981;
   --accent-dim:  rgba(16,185,129,.15);
   --accent-glow: rgba(16,185,129,.30);
@@ -272,7 +272,7 @@ body::after {
 @keyframes gA{0%,100%{opacity:0;transform:none;}40%{opacity:.8;transform:translate(-3px,0);}}
 @keyframes gB{0%,100%{opacity:0;transform:none;}60%{opacity:.7;transform:translate(3px,0);}}
 
-.status-sub{color:var(--fg-muted);font-size:.88rem;line-height:1.6;max-width:34ch;text-wrap:balance;}
+.status-sub{color:var(--fg-muted);font-size:.93rem;line-height:1.6;max-width:34ch;text-wrap:balance;}
 
 .countdown-block{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 24px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:180px;}
 .countdown-label{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-muted);}
@@ -296,7 +296,7 @@ body::after {
 .ob-sym{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--fg-muted);}
 .ob-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0 10px;}
 .ob-col{display:flex;flex-direction:column;gap:3px;}
-.ob-col-hdr{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.ob-col-hdr{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid var(--border);}
 .ob-col-hdr.bid{color:var(--up);}
 .ob-col-hdr.ask{color:var(--dn);text-align:right;}
 .ob-row{display:flex;align-items:center;position:relative;height:20px;overflow:hidden;border-radius:3px;}
@@ -306,7 +306,7 @@ body::after {
 .ob-price{font-family:'Space Mono',monospace;font-size:.64rem;font-weight:700;position:relative;z-index:1;padding:0 5px;transition:color .2s;}
 .ob-row.bid-row .ob-price{color:var(--up);}
 .ob-row.ask-row .ob-price{color:var(--dn);margin-left:auto;}
-.ob-size{font-family:'Space Mono',monospace;font-size:.55rem;color:var(--fg-muted);position:relative;z-index:1;padding:0 5px;}
+.ob-size{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--fg-muted);position:relative;z-index:1;padding:0 5px;}
 .ob-row.ask-row .ob-size{margin-right:auto;}
 .ob-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
 .ob-mid-price{font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;color:var(--fg);text-shadow:0 0 8px var(--accent-glow);}
@@ -350,7 +350,7 @@ body::after {
 .hours-title{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-muted);margin-bottom:14px;}
 .hours-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
 .day-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
-.day-label{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-muted);}
+.day-label{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-muted);}
 .day-bar{width:100%;height:44px;border-radius:5px;background:var(--surface-2);}
 .day-col.active .day-bar{background:var(--accent-dim);border:1px solid rgba(16,185,129,.22);}
 .day-col.today .day-label{color:var(--accent);font-weight:700;}
