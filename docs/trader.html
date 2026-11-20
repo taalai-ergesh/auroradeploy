@@ -366,8 +366,13 @@ body::after {
   .price-alert-line,.ticker-scroll,.ring,.radar-sweep,.brand-ring,.card-shimmer,
   .status-card,.cta-btn::before,.clk-sep,.boot-terminal{animation:none!important;}
 }
+
+/* Theme toggle */
+.theme-toggle{position:fixed;top:16px;right:16px;z-index:300;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:7px 12px;cursor:pointer;font-size:.78rem;color:var(--fg-muted);display:flex;align-items:center;gap:6px;transition:background .2s,border-color .2s,color .2s;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+.theme-toggle:hover{color:var(--accent);border-color:var(--accent);}
 </style>
 
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙 Dark</button>
 <div class="boot-terminal" id="bootTerminal"><div id="bootLines"></div></div>
 <!-- price-alert lines injected by JS -->
 <canvas id="canvas"></canvas>
@@ -805,4 +810,18 @@ function tick(){
   }
 }
 tick(); setInterval(tick,1000);
+/* Theme toggle — dark by default */
+(function(){
+  const root=document.documentElement, btn=document.getElementById('themeToggle');
+  const saved=(() => { try{ return localStorage.getItem('theme'); } catch(e){ return null; } })();
+  const theme=saved||'dark';
+  root.setAttribute('data-theme', theme);
+  btn.textContent = theme==='dark' ? '☀️ Light' : '🌙 Dark';
+  btn.addEventListener('click', () => {
+    const next = root.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    btn.textContent = next==='dark' ? '☀️ Light' : '🌙 Dark';
+    try { localStorage.setItem('theme', next); } catch(e){}
+  });
+})();
 </script>
